@@ -44,7 +44,7 @@ Standard format for presenting next steps after completing a command or workflow
 
 **02.03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
 
-`/ace.run 2`
+`/ace.run-stage 2`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -52,7 +52,7 @@ Standard format for presenting next steps after completing a command or workflow
 
 **Also available:**
 - Review run before executing
-- `/ace.assumptions 2` — check assumptions
+- `/ace.list-stage-assumptions 2` — check assumptions
 
 ---
 ```
@@ -69,7 +69,7 @@ Add note that this is the last run and what comes after:
 **02.03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
 <sub>Final run in Stage 2</sub>
 
-`/ace.run 2`
+`/ace.run-stage 2`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -91,15 +91,15 @@ Add note that this is the last run and what comes after:
 
 **Stage 2: Authentication** — JWT login flow with refresh tokens
 
-`/ace.plan 2`
+`/ace.plan-stage 2`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.scope 2` — gather context first
-- `/ace.recon 2` — investigate unknowns
+- `/ace.discuss-stage 2` — gather context first
+- `/ace.research-stage 2` — investigate unknowns
 - Review track
 
 ---
@@ -120,15 +120,15 @@ Show completion status before next action:
 
 **Stage 3: Core Features** — User dashboard, settings, and data export
 
-`/ace.plan 3`
+`/ace.plan-stage 3`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.scope 3` — gather context first
-- `/ace.recon 3` — investigate unknowns
+- `/ace.discuss-stage 3` — gather context first
+- `/ace.research-stage 3` — investigate unknowns
 - Review what Stage 2 built
 
 ---
@@ -145,11 +145,11 @@ When there's no clear primary action:
 
 **Stage 3: Core Features** — User dashboard, settings, and data export
 
-**To plan directly:** `/ace.plan 3`
+**To plan directly:** `/ace.plan-stage 3`
 
-**To discuss context first:** `/ace.scope 3`
+**To discuss context first:** `/ace.discuss-stage 3`
 
-**To research unknowns:** `/ace.recon 3`
+**To research unknowns:** `/ace.research-stage 3`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -169,7 +169,7 @@ All 4 stages shipped
 
 **Start v1.1** — questioning → research → requirements → track
 
-`/ace.milestone`
+`/ace.new-milestone`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -214,7 +214,7 @@ Extract: `**02.03: Refresh Token Rotation** — Add /api/auth/refresh with slidi
 ## To Continue
 
 Run `/clear`, then paste:
-/ace.run 2
+/ace.run-stage 2
 ```
 
 User has no idea what 02.03 is about.
@@ -222,7 +222,7 @@ User has no idea what 02.03 is about.
 ### Don't: Missing /clear explanation
 
 ```
-`/ace.plan 3`
+`/ace.plan-stage 3`
 
 Run /clear first.
 ```
@@ -242,7 +242,7 @@ Sounds like an afterthought. Use "Also available:" instead.
 
 ```
 ```
-/ace.plan 3
+/ace.plan-stage 3
 ```
 ```
 

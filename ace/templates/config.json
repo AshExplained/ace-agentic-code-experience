@@ -1,0 +1,36 @@
+{
+  "style": "guided",
+  "depth": "standard",
+  "horsepower": "balanced",
+  "checks": {
+    "recon": true,
+    "review": true,
+    "auditor": true
+  },
+  "planning": {
+    "commit_docs": true,
+    "search_gitignored": false
+  },
+  "parallelization": {
+    "enabled": true,
+    "run_level": true,
+    "task_level": false,
+    "skip_gates": true,
+    "max_concurrent_agents": 3,
+    "min_runs_for_parallel": 2
+  },
+  "gates": {
+    "confirm_project": true,
+    "confirm_stages": true,
+    "confirm_track": true,
+    "confirm_breakdown": true,
+    "confirm_run": true,
+    "execute_next_run": true,
+    "issues_review": true,
+    "confirm_transition": true
+  },
+  "safety": {
+    "always_confirm_destructive": true,
+    "always_confirm_external_services": true
+  }
+}

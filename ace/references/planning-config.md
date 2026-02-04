@@ -106,25 +106,25 @@ To use uncommitted mode:
 | Strategy | When branch created | Branch scope | Merge point |
 |----------|---------------------|--------------|-------------|
 | `none` | Never | N/A | N/A |
-| `stage` | At `ace.run` start | Single stage | User merges after stage |
-| `milestone` | At first `ace.run` of milestone | Entire milestone | At `ace.ship` |
+| `stage` | At `ace.run-stage` start | Single stage | User merges after stage |
+| `milestone` | At first `ace.run-stage` of milestone | Entire milestone | At `ace.complete-milestone` |
 
 **When `git.branching_strategy: "none"` (default):**
 - All work commits to current branch
 - Standard ACE behavior
 
 **When `git.branching_strategy: "stage"`:**
-- `ace.run` creates/switches to a branch before execution
+- `ace.run-stage` creates/switches to a branch before execution
 - Branch name from `stage_branch_template` (e.g., `ace/stage-03-authentication`)
 - All run commits go to that branch
 - User merges branches manually after stage completion
-- `ace.ship` offers to merge all stage branches
+- `ace.complete-milestone` offers to merge all stage branches
 
 **When `git.branching_strategy: "milestone"`:**
-- First `ace.run` of milestone creates the milestone branch
+- First `ace.run-stage` of milestone creates the milestone branch
 - Branch name from `milestone_branch_template` (e.g., `ace/v1.0-mvp`)
 - All stages in milestone commit to same branch
-- `ace.ship` offers to merge milestone branch to main
+- `ace.complete-milestone` offers to merge milestone branch to main
 
 **Template variables:**
 
@@ -165,7 +165,7 @@ if [ "$BRANCHING_STRATEGY" = "milestone" ]; then
 fi
 ```
 
-**Merge options at ace.ship:**
+**Merge options at ace.complete-milestone:**
 
 | Option | Git command | Result |
 |--------|-------------|--------|

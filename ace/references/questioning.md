@@ -19,8 +19,8 @@ By the end of questioning, you need enough clarity to write a BRIEF.md that down
 - **Research** needs: what domain to research, what the user already knows, what unknowns exist
 - **Requirements** needs: clear enough vision to scope v1 features
 - **Track** needs: clear enough vision to decompose into stages, what "done" looks like
-- **ace.plan** needs: specific requirements to break into tasks, context for implementation choices
-- **ace.run** needs: success criteria to verify against, the "why" behind requirements
+- **ace.plan-stage** needs: specific requirements to break into tasks, context for implementation choices
+- **ace.run-stage** needs: success criteria to verify against, the "why" behind requirements
 
 A vague BRIEF.md forces every downstream stage to guess. The cost compounds.
 

@@ -10,13 +10,13 @@ Horsepower profiles control which Claude model each ACE agent uses. This allows 
 | ace-navigator | opus | sonnet | sonnet |
 | ace-runner | opus | sonnet | sonnet |
 | ace-stage-scout | opus | sonnet | haiku |
-| ace-scout | opus | sonnet | haiku |
+| ace-project-scout | opus | sonnet | haiku |
 | ace-synthesizer | sonnet | sonnet | haiku |
 | ace-detective | opus | sonnet | sonnet |
-| ace-mapper | sonnet | haiku | haiku |
+| ace-codebase-mapper | sonnet | haiku | haiku |
 | ace-auditor | sonnet | sonnet | haiku |
 | ace-plan-reviewer | sonnet | sonnet | haiku |
-| ace-integrator | sonnet | sonnet | haiku |
+| ace-integration-checker | sonnet | sonnet | haiku |
 
 ## Profile Philosophy
 
@@ -49,7 +49,7 @@ Orchestrators resolve model before spawning:
 
 ## Switching Profiles
 
-Runtime: `/ace.profile <profile>`
+Runtime: `/ace.set-profile <profile>`
 
 Per-project default: Set in `.ace/config.json`:
 ```json
@@ -69,5 +69,5 @@ Runners follow explicit RUN.md instructions. The run already contains the reason
 **Why Sonnet (not Haiku) for auditors in balanced?**
 Verification requires goal-backward reasoning - checking if code *delivers* what the stage promised, not just pattern matching. Sonnet handles this well; Haiku may miss subtle gaps.
 
-**Why Haiku for ace-mapper?**
+**Why Haiku for ace-codebase-mapper?**
 Read-only exploration and pattern extraction. No reasoning required, just structured output from file contents.
