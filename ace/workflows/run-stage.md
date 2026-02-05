@@ -195,7 +195,7 @@ Build plan inventory:
 - Batch number
 - Autonomous flag
 - Gap closure flag
-- Completion status (SUMMARY exists = complete)
+- Completion status (RECAP exists = complete)
 
 **Filtering:**
 - Skip completed plans (have RECAP.md)
@@ -231,7 +231,7 @@ Report batch structure with context:
 ```
 ## Execution Plan
 
-**Phase {X}: {Name}** — {total_plans} plans across {batch_count} batchs
+**Stage {X}: {Name}** — {total_plans} runs across {batch_count} batchs
 
 | Batch | Plans | What it builds |
 |------|-------|----------------|
@@ -461,7 +461,7 @@ If a plan in a parallel batch has a checkpoint:
 After all batchs complete, aggregate results:
 
 ```markdown
-## Phase {X}: {Name} Execution Complete
+## Stage {X}: {Name} Execution Complete
 
 **Batchs executed:** {N}
 **Plans completed:** {M} of {total}
@@ -482,26 +482,26 @@ After all batchs complete, aggregate results:
 ...
 
 ### Issues Encountered
-[Aggregate from all SUMMARYs, or "None"]
+[Aggregate from all RECAPs, or "None"]
 ```
 </step>
 
 <step name="verify_stage_goal">
 Verify stage achieved its GOAL, not just completed its TASKS.
 
-**Spawn verifier:**
+**Spawn auditor:**
 
 ```
 Task(
   prompt="Verify stage {stage_number} goal achievement.
 
-Phase directory: {stage_dir}
-Phase goal: {goal from TRACK.md}
+Stage directory: {stage_dir}
+Stage goal: {goal from TRACK.md}
 
 Check must_haves against actual codebase. Create PROOF.md.
 Verify what actually exists in the code.",
   subagent_type="ace-auditor",
-  model="{verifier_model}"
+  model="{auditor_model}"
 )
 ```
 
@@ -521,12 +521,12 @@ grep "^status:" "$STAGE_DIR"/*-PROOF.md | cut -d: -f2 | tr -d ' '
 
 **If passed:**
 
-Phase goal verified. Proceed to update_roadmap.
+Stage goal verified. Proceed to update_track.
 
 **If human_needed:**
 
 ```markdown
-## ✓ Phase {X}: {Name} — Human Verification Required
+## ✓ Stage {X}: {Name} — Human Verification Required
 
 All automated checks passed. {N} items need human testing:
 
@@ -549,7 +549,7 @@ If user reports issues → treat as gaps_found.
 Present gaps and offer next command:
 
 ```markdown
-## ⚠ Phase {X}: {Name} — Gaps Found
+## ⚠ Stage {X}: {Name} — Gaps Found
 
 **Score:** {N}/{M} must-haves verified
 **Report:** {stage_dir}/{stage}-PROOF.md
@@ -580,7 +580,7 @@ User runs `/ace.plan-stage {X} --gaps` which:
 2. Creates additional plans (04, 05, etc.) with `gap_closure: true` to close gaps
 3. User then runs `/ace.run-stage {X} --gaps-only`
 4. Run-stage runs only gap closure plans (04-05)
-5. Verifier runs again after new plans complete
+5. Auditor runs again after new runs complete
 
 User stays in control at each decision point.
 </step>
@@ -620,7 +620,7 @@ Present next steps based on milestone status:
 ```
 ## Next Up
 
-**Phase {X+1}: {Name}** — {Goal}
+**Stage {X+1}: {Name}** — {Goal}
 
 `/ace.plan-stage {X+1}`
 
@@ -648,7 +648,7 @@ No polling (Task blocks). No context bleed.
 <failure_handling>
 **Subagent fails mid-plan:**
 - RECAP.md won't exist
-- Orchestrator detects missing SUMMARY
+- Orchestrator detects missing RECAP
 - Reports failure, asks user how to proceed
 
 **Dependency chain breaks:**
@@ -674,7 +674,7 @@ No polling (Task blocks). No context bleed.
 If stage execution was interrupted (context limit, user exit, error):
 
 1. Run `/ace.run-stage {stage}` again
-2. discover_plans finds completed SUMMARYs
+2. discover_plans finds completed RECAPs
 3. Skips completed plans
 4. Resumes from first incomplete plan
 5. Continues batch-based execution

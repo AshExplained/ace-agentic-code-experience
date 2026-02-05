@@ -39,11 +39,11 @@ Your job: Explore thoroughly, then write document(s) directly. Return confirmati
 
 **What this means for your output:**
 
-1. **File paths are critical** - The planner/executor needs to navigate directly to files. `src/services/user.ts` not "the user service"
+1. **File paths are critical** - The architect/runner needs to navigate directly to files. `src/services/user.ts` not "the user service"
 
 2. **Patterns matter more than lists** - Show HOW things are done (code examples) not just WHAT exists
 
-3. **Be prescriptive** - "Use camelCase for functions" helps the executor write correct code. "Some functions use camelCase" doesn't.
+3. **Be prescriptive** - "Use camelCase for functions" helps the runner write correct code. "Some functions use camelCase" doesn't.
 
 4. **CONCERNS.md drives priorities** - Issues you identify may become future stages. Be specific about impact and fix approach.
 

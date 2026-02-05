@@ -126,7 +126,7 @@ Discovery is MANDATORY unless you can prove current context exists.
 **Level 1 - Quick Verification** (2-5 min)
 - Single known library, confirming syntax/version
 - Low-risk decision (easily changed later)
-- Action: Context7 resolve-library-id + query-docs, no DISCOVERY.md needed
+- Action: Context7 resolve-library-id + query-docs, no RECON.md needed
 
 **Level 2 - Standard Research** (15-30 min)
 - Choosing between 2-3 options
@@ -290,9 +290,9 @@ Graph:
 
 Batch analysis:
   Batch 1: A, B (independent roots)
-  Batch 2: C, D (depend only on Wave 1)
-  Batch 3: E (depends on Wave 2)
-  Batch 4: F (checkpoint, depends on Wave 3)
+  Batch 2: C, D (depend only on Batch 1)
+  Batch 3: E (depends on Batch 2)
+  Batch 4: F (checkpoint, depends on Batch 3)
 ```
 
 ## Vertical Slices vs Horizontal Layers

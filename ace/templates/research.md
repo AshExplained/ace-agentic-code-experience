@@ -26,7 +26,7 @@ Template for `.ace/stages/XX-name/{stage}-RESEARCH.md` - comprehensive ecosystem
 - [Decision 2]
 
 ### Claude's Discretion
-[Copy from INTEL.md - areas where researcher/architect can choose]
+[Copy from INTEL.md - areas where scout/architect can choose]
 - [Area 1]
 - [Area 2]
 

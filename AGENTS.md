@@ -46,8 +46,8 @@ What this does, why it matters, context budget (~15% orchestrator).
 <context>
 $ARGUMENTS
 
-@.ace/STATE.md
-@.ace/ROADMAP.md
+@.ace/PULSE.md
+@.ace/TRACK.md
 </context>
 
 <process>
@@ -93,7 +93,7 @@ Your job: [success definition].
 Before any operation, read project state:
 
 ```bash
-cat .ace/STATE.md 2>/dev/null
+cat .ace/PULSE.md 2>/dev/null
 ```
 
 Parse: current position, decisions, blockers.
@@ -104,7 +104,7 @@ Do the actual work here.
 </step>
 
 <step name="create_output">
-Create SUMMARY.md or return structured result.
+Create RECAP.md or return structured result.
 </step>
 
 </execution_flow>
@@ -117,9 +117,9 @@ Create SUMMARY.md or return structured result.
 ```
 
 **Agent return formats:**
-- `## PLAN COMPLETE` — Success
-- `## CHECKPOINT REACHED` — Pause for user
-- `## ROOT CAUSE FOUND` — Debug result
+- `## RUN COMPLETE` — Success
+- `## GATE REACHED` — Pause for user
+- `## CULPRIT FOUND` — Debug result
 - `## INVESTIGATION INCONCLUSIVE` — Blocked
 
 ---
@@ -280,13 +280,13 @@ Build authentication
 
 ### Static (always load)
 ```markdown
-@~/.claude/ace/workflows/execute-phase.md
-@.ace/STATE.md
+@~/.claude/ace/workflows/run-stage.md
+@.ace/PULSE.md
 ```
 
 ### Conditional (if exists)
 ```markdown
-@.ace/DISCOVERY.md (if exists)
+@.ace/RECON.md (if exists)
 ```
 
 ### Path rule
@@ -300,18 +300,18 @@ Always use `~/.claude/` in source files. Installer transforms paths during copy:
 
 | File | Purpose | Updated By |
 |------|---------|------------|
-| `STATE.md` | Living memory across sessions | Executor, orchestrator, commands |
-| `ROADMAP.md` | Phase structure | Roadmapper, phase commands |
-| `PROJECT.md` | Project context | Init, rarely after |
-| `REQUIREMENTS.md` | Requirement traceability | Planner, verifier |
+| `PULSE.md` | Living memory across sessions | Runner, orchestrator, commands |
+| `TRACK.md` | Stage structure | Navigator, stage commands |
+| `BRIEF.md` | Project context | Init, rarely after |
+| `SPECS.md` | Requirement traceability | Architect, auditor |
 | `config.json` | Workflow preferences | Init, settings command |
 
-### STATE.md is double-loaded intentionally
+### PULSE.md is double-loaded intentionally
 
 - **Orchestrator inlines:** Fallback if disk fails
-- **Executor reads disk:** Gets fresh state from other writers
+- **Runner reads disk:** Gets fresh state from other writers
 
-Multiple actors write STATE.md → readers need fresh data.
+Multiple actors write PULSE.md → readers need fresh data.
 
 ---
 
@@ -319,7 +319,7 @@ Multiple actors write STATE.md → readers need fresh data.
 
 ### Format
 ```
-{type}({phase}-{plan}): {description}
+{type}({stage}.{run}): {description}
 ```
 
 ### Types
@@ -349,21 +349,21 @@ git add src/   # FORBIDDEN
 
 | Type | Convention | Example |
 |------|------------|---------|
-| Files | kebab-case | `execute-phase.md` |
-| Commands | `ace.kebab-case` | `ace.execute-phase` |
-| Agents | `ace-kebab` | `ace-executor` |
+| Files | kebab-case | `run-stage.md` |
+| Commands | `ace.kebab-case` | `ace.run-stage` |
+| Agents | `ace-kebab` | `ace-runner` |
 | Step names | snake_case | `name="load_state"` |
-| Bash vars | CAPS_SNAKE | `PHASE_ARG` |
-| State files | UPPERCASE | `STATE.md` |
-| Phase dirs | `NN-kebab` | `01-authentication` |
+| Bash vars | CAPS_SNAKE | `STAGE_ARG` |
+| State files | UPPERCASE | `PULSE.md` |
+| Stage dirs | `NN-kebab` | `01-authentication` |
 
 ---
 
 ## 11. Context Engineering
 
-### Plan size constraint
-- **2-3 tasks max per plan**
-- Split larger work into multiple plans
+### Run size constraint
+- **2-3 tasks max per run**
+- Split larger work into multiple runs
 - This sidesteps JIT loading complexity
 
 ### Fresh context per agent
@@ -380,7 +380,7 @@ git add src/   # FORBIDDEN
 
 ---
 
-## 12. Deviation Rules
+## 12. Drift Rules
 
 | Rule | Trigger | Action |
 |------|---------|--------|
@@ -463,8 +463,8 @@ Commands should delegate to workflows, not contain 500+ lines of execution logic
 - [ ] YAML frontmatter with name, description, tools, color
 - [ ] `<role>` defining identity and success
 - [ ] `<execution_flow>` with `<step>` elements
-- [ ] First step reads STATE.md
-- [ ] Last step creates output (SUMMARY or structured return)
+- [ ] First step reads PULSE.md
+- [ ] Last step creates output (RECAP or structured return)
 - [ ] `<success_criteria>` checklist
 
 ### New Workflow
@@ -493,11 +493,11 @@ Commands should delegate to workflows, not contain 500+ lines of execution logic
 
 1. **XML for semantics, Markdown for content**
 2. **Commands delegate, workflows execute**
-3. **Plans are prompts, not documents**
-4. **Small plans (2-3 tasks) sidestep context issues**
-5. **STATE.md is the living memory**
+3. **Runs are prompts, not documents**
+4. **Small runs (2-3 tasks) sidestep context issues**
+5. **PULSE.md is the living memory**
 6. **Fresh context per agent (200k each)**
 7. **Atomic commits enable recovery**
 8. **No enterprise patterns (solo dev + Claude)**
 9. **Describe current state, not history**
-10. **Deviation rules 1-3 are automatic**
+10. **Drift rules 1-3 are automatic**

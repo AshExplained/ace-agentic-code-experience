@@ -82,7 +82,7 @@ fi
 
 - This is a mid-run resumption point
 - Read the file for specific resumption context
-- Flag: "Found mid-run checkpoint"
+- Flag: "Found mid-run gate"
 
 **If RUN without RECAP exists:**
 
@@ -144,7 +144,7 @@ Based on project state, determine the most logical next action:
 → Option: Start fresh (abandon agent work)
 
 **If .continue-here file exists:**
-→ Primary: Resume from checkpoint
+→ Primary: Resume from gate
 → Option: Start fresh on current run
 
 **If incomplete run (RUN without RECAP):**

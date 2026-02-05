@@ -8,8 +8,8 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 **INTEL.md feeds into:**
 
 1. **ace-stage-scout** — Reads INTEL.md to know WHAT to research
-   - "User wants card-based layout" → researcher investigates card component patterns
-   - "Infinite scroll decided" → researcher looks into virtualization libraries
+   - "User wants card-based layout" → scout investigates card component patterns
+   - "Infinite scroll decided" → scout looks into virtualization libraries
 
 2. **ace-architect** — Reads INTEL.md to know WHAT decisions are locked
    - "Pull-to-refresh on mobile" → architect includes that in task specs
@@ -30,8 +30,8 @@ The user knows:
 - Specific behaviors or references they have in mind
 
 The user doesn't know (and shouldn't be asked):
-- Codebase patterns (researcher reads the code)
-- Technical risks (researcher identifies these)
+- Codebase patterns (scout reads the code)
+- Technical risks (scout identifies these)
 - Implementation approach (architect figures this out)
 - Success metrics (inferred from the work)
 

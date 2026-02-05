@@ -527,9 +527,9 @@ gaps:
 - `artifacts`: Which files have issues and what's wrong
 - `missing`: Specific things that need to be added/fixed
 
-The planner (`/ace.plan-stage --gaps`) reads this gap analysis and creates appropriate runs.
+The architect (`/ace.plan-stage --gaps`) reads this gap analysis and creates appropriate runs.
 
-**Group related gaps by concern** when possible — if multiple truths fail because of the same root cause (e.g., "Chat component is a stub"), note this in the reason to help the planner create focused runs.
+**Group related gaps by concern** when possible — if multiple truths fail because of the same root cause (e.g., "Chat component is a stub"), note this in the reason to help the architect create focused runs.
 
 </verification_process>
 
@@ -674,7 +674,7 @@ Automated checks passed. Awaiting human verification.
 
 **DO NOT skip key link verification.** This is where 80% of stubs hide. The pieces exist but aren't connected.
 
-**Structure gaps in YAML frontmatter.** The planner (`/ace.plan-stage --gaps`) creates runs from your analysis.
+**Structure gaps in YAML frontmatter.** The architect (`/ace.plan-stage --gaps`) creates runs from your analysis.
 
 **DO flag for human verification when uncertain.** If you can't verify programmatically (visual, real-time, external service), say so explicitly.
 

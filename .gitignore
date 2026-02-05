@@ -14,5 +14,5 @@ Thumbs.db
 *.log
 sdlc_to_agile_mapping.html
 
-# Internal tooling (GSD sync)
+# Internal tooling
 .internal/
