@@ -1,8 +1,8 @@
 <purpose>
-Execute recon at the appropriate depth level.
-Produces recon.md (for Level 2-3) that informs run.md creation.
+Execute research at the appropriate depth level.
+Produces research.md (for Level 2-3) that informs run.md creation.
 
-Called from plan-stage.md's mandatory_recon step with a depth parameter.
+Called from plan-stage.md's mandatory_research step with a depth parameter.
 
 NOTE: For comprehensive ecosystem research ("how do experts build this"), use /ace.research-stage instead, which produces RESEARCH.md.
 </purpose>
@@ -13,8 +13,8 @@ NOTE: For comprehensive ecosystem research ("how do experts build this"), use /a
 | Level | Name         | Time      | Output                                       | When                                      |
 | ----- | ------------ | --------- | -------------------------------------------- | ----------------------------------------- |
 | 1     | Quick Verify | 2-5 min   | No file, proceed with verified knowledge     | Single library, confirming current syntax |
-| 2     | Standard     | 15-30 min | recon.md                                     | Choosing between options, new integration |
-| 3     | Deep Dive    | 1+ hour   | Detailed recon.md with validation gates      | Architectural decisions, novel problems   |
+| 2     | Standard     | 15-30 min | research.md                                     | Choosing between options, new integration |
+| 3     | Deep Dive    | 1+ hour   | Detailed research.md with validation gates      | Architectural decisions, novel problems   |
 
 **Depth is determined by plan-stage.md before routing here.**
 </depth_levels>
@@ -28,7 +28,7 @@ Claude's training data is 6-18 months stale. Always verify.
 2. **Official docs** - When Context7 lacks coverage
 3. **WebSearch LAST** - For comparisons and trends only
 
-See ~/.claude/ace/templates/recon.md `<recon_protocol>` for full protocol.
+See ~/.claude/ace/templates/research.md `<research_protocol>` for full protocol.
 </source_hierarchy>
 
 <process>
@@ -36,7 +36,7 @@ See ~/.claude/ace/templates/recon.md `<recon_protocol>` for full protocol.
 <step name="determine_depth">
 Check the depth parameter passed from plan-stage.md:
 - `depth=verify` → Level 1 (Quick Verification)
-- `depth=standard` → Level 2 (Standard Recon)
+- `depth=standard` → Level 2 (Standard Research)
 - `depth=deep` → Level 3 (Deep Dive)
 
 Route to appropriate level workflow below.
@@ -69,7 +69,7 @@ For: Single known library, confirming syntax/version still correct.
    - API syntax unchanged
    - No breaking changes in recent versions
 
-4. **If verified:** Return to plan-stage.md with confirmation. No recon.md needed.
+4. **If verified:** Return to plan-stage.md with confirmation. No research.md needed.
 
 5. **If concerns found:** Escalate to Level 2.
 
@@ -77,7 +77,7 @@ For: Single known library, confirming syntax/version still correct.
 </step>
 
 <step name="level_2_standard">
-**Level 2: Standard Recon (15-30 minutes)**
+**Level 2: Standard Research (15-30 minutes)**
 
 For: Choosing between options, new external integration.
 
@@ -107,7 +107,7 @@ For: Choosing between options, new external integration.
 
 5. **Cross-verify:** Any WebSearch finding → confirm with Context7/official docs.
 
-6. **Create recon.md** using ~/.claude/ace/templates/recon.md structure:
+6. **Create research.md** using ~/.claude/ace/templates/research.md structure:
 
    - Summary with recommendation
    - Key findings per option
@@ -116,7 +116,7 @@ For: Choosing between options, new external integration.
 
 7. Return to plan-stage.md.
 
-**Output:** `.ace/stages/XX-name/recon.md`
+**Output:** `.ace/stages/XX-name/research.md`
 </step>
 
 <step name="level_3_deep_dive">
@@ -126,7 +126,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 **Process:**
 
-1. **Scope the recon** using ~/.claude/ace/templates/recon.md:
+1. **Scope the research** using ~/.claude/ace/templates/research.md:
 
    - Define clear scope
    - Define include/exclude boundaries
@@ -158,9 +158,9 @@ For: Architectural decisions, novel problems, high-risk choices.
    - Mark what's verified vs assumed
    - Flag contradictions
 
-6. **Create comprehensive recon.md:**
+6. **Create comprehensive research.md:**
 
-   - Full structure from ~/.claude/ace/templates/recon.md
+   - Full structure from ~/.claude/ace/templates/research.md
    - Quality report with source attribution
    - Confidence by finding
    - If LOW confidence on any critical finding → add validation checkpoints
@@ -169,7 +169,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 8. Return to plan-stage.md.
 
-**Output:** `.ace/stages/XX-name/recon.md` (comprehensive)
+**Output:** `.ace/stages/XX-name/research.md` (comprehensive)
 </step>
 
 <step name="identify_unknowns">
@@ -183,27 +183,27 @@ Ask: What do we need to learn before we can plan this stage?
 - Architecture approach?
   </step>
 
-<step name="create_recon_scope">
-Use ~/.claude/ace/templates/recon.md.
+<step name="create_research_scope">
+Use ~/.claude/ace/templates/research.md.
 
 Include:
 
-- Clear recon objective
+- Clear research objective
 - Scoped include/exclude lists
 - Source preferences (official docs, Context7, current year)
-- Output structure for recon.md
+- Output structure for research.md
   </step>
 
-<step name="execute_recon">
-Run the recon:
+<step name="execute_research">
+Run the research:
 - Use web search for current info
 - Use Context7 MCP for library docs
 - Prefer current year sources
 - Structure findings per template
 </step>
 
-<step name="create_recon_output">
-Write `.ace/stages/XX-name/recon.md`:
+<step name="create_research_output">
+Write `.ace/stages/XX-name/research.md`:
 - Summary with recommendation
 - Key findings with sources
 - Code examples if applicable
@@ -211,42 +211,42 @@ Write `.ace/stages/XX-name/recon.md`:
 </step>
 
 <step name="confidence_gate">
-After creating recon.md, check confidence level.
+After creating research.md, check confidence level.
 
 If confidence is LOW:
 Use AskUserQuestion:
 
 - header: "Low Confidence"
-- question: "Recon confidence is LOW: [reason]. How would you like to proceed?"
+- question: "Research confidence is LOW: [reason]. How would you like to proceed?"
 - options:
   - "Dig deeper" - Do more research before planning
   - "Proceed anyway" - Accept uncertainty, plan with caveats
   - "Pause" - I need to think about this
 
 If confidence is MEDIUM:
-Inline: "Recon complete (medium confidence). [brief reason]. Proceed to planning?"
+Inline: "Research complete (medium confidence). [brief reason]. Proceed to planning?"
 
 If confidence is HIGH:
-Proceed directly, just note: "Recon complete (high confidence)."
+Proceed directly, just note: "Research complete (high confidence)."
 </step>
 
 <step name="open_questions_gate">
-If recon.md has open_questions:
+If research.md has open_questions:
 
 Present them inline:
-"Open questions from recon:
+"Open questions from research:
 
 - [Question 1]
 - [Question 2]
 
 These may affect implementation. Acknowledge and proceed? (yes / address first)"
 
-If "address first": Gather user input on questions, update recon.
+If "address first": Gather user input on questions, update research.
 </step>
 
 <step name="offer_next">
 ```
-Recon complete: .ace/stages/XX-name/recon.md
+Research complete: .ace/stages/XX-name/research.md
 Recommendation: [one-liner]
 Confidence: [level]
 
@@ -254,12 +254,12 @@ What's next?
 
 1. Discuss stage context (/ace.discuss-stage [current-stage])
 2. Create stage plan (/ace.plan-stage [current-stage])
-3. Refine recon (dig deeper)
-4. Review recon
+3. Refine research (dig deeper)
+4. Review research
 
 ```
 
-NOTE: recon.md is NOT committed separately. It will be committed with stage completion.
+NOTE: research.md is NOT committed separately. It will be committed with stage completion.
 </step>
 
 </process>
@@ -273,15 +273,15 @@ NOTE: recon.md is NOT committed separately. It will be committed with stage comp
 **Level 2 (Standard):**
 - Context7 consulted for all options
 - WebSearch findings cross-verified
-- recon.md created with recommendation
+- research.md created with recommendation
 - Confidence level MEDIUM or higher
 - Ready to inform run.md creation
 
 **Level 3 (Deep Dive):**
-- Recon scope defined
+- Research scope defined
 - Context7 exhaustively consulted
 - All WebSearch findings verified against authoritative sources
-- recon.md created with comprehensive analysis
+- research.md created with comprehensive analysis
 - Quality report with source attribution
 - If LOW confidence findings → validation checkpoints defined
 - Confidence gate passed

@@ -162,7 +162,7 @@ ace/
 - Purpose: Document templates for .ace/ files
 - Contains: Template definitions with frontmatter
 - Key files: brief.md, pulse.md, track.md, recap.md
-- Subdirectories: codebase/ (stack/architecture/structure), recon/ (research templates)
+- Subdirectories: codebase/ (stack/architecture/structure), research/ (research templates)
 
 **ace/workflows/**
 - Purpose: Reusable multi-step procedures

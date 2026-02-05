@@ -25,7 +25,7 @@ Template for spawning ace-architect agent. The agent contains all planning exper
 @.ace/stages/{stage_dir}/{stage}-intel.md
 
 **Research (if exists):**
-@.ace/stages/{stage_dir}/{stage}-recon.md
+@.ace/stages/{stage_dir}/{stage}-research.md
 
 **Gap Closure (if --gaps mode):**
 @.ace/stages/{stage_dir}/{stage}-proof.md

@@ -1,6 +1,6 @@
 # Features Research Template
 
-Template for `.ace/recon/features.md` — feature landscape for the project domain.
+Template for `.ace/research/features.md` — feature landscape for the project domain.
 
 <template>
 

@@ -30,7 +30,7 @@ cat .ace/config.json
 ```
 
 Parse current values (default to `true` if not present):
-- `checks.recon` — spawn scout during plan-stage
+- `checks.research` — spawn scout during plan-stage
 - `checks.review` — spawn plan reviewer during plan-stage
 - `checks.auditor` — spawn auditor during run-stage
 - `horsepower` — which model each agent uses (default: `balanced`)
@@ -49,16 +49,16 @@ AskUserQuestion([
     options: [
       { label: "Max", description: "Opus everywhere except auditing (highest cost)" },
       { label: "Balanced (Recommended)", description: "Opus for planning, Sonnet for execution/auditing" },
-      { label: "Eco", description: "Sonnet for writing, Haiku for recon/auditing (lowest cost)" }
+      { label: "Eco", description: "Sonnet for writing, Haiku for research/auditing (lowest cost)" }
     ]
   },
   {
     question: "Spawn Stage Scout? (researches domain before planning)",
-    header: "Recon",
+    header: "Research",
     multiSelect: false,
     options: [
       { label: "Yes", description: "Research stage goals before planning" },
-      { label: "No", description: "Skip recon, plan directly" }
+      { label: "No", description: "Skip research, plan directly" }
     ]
   },
   {
@@ -103,7 +103,7 @@ Merge new settings into existing config.json:
   ...existing_config,
   "horsepower": "max" | "balanced" | "eco",
   "checks": {
-    "recon": true/false,
+    "research": true/false,
     "review": true/false,
     "auditor": true/false
   },
@@ -136,8 +136,8 @@ These settings apply to future /ace.plan-stage and /ace.run-stage runs.
 
 Quick commands:
 - /ace.set-profile <profile> — switch horsepower profile
-- /ace.plan-stage --research — force recon
-- /ace.plan-stage --skip-research — skip recon
+- /ace.plan-stage --research — force research
+- /ace.plan-stage --skip-research — skip research
 - /ace.plan-stage --skip-verify — skip plan review
 ```
 

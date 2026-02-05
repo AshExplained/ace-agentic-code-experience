@@ -1,7 +1,7 @@
 ---
 name: ace.plan-stage
 description: Create detailed execution run for a stage (run.md) with verification loop
-argument-hint: "[stage] [--recon] [--skip-recon] [--gaps] [--skip-verify]"
+argument-hint: "[stage] [--research] [--skip-research] [--gaps] [--skip-verify]"
 agent: ace-architect
 allowed-tools:
   - Read
@@ -19,22 +19,22 @@ allowed-tools:
 </execution_context>
 
 <objective>
-Create executable stage prompts (run.md files) for a track stage with integrated recon and verification.
+Create executable stage prompts (run.md files) for a track stage with integrated research and verification.
 
-**Default flow:** Recon (if needed) → Plan → Verify → Done
+**Default flow:** Research (if needed) → Plan → Verify → Done
 
-**Orchestrator role:** Parse arguments, validate stage, recon domain (unless skipped or exists), spawn ace-architect agent, verify runs with ace-plan-reviewer, iterate until runs pass or max iterations reached, present results.
+**Orchestrator role:** Parse arguments, validate stage, research domain (unless skipped or exists), spawn ace-architect agent, verify runs with ace-plan-reviewer, iterate until runs pass or max iterations reached, present results.
 
-**Why subagents:** Recon and planning burn context fast. Verification uses fresh context. User sees the flow between agents in main context.
+**Why subagents:** Research and planning burn context fast. Verification uses fresh context. User sees the flow between agents in main context.
 </objective>
 
 <context>
 Stage number: $ARGUMENTS (optional - auto-detects next unplanned stage if not provided)
 
 **Flags:**
-- `--recon` — Force re-recon even if recon.md exists
-- `--skip-recon` — Skip recon entirely, go straight to planning
-- `--gaps` — Gap closure mode (reads proof.md, skips recon)
+- `--research` — Force re-research even if research.md exists
+- `--skip-research` — Skip research entirely, go straight to planning
+- `--gaps` — Gap closure mode (reads proof.md, skips research)
 - `--skip-verify` — Skip architect → reviewer verification loop
 
 Normalize stage input in step 2 before any directory lookups.
@@ -73,8 +73,8 @@ Store resolved models for use in Task calls below.
 Extract from $ARGUMENTS:
 
 - Stage number (integer or decimal like `2.1`)
-- `--recon` flag to force re-recon
-- `--skip-recon` flag to skip recon
+- `--research` flag to force re-research
+- `--skip-research` flag to skip research
 - `--gaps` flag for gap closure mode
 - `--skip-verify` flag to bypass verification loop
 
@@ -91,10 +91,10 @@ elif [[ "$STAGE" =~ ^([0-9]+)\.([0-9]+)$ ]]; then
 fi
 ```
 
-**Check for existing recon and runs:**
+**Check for existing research and runs:**
 
 ```bash
-ls .ace/stages/${STAGE}-*/*-recon.md 2>/dev/null
+ls .ace/stages/${STAGE}-*/*-research.md 2>/dev/null
 ls .ace/stages/${STAGE}-*/*-run.md 2>/dev/null
 ```
 
@@ -123,40 +123,40 @@ INTEL_CONTENT=$(cat "${STAGE_DIR}"/*-intel.md 2>/dev/null)
 ```
 
 **CRITICAL:** Store `INTEL_CONTENT` now. It must be passed to:
-- **Scout** — constrains what to recon (locked decisions vs Claude's discretion)
+- **Scout** — constrains what to research (locked decisions vs Claude's discretion)
 - **Architect** — locked decisions must be honored, not revisited
 - **Reviewer** — verifies runs respect user's stated vision
 - **Revision** — context for targeted fixes
 
 If intel.md exists, display: `Using stage context from: ${STAGE_DIR}/*-intel.md`
 
-## 5. Handle Recon
+## 5. Handle Research
 
-**If `--gaps` flag:** Skip recon (gap closure uses proof.md instead).
+**If `--gaps` flag:** Skip research (gap closure uses proof.md instead).
 
-**If `--skip-recon` flag:** Skip to step 6.
+**If `--skip-research` flag:** Skip to step 6.
 
-**Check config for recon setting:**
+**Check config for research setting:**
 
 ```bash
-WORKFLOW_RECON=$(cat .ace/config.json 2>/dev/null | grep -o '"recon"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+WORKFLOW_RESEARCH=$(cat .ace/config.json 2>/dev/null | grep -o '"research"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 ```
 
-**If `checks.recon` is `false` AND `--recon` flag NOT set:** Skip to step 6.
+**If `checks.research` is `false` AND `--research` flag NOT set:** Skip to step 6.
 
 **Otherwise:**
 
-Check for existing recon:
+Check for existing research:
 
 ```bash
-ls "${STAGE_DIR}"/*-recon.md 2>/dev/null
+ls "${STAGE_DIR}"/*-research.md 2>/dev/null
 ```
 
-**If recon.md exists AND `--recon` flag NOT set:**
-- Display: `Using existing recon: ${STAGE_DIR}/${STAGE}-recon.md`
+**If research.md exists AND `--research` flag NOT set:**
+- Display: `Using existing research: ${STAGE_DIR}/${STAGE}-research.md`
 - Skip to step 6
 
-**If recon.md missing OR `--recon` flag set:**
+**If research.md missing OR `--research` flag set:**
 
 Display stage banner:
 ```
@@ -171,7 +171,7 @@ Proceed to spawn scout
 
 ### Spawn ace-stage-scout
 
-Gather additional context for recon prompt:
+Gather additional context for research prompt:
 
 ```bash
 # Get stage description from track
@@ -186,7 +186,7 @@ DECISIONS=$(grep -A20 "### Decisions Made" .ace/pulse.md 2>/dev/null)
 # INTEL_CONTENT already loaded in step 4
 ```
 
-Fill recon prompt and spawn:
+Fill research prompt and spawn:
 
 ```markdown
 <objective>
@@ -198,8 +198,8 @@ Answer: "What do I need to know to PLAN this stage well?"
 <stage_context>
 **IMPORTANT:** If intel.md exists below, it contains user decisions from /ace.discuss-stage.
 
-- **Decisions section** = Locked choices — recon THESE deeply, don't explore alternatives
-- **Claude's Discretion section** = Your freedom areas — recon options, make recommendations
+- **Decisions section** = Locked choices — research THESE deeply, don't explore alternatives
+- **Claude's Discretion section** = Your freedom areas — research options, make recommendations
 - **Deferred Ideas section** = Out of scope — ignore completely
 
 {intel_content}
@@ -217,28 +217,28 @@ Answer: "What do I need to know to PLAN this stage well?"
 </additional_context>
 
 <output>
-Write recon findings to: {stage_dir}/{stage}-recon.md
+Write research findings to: {stage_dir}/{stage}-research.md
 </output>
 ```
 
 ```
 Task(
-  prompt="First, read ~/.claude/agents/ace-stage-scout.md for your role and instructions.\n\n" + recon_prompt,
+  prompt="First, read ~/.claude/agents/ace-stage-scout.md for your role and instructions.\n\n" + research_prompt,
   subagent_type="general-purpose",
   model="{scout_model}",
-  description="Recon Stage {stage}"
+  description="Research Stage {stage}"
 )
 ```
 
 ### Handle Scout Return
 
-**`## RECON COMPLETE`:**
-- Display: `Recon complete. Proceeding to planning...`
+**`## RESEARCH COMPLETE`:**
+- Display: `Research complete. Proceeding to planning...`
 - Continue to step 6
 
-**`## RECON BLOCKED`:**
+**`## RESEARCH BLOCKED`:**
 - Display blocker information
-- Offer: 1) Provide more context, 2) Skip recon and plan anyway, 3) Abort
+- Offer: 1) Provide more context, 2) Skip research and plan anyway, 3) Abort
 - Wait for user response
 
 ## 6. Check Existing Runs
@@ -261,7 +261,7 @@ TRACK_CONTENT=$(cat .ace/track.md)
 # Read optional files (empty string if missing)
 SPECS_CONTENT=$(cat .ace/specs.md 2>/dev/null)
 # INTEL_CONTENT already loaded in step 4
-RECON_CONTENT=$(cat "${STAGE_DIR}"/*-recon.md 2>/dev/null)
+RESEARCH_CONTENT=$(cat "${STAGE_DIR}"/*-research.md 2>/dev/null)
 
 # Gap closure files (only if --gaps mode)
 PROOF_CONTENT=$(cat "${STAGE_DIR}"/*-proof.md 2>/dev/null)
@@ -305,8 +305,8 @@ IMPORTANT: If stage intel exists below, it contains USER DECISIONS from /ace.dis
 
 {intel_content}
 
-**Recon (if exists):**
-{recon_content}
+**Research (if exists):**
+{research_content}
 
 **Gap Closure (if --gaps mode):**
 {proof_content}
@@ -529,7 +529,7 @@ Output this markdown directly (not as a code block):
 | 1    | 01, 02 | [objectives] |
 | 2    | 03     | [objective]  |
 
-Recon: {Completed | Used existing | Skipped}
+Research: {Completed | Used existing | Skipped}
 Verification: {Passed | Passed with override | Skipped}
 
 ───────────────────────────────────────────────────────────────
@@ -546,7 +546,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 **Also available:**
 - cat .ace/stages/{stage-dir}/*-run.md — review runs
-- /ace.plan-stage {X} --recon — re-recon first
+- /ace.plan-stage {X} --research — re-research first
 
 ───────────────────────────────────────────────────────────────
 </offer_next>
@@ -556,10 +556,10 @@ Verification: {Passed | Passed with override | Skipped}
 - [ ] Stage validated against track
 - [ ] Stage directory created if needed
 - [ ] intel.md loaded early (step 4) and passed to ALL agents
-- [ ] Recon completed (unless --skip-recon or --gaps or exists)
-- [ ] ace-stage-scout spawned with intel.md (constrains recon scope)
+- [ ] Research completed (unless --skip-research or --gaps or exists)
+- [ ] ace-stage-scout spawned with intel.md (constrains research scope)
 - [ ] Existing runs checked
-- [ ] ace-architect spawned with context (intel.md + recon.md)
+- [ ] ace-architect spawned with context (intel.md + research.md)
 - [ ] Runs created (ARCHITECTING COMPLETE or GATE handled)
 - [ ] ace-plan-reviewer spawned with intel.md (verifies intel compliance)
 - [ ] Verification passed OR user override OR max iterations with user decision

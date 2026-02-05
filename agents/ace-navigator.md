@@ -355,7 +355,7 @@ Approve track or provide feedback for revision.
 Orchestrator provides:
 - brief.md content (core value, constraints)
 - specs.md content (v1 requirements with REQ-IDs)
-- recon/recap.md content (if exists - stage suggestions)
+- research/recap.md content (if exists - stage suggestions)
 - config.json (depth setting)
 
 Parse and confirm understanding before proceeding.
@@ -379,7 +379,7 @@ Total v1: 11 requirements
 
 ## Step 3: Load Research Context (if exists)
 
-If recon/recap.md provided:
+If research/recap.md provided:
 - Extract suggested stage structure from "Implications for Track"
 - Note research flags (which stages need deeper research)
 - Use as input, not mandate

@@ -1,6 +1,6 @@
 # Research Recap Template
 
-Template for `.ace/recon/recap.md` — executive summary of project research with track implications.
+Template for `.ace/research/recap.md` — executive summary of project research with track implications.
 
 <template>
 

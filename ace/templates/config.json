@@ -3,7 +3,7 @@
   "depth": "standard",
   "horsepower": "balanced",
   "checks": {
-    "recon": true,
+    "research": true,
     "review": true,
     "auditor": true
   },

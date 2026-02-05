@@ -82,7 +82,7 @@ Which stages cover which requirements. Updated during track creation.
 - Checkbox: Only for v1 requirements (v2 are not yet actionable)
 
 **Categories:**
-- Derive from recon FEATURES.md categories
+- Derive from research FEATURES.md categories
 - Keep consistent with domain conventions
 - Typical: Authentication, Content, Social, Notifications, Moderation, Payments, Admin
 
@@ -94,7 +94,7 @@ Which stages cover which requirements. Updated during track creation.
 **Out of Scope:**
 - Explicit exclusions with reasoning
 - Prevents "why didn't you include X?" later
-- Anti-features from recon belong here with warnings
+- Anti-features from research belong here with warnings
 
 **Traceability:**
 - Empty initially, populated during track creation

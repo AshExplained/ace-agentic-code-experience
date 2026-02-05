@@ -189,7 +189,7 @@ mv "18-01-recap.md" "17-01-recap.md"  # if exists
 # etc.
 ```
 
-Also handle intel.md and recon.md (these don't have stage prefixes, so no rename needed).
+Also handle intel.md and research.md (these don't have stage prefixes, so no rename needed).
 </step>
 
 <step name="update_track">

@@ -16,7 +16,7 @@ The git log should read like a changelog of what shipped, not a diary of plannin
 | BRIEF + TRACK created   | YES     | Project initialization                           |
 | run.md created          | NO      | Intermediate - commit with run completion        |
 | RESEARCH.md created     | NO      | Intermediate                                     |
-| recon.md created        | NO      | Intermediate                                     |
+| research.md created        | NO      | Intermediate                                     |
 | **Task completed**      | YES     | Atomic unit of work (1 commit per task)         |
 | **Run completed**       | YES     | Metadata commit (RECAP + PULSE + TRACK)         |
 | Handoff created         | YES     | WIP state preserved                              |
@@ -213,7 +213,7 @@ Each run produces 2-4 commits (tasks + metadata). Clear, granular, bisectable.
 **Still don't commit (intermediate artifacts):**
 - run.md creation (commit with run completion)
 - RESEARCH.md (intermediate)
-- recon.md (intermediate)
+- research.md (intermediate)
 - Minor planning tweaks
 - "Fixed typo in track"
 

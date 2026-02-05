@@ -45,7 +45,7 @@ One command takes you from idea to ready-for-planning:
 Creates all `.ace/` artifacts:
 - `brief.md` — vision and requirements
 - `config.json` — workflow style (guided/turbo)
-- `recon/` — domain research (if selected)
+- `research/` — domain research (if selected)
 - `specs.md` — scoped requirements with REQ-IDs
 - `track.md` — stages mapped to requirements
 - `pulse.md` — project memory
@@ -77,7 +77,7 @@ Usage: `/ace.discuss-stage 2`
 Comprehensive ecosystem research for niche/complex domains.
 
 - Discovers standard stack, architecture patterns, pitfalls
-- Creates recon.md with "how experts build this" knowledge
+- Creates research.md with "how experts build this" knowledge
 - Use for 3D, games, audio, shaders, ML, and other specialized domains
 - Goes beyond "which library" to ecosystem knowledge
 
@@ -125,7 +125,7 @@ Quick mode uses the same system with a shorter path:
 - Quick tasks live in `.ace/quick/` separate from planned stages
 - Updates pulse.md tracking (not track.md)
 
-Use when you know exactly what to do and the task is small enough to not need recon or auditing.
+Use when you know exactly what to do and the task is small enough to not need research or auditing.
 
 Usage: `/ace.dash`
 Result: Creates `.ace/quick/NNN-slug/run.md`, `.ace/quick/NNN-slug/recap.md`
@@ -310,7 +310,7 @@ Quick switch horsepower profile for ACE agents.
 
 - `max` — Opus everywhere except auditing
 - `balanced` — Opus for planning, Sonnet for execution (default)
-- `eco` — Sonnet for writing, Haiku for recon/auditing
+- `eco` — Sonnet for writing, Haiku for research/auditing
 
 Usage: `/ace.set-profile eco`
 
@@ -399,7 +399,7 @@ Example config:
 **Starting a new project:**
 
 ```
-/ace.start              # Unified flow: questioning → recon → requirements → track
+/ace.start              # Unified flow: questioning → research → requirements → track
 /clear
 /ace.plan-stage 1       # Create runs for first stage
 /clear
@@ -425,7 +425,7 @@ Example config:
 ```
 /ace.complete-milestone 1.0.0
 /clear
-/ace.new-milestone  # Start next milestone (questioning → recon → requirements → track)
+/ace.new-milestone  # Start next milestone (questioning → research → requirements → track)
 ```
 
 **Capturing ideas during work:**

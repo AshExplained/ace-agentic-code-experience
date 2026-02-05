@@ -1,8 +1,8 @@
-# Recon Template
+# Research Template
 
-Template for `.ace/stages/XX-name/recon.md` - shallow research for library/option decisions.
+Template for `.ace/stages/XX-name/research.md` - shallow research for library/option decisions.
 
-**Purpose:** Answer "which library/option should we use" questions during mandatory recon in plan-stage.
+**Purpose:** Answer "which library/option should we use" questions during mandatory research in plan-stage.
 
 For deep ecosystem research ("how do experts build this"), use `/ace.research-stage` which produces RESEARCH.md.
 
@@ -13,27 +13,27 @@ For deep ecosystem research ("how do experts build this"), use `/ace.research-st
 ```markdown
 ---
 stage: XX-name
-type: recon
-topic: [recon-topic]
+type: research
+topic: [research-topic]
 ---
 
 <session_initialization>
-Before beginning recon, verify today's date:
+Before beginning research, verify today's date:
 !`date +%Y-%m-%d`
 
 Use this date when searching for "current" or "latest" information.
 Example: If today is 2025-11-22, search for "2025" not "2024".
 </session_initialization>
 
-<recon_objective>
+<research_objective>
 Discover [topic] to inform [stage name] implementation.
 
 Purpose: [What decision/implementation this enables]
 Scope: [Boundaries]
-Output: recon.md with recommendation
-</recon_objective>
+Output: research.md with recommendation
+</research_objective>
 
-<recon_scope>
+<research_scope>
 <include>
 - [Question to answer]
 - [Area to investigate]
@@ -41,12 +41,12 @@ Output: recon.md with recommendation
 </include>
 
 <exclude>
-- [Out of scope for this recon]
+- [Out of scope for this research]
 - [Defer to implementation stage]
 </exclude>
-</recon_scope>
+</research_scope>
 
-<recon_protocol>
+<research_protocol>
 
 **Source Priority:**
 1. **Context7 MCP** - For library/framework documentation (current, authoritative)
@@ -54,7 +54,7 @@ Output: recon.md with recommendation
 3. **WebSearch** - For comparisons, trends, community patterns (verify all findings)
 
 **Quality Checklist:**
-Before completing recon, verify:
+Before completing research, verify:
 - [ ] All claims have authoritative sources (Context7 or official docs)
 - [ ] Negative claims ("X is not possible") verified with official documentation
 - [ ] API syntax/configuration from Context7 or official docs (never WebSearch alone)
@@ -67,14 +67,14 @@ Before completing recon, verify:
 - MEDIUM: WebSearch + Context7/official docs confirm
 - LOW: WebSearch only or training knowledge only (mark for validation)
 
-</recon_protocol>
+</research_protocol>
 
 
 <output_structure>
-Create `.ace/stages/XX-name/recon.md`:
+Create `.ace/stages/XX-name/research.md`:
 
 ```markdown
-# [Topic] Recon
+# [Topic] Research
 
 ## Summary
 [2-3 paragraph executive summary - what was researched, what was found, what's recommended]
@@ -127,7 +127,7 @@ Create `.ace/stages/XX-name/recon.md`:
 </success_criteria>
 
 <guidelines>
-**When to use recon:**
+**When to use research:**
 - Technology choice unclear (library A vs B)
 - Best practices needed for unfamiliar integration
 - API/library investigation required

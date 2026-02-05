@@ -18,7 +18,7 @@ This is the most leveraged moment in any project. Deep questioning here means be
 **Creates:**
 - `.ace/brief.md` — project context
 - `.ace/config.json` — workflow preferences
-- `.ace/recon/` — domain research (optional)
+- `.ace/research/` — domain research (optional)
 - `.ace/specs.md` — scoped requirements
 - `.ace/track.md` — stage structure
 - `.ace/pulse.md` — project memory
@@ -296,7 +296,7 @@ All recommended for important projects. Skip for quick experiments.
 ```
 questions: [
   {
-    header: "Recon",
+    header: "Research",
     question: "Research before planning each stage? (adds tokens/time)",
     multiSelect: false,
     options: [
@@ -328,7 +328,7 @@ questions: [
     multiSelect: false,
     options: [
       { label: "Balanced (Recommended)", description: "Sonnet for most agents — good quality/cost ratio" },
-      { label: "Max", description: "Opus for recon/navigator — higher cost, deeper analysis" },
+      { label: "Max", description: "Opus for research/navigator — higher cost, deeper analysis" },
       { label: "Eco", description: "Haiku where possible — fastest, lowest cost" }
     ]
   }
@@ -345,7 +345,7 @@ Create `.ace/config.json` with all settings:
   "commit_docs": true|false,
   "horsepower": "max|balanced|eco",
   "checks": {
-    "recon": true|false,
+    "research": true|false,
     "review": true|false,
     "auditor": true|false
   }
@@ -369,7 +369,7 @@ chore: add project config
 Style: [chosen style]
 Depth: [chosen depth]
 Parallelization: [enabled/disabled]
-Workflow agents: recon=[on/off], review=[on/off], auditor=[on/off]
+Workflow agents: research=[on/off], review=[on/off], auditor=[on/off]
 EOF
 )"
 ```
@@ -396,16 +396,16 @@ Default to "balanced" if not set.
 
 Store resolved models for use in Task calls below.
 
-## Stage 6: Recon Decision
+## Stage 6: Research Decision
 
 Use AskUserQuestion:
-- header: "Recon"
+- header: "Research"
 - question: "Research the domain ecosystem before defining requirements?"
 - options:
-  - "Recon first (Recommended)" — Discover standard stacks, expected features, architecture patterns
-  - "Skip recon" — I know this domain well, go straight to requirements
+  - "Research first (Recommended)" — Discover standard stacks, expected features, architecture patterns
+  - "Skip research" — I know this domain well, go straight to requirements
 
-**If "Recon first":**
+**If "Research first":**
 
 Display stage banner:
 ```
@@ -416,9 +416,9 @@ Display stage banner:
 Researching [domain] ecosystem...
 ```
 
-Create recon directory:
+Create research directory:
 ```bash
-mkdir -p .ace/recon
+mkdir -p .ace/research
 ```
 
 **Determine milestone context:**
@@ -474,8 +474,8 @@ Your STACK.md feeds into track creation. Be prescriptive:
 </quality_gate>
 
 <output>
-Write to: .ace/recon/stack.md
-Use template: ~/.claude/ace/templates/recon/stack.md
+Write to: .ace/research/stack.md
+Use template: ~/.claude/ace/templates/research/stack.md
 </output>
 ", subagent_type="general-purpose", model="{scout_model}", description="Stack research")
 
@@ -514,8 +514,8 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 </quality_gate>
 
 <output>
-Write to: .ace/recon/features.md
-Use template: ~/.claude/ace/templates/recon/features.md
+Write to: .ace/research/features.md
+Use template: ~/.claude/ace/templates/research/features.md
 </output>
 ", subagent_type="general-purpose", model="{scout_model}", description="Features research")
 
@@ -554,8 +554,8 @@ Your ARCHITECTURE.md informs stage structure in track. Include:
 </quality_gate>
 
 <output>
-Write to: .ace/recon/architecture.md
-Use template: ~/.claude/ace/templates/recon/architecture.md
+Write to: .ace/research/architecture.md
+Use template: ~/.claude/ace/templates/research/architecture.md
 </output>
 ", subagent_type="general-purpose", model="{scout_model}", description="Architecture research")
 
@@ -594,8 +594,8 @@ Your PITFALLS.md prevents mistakes in track/planning. For each pitfall:
 </quality_gate>
 
 <output>
-Write to: .ace/recon/pitfalls.md
-Use template: ~/.claude/ace/templates/recon/pitfalls.md
+Write to: .ace/research/pitfalls.md
+Use template: ~/.claude/ace/templates/research/pitfalls.md
 </output>
 ", subagent_type="general-purpose", model="{scout_model}", description="Pitfalls research")
 ```
@@ -610,15 +610,15 @@ Synthesize research outputs into recap.md.
 
 <research_files>
 Read these files:
-- .ace/recon/stack.md
-- .ace/recon/features.md
-- .ace/recon/architecture.md
-- .ace/recon/pitfalls.md
+- .ace/research/stack.md
+- .ace/research/features.md
+- .ace/research/architecture.md
+- .ace/research/pitfalls.md
 </research_files>
 
 <output>
-Write to: .ace/recon/recap.md
-Use template: ~/.claude/ace/templates/recon/recap.md
+Write to: .ace/research/recap.md
+Use template: ~/.claude/ace/templates/research/recap.md
 Commit after writing.
 </output>
 ", subagent_type="ace-synthesizer", model="{synthesizer_model}", description="Synthesize research")
@@ -627,7 +627,7 @@ Commit after writing.
 Display research complete banner and key findings:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► RECON COMPLETE ✓
+ ACE ► RESEARCH COMPLETE ✓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ## Key Findings
@@ -636,10 +636,10 @@ Display research complete banner and key findings:
 **Table Stakes:** [from recap.md]
 **Watch Out For:** [from recap.md]
 
-Files: `.ace/recon/`
+Files: `.ace/research/`
 ```
 
-**If "Skip recon":** Continue to Stage 7.
+**If "Skip research":** Continue to Stage 7.
 
 ## Stage 7: Define Requirements
 
@@ -657,7 +657,7 @@ Read brief.md and extract:
 - Stated constraints (budget, timeline, tech limitations)
 - Any explicit scope boundaries
 
-**If recon exists:** Read recon/features.md and extract feature categories.
+**If research exists:** Read research/features.md and extract feature categories.
 
 **Present features by category:**
 
@@ -676,7 +676,7 @@ Here are the features for [domain]:
 - OAuth (Google, GitHub)
 - 2FA
 
-**Recon notes:** [any relevant notes]
+**Research notes:** [any relevant notes]
 
 ---
 
@@ -684,7 +684,7 @@ Here are the features for [domain]:
 ...
 ```
 
-**If no recon:** Gather requirements through conversation instead.
+**If no research:** Gather requirements through conversation instead.
 
 Ask: "What are the main things users need to be able to do?"
 
@@ -715,9 +715,9 @@ Track responses:
 
 Use AskUserQuestion:
 - header: "Additions"
-- question: "Any requirements recon missed? (Features specific to your vision)"
+- question: "Any requirements research missed? (Features specific to your vision)"
 - options:
-  - "No, recon covered it" — Proceed
+  - "No, research covered it" — Proceed
   - "Yes, let me add some" — Capture additions
 
 **Validate core value:**
@@ -807,8 +807,8 @@ Task(prompt="
 **Requirements:**
 @.ace/specs.md
 
-**Recon (if exists):**
-@.ace/recon/recap.md
+**Research (if exists):**
+@.ace/research/recap.md
 
 **Config:**
 @.ace/config.json
@@ -941,7 +941,7 @@ Present completion with next steps:
 |----------------|-----------------------------|
 | Project        | `.ace/brief.md`             |
 | Config         | `.ace/config.json`          |
-| Recon          | `.ace/recon/`               |
+| Research          | `.ace/research/`               |
 | Requirements   | `.ace/specs.md`             |
 | Track          | `.ace/track.md`             |
 
@@ -971,7 +971,7 @@ Present completion with next steps:
 
 - `.ace/brief.md`
 - `.ace/config.json`
-- `.ace/recon/` (if recon selected)
+- `.ace/research/` (if research selected)
   - `STACK.md`
   - `FEATURES.md`
   - `ARCHITECTURE.md`
@@ -991,8 +991,8 @@ Present completion with next steps:
 - [ ] Deep questioning completed (threads followed, not rushed)
 - [ ] brief.md captures full context → **committed**
 - [ ] config.json has workflow style, depth, parallelization → **committed**
-- [ ] Recon completed (if selected) — 4 parallel agents spawned → **committed**
-- [ ] Requirements gathered (from recon or conversation)
+- [ ] Research completed (if selected) — 4 parallel agents spawned → **committed**
+- [ ] Requirements gathered (from research or conversation)
 - [ ] User scoped each category (v1/v2/out of scope)
 - [ ] specs.md created with REQ-IDs → **committed**
 - [ ] ace-navigator spawned with context

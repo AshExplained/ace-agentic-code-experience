@@ -18,7 +18,7 @@ Extract implementation decisions that downstream agents need — scout and archi
 1. Analyze the stage to identify gray areas (UI, UX, behavior, etc.)
 2. Present gray areas — user selects which to discuss
 3. Deep-dive each selected area until satisfied
-4. Create intel.md with decisions that guide recon and architecting
+4. Create intel.md with decisions that guide research and architecting
 
 **Output:** `{stage}-intel.md` — decisions clear enough that downstream agents can act without asking the user again
 </objective>
@@ -45,7 +45,7 @@ Stage number: $ARGUMENTS (required)
 4. **Present gray areas** — Multi-select: which to discuss? (NO skip option)
 5. **Deep-dive each area** — 4 questions per area, then offer more/next
 6. **Write intel.md** — Sections match areas discussed
-7. Offer next steps (recon or architect)
+7. Offer next steps (research or architect)
 
 **CRITICAL: Scope guardrail**
 - Stage boundary from track.md is FIXED

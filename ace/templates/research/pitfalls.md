@@ -1,6 +1,6 @@
 # Pitfalls Research Template
 
-Template for `.ace/recon/pitfalls.md` — common mistakes to avoid in the project domain.
+Template for `.ace/research/pitfalls.md` — common mistakes to avoid in the project domain.
 
 <template>
 

@@ -286,7 +286,7 @@ Build authentication
 
 ### Conditional (if exists)
 ```markdown
-@.ace/recon.md (if exists)
+@.ace/research.md (if exists)
 ```
 
 ### Path rule

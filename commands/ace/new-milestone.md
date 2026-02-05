@@ -11,13 +11,13 @@ allowed-tools:
 ---
 
 <objective>
-Start a new milestone through unified flow: questioning → recon (optional) → requirements → track.
+Start a new milestone through unified flow: questioning → research (optional) → requirements → track.
 
 This is the brownfield equivalent of ace.start. The project exists, brief.md has history. This command gathers "what's next", updates brief.md, then continues through the full requirements → track cycle.
 
 **Creates/Updates:**
 - `.ace/brief.md` — updated with new milestone goals
-- `.ace/recon/` — domain recon (optional, focuses on NEW features)
+- `.ace/research/` — domain research (optional, focuses on NEW features)
 - `.ace/specs.md` — scoped requirements for this milestone
 - `.ace/track.md` — stage structure (continues numbering)
 - `.ace/pulse.md` — reset for new milestone
@@ -132,38 +132,38 @@ Default to "balanced" if not set.
 
 Store resolved models for use in Task calls below.
 
-## Stage 7: Recon Decision
+## Stage 7: Research Decision
 
 Use AskUserQuestion:
-- header: "Recon"
+- header: "Research"
 - question: "Research the domain ecosystem for new features before defining requirements?"
 - options:
-  - "Recon first (Recommended)" — Discover patterns, expected features, architecture for NEW capabilities
-  - "Skip recon" — I know what I need, go straight to requirements
+  - "Research first (Recommended)" — Discover patterns, expected features, architecture for NEW capabilities
+  - "Skip research" — I know what I need, go straight to requirements
 
-**If "Recon first":**
+**If "Research first":**
 
 Display stage banner:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► RECON
+ ACE ► RESEARCH
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Researching [new features] ecosystem...
 ```
 
-Create recon directory:
+Create research directory:
 ```bash
-mkdir -p .ace/recon
+mkdir -p .ace/research
 ```
 
 Display spawning indicator:
 ```
 ◆ Spawning 4 scouts in parallel...
-  → Stack recon (for new features)
-  → Features recon
-  → Architecture recon (integration)
-  → Pitfalls recon
+  → Stack research (for new features)
+  → Features research
+  → Architecture research (integration)
+  → Pitfalls research
 ```
 
 Spawn 4 parallel ace-project-scout agents with milestone-aware context:
@@ -171,7 +171,7 @@ Spawn 4 parallel ace-project-scout agents with milestone-aware context:
 ```
 Task(prompt="
 <research_type>
-Project Recon — Stack dimension for [new features].
+Project Research — Stack dimension for [new features].
 </research_type>
 
 <milestone_context>
@@ -205,14 +205,14 @@ Your STACK.md feeds into track creation. Be prescriptive:
 </quality_gate>
 
 <output>
-Write to: .ace/recon/stack.md
-Use template: ~/.claude/ace/templates/recon/stack.md
+Write to: .ace/research/stack.md
+Use template: ~/.claude/ace/templates/research/stack.md
 </output>
-", subagent_type="ace-project-scout", model="{scout_model}", description="Stack recon")
+", subagent_type="ace-project-scout", model="{scout_model}", description="Stack research")
 
 Task(prompt="
 <research_type>
-Project Recon — Features dimension for [new features].
+Project Research — Features dimension for [new features].
 </research_type>
 
 <milestone_context>
@@ -246,14 +246,14 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 </quality_gate>
 
 <output>
-Write to: .ace/recon/features.md
-Use template: ~/.claude/ace/templates/recon/features.md
+Write to: .ace/research/features.md
+Use template: ~/.claude/ace/templates/research/features.md
 </output>
-", subagent_type="ace-project-scout", model="{scout_model}", description="Features recon")
+", subagent_type="ace-project-scout", model="{scout_model}", description="Features research")
 
 Task(prompt="
 <research_type>
-Project Recon — Architecture dimension for [new features].
+Project Research — Architecture dimension for [new features].
 </research_type>
 
 <milestone_context>
@@ -288,14 +288,14 @@ Your ARCHITECTURE.md informs stage structure in track. Include:
 </quality_gate>
 
 <output>
-Write to: .ace/recon/architecture.md
-Use template: ~/.claude/ace/templates/recon/architecture.md
+Write to: .ace/research/architecture.md
+Use template: ~/.claude/ace/templates/research/architecture.md
 </output>
-", subagent_type="ace-project-scout", model="{scout_model}", description="Architecture recon")
+", subagent_type="ace-project-scout", model="{scout_model}", description="Architecture research")
 
 Task(prompt="
 <research_type>
-Project Recon — Pitfalls dimension for [new features].
+Project Research — Pitfalls dimension for [new features].
 </research_type>
 
 <milestone_context>
@@ -326,10 +326,10 @@ Your PITFALLS.md prevents mistakes in track/planning. For each pitfall:
 </quality_gate>
 
 <output>
-Write to: .ace/recon/pitfalls.md
-Use template: ~/.claude/ace/templates/recon/pitfalls.md
+Write to: .ace/research/pitfalls.md
+Use template: ~/.claude/ace/templates/research/pitfalls.md
 </output>
-", subagent_type="ace-project-scout", model="{scout_model}", description="Pitfalls recon")
+", subagent_type="ace-project-scout", model="{scout_model}", description="Pitfalls research")
 ```
 
 After all 4 agents complete, spawn synthesizer to create recap.md:
@@ -337,29 +337,29 @@ After all 4 agents complete, spawn synthesizer to create recap.md:
 ```
 Task(prompt="
 <task>
-Synthesize recon outputs into recap.md.
+Synthesize research outputs into recap.md.
 </task>
 
-<recon_files>
+<research_files>
 Read these files:
-- .ace/recon/stack.md
-- .ace/recon/features.md
-- .ace/recon/architecture.md
-- .ace/recon/pitfalls.md
-</recon_files>
+- .ace/research/stack.md
+- .ace/research/features.md
+- .ace/research/architecture.md
+- .ace/research/pitfalls.md
+</research_files>
 
 <output>
-Write to: .ace/recon/recap.md
-Use template: ~/.claude/ace/templates/recon/recap.md
+Write to: .ace/research/recap.md
+Use template: ~/.claude/ace/templates/research/recap.md
 Commit after writing.
 </output>
-", subagent_type="ace-synthesizer", model="{synthesizer_model}", description="Synthesize recon")
+", subagent_type="ace-synthesizer", model="{synthesizer_model}", description="Synthesize research")
 ```
 
-Display recon complete banner and key findings:
+Display research complete banner and key findings:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► RECON COMPLETE ✓
+ ACE ► RESEARCH COMPLETE ✓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ## Key Findings
@@ -368,10 +368,10 @@ Display recon complete banner and key findings:
 **New feature table stakes:** [from recap.md]
 **Watch Out For:** [from recap.md]
 
-Files: `.ace/recon/`
+Files: `.ace/research/`
 ```
 
-**If "Skip recon":** Continue to Stage 8.
+**If "Skip research":** Continue to Stage 8.
 
 ## Stage 8: Define Requirements
 
@@ -389,7 +389,7 @@ Read brief.md and extract:
 - Current milestone goals
 - Validated requirements (what already exists)
 
-**If recon exists:** Read recon/features.md and extract feature categories.
+**If research exists:** Read research/features.md and extract feature categories.
 
 **Present features by category:**
 
@@ -405,7 +405,7 @@ Here are the features for [new capabilities]:
 - Feature C
 - Feature D
 
-**Recon notes:** [any relevant notes]
+**Research notes:** [any relevant notes]
 
 ---
 
@@ -413,7 +413,7 @@ Here are the features for [new capabilities]:
 ...
 ```
 
-**If no recon:** Gather requirements through conversation instead.
+**If no research:** Gather requirements through conversation instead.
 
 Ask: "What are the main things users need to be able to do with [new features]?"
 
@@ -444,9 +444,9 @@ Track responses:
 
 Use AskUserQuestion:
 - header: "Additions"
-- question: "Any requirements recon missed? (Features specific to your vision)"
+- question: "Any requirements research missed? (Features specific to your vision)"
 - options:
-  - "No, recon covered it" — Proceed
+  - "No, research covered it" — Proceed
   - "Yes, let me add some" — Capture additions
 
 **Generate specs.md:**
@@ -535,8 +535,8 @@ Task(prompt="
 **Requirements:**
 @.ace/specs.md
 
-**Recon (if exists):**
-@.ace/recon/recap.md
+**Research (if exists):**
+@.ace/research/recap.md
 
 **Config:**
 @.ace/config.json
@@ -666,7 +666,7 @@ Present completion with next steps:
 | Artifact       | Location                    |
 |----------------|-----------------------------|
 | Project        | `.ace/brief.md`             |
-| Recon          | `.ace/recon/`               |
+| Research          | `.ace/research/`               |
 | Requirements   | `.ace/specs.md`             |
 | Track          | `.ace/track.md`             |
 
@@ -695,8 +695,8 @@ Present completion with next steps:
 <success_criteria>
 - [ ] brief.md updated with Current Milestone section
 - [ ] pulse.md reset for new milestone
-- [ ] Recon completed (if selected) — 4 parallel agents spawned, milestone-aware
-- [ ] Requirements gathered (from recon or conversation)
+- [ ] Research completed (if selected) — 4 parallel agents spawned, milestone-aware
+- [ ] Requirements gathered (from research or conversation)
 - [ ] User scoped each category
 - [ ] specs.md created with REQ-IDs
 - [ ] ace-navigator spawned with stage numbering context

@@ -16,7 +16,7 @@ Switch the horsepower profile used by ACE agents. This controls which Claude mod
 |---------|-------------|
 | **max** | Opus everywhere except read-only auditing |
 | **balanced** | Opus for planning, Sonnet for execution/auditing (default) |
-| **eco** | Sonnet for writing, Haiku for recon/auditing |
+| **eco** | Sonnet for writing, Haiku for research/auditing |
 </profiles>
 
 <process>

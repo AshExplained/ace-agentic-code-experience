@@ -11,16 +11,16 @@ allowed-tools:
 <objective>
 Research how to implement a stage. Spawns ace-stage-scout agent with stage context.
 
-**Note:** This is a standalone recon command. For most workflows, use `/ace.plan-stage` which integrates recon automatically.
+**Note:** This is a standalone research command. For most workflows, use `/ace.plan-stage` which integrates research automatically.
 
 **Use this command when:**
-- You want to recon without architecting yet
-- You want to re-recon after architecting is complete
+- You want to research without architecting yet
+- You want to re-research after architecting is complete
 - You need to investigate before deciding if a stage is feasible
 
-**Orchestrator role:** Parse stage, validate against track, check existing recon, gather context, spawn scout agent, present results.
+**Orchestrator role:** Parse stage, validate against track, check existing research, gather context, spawn scout agent, present results.
 
-**Why subagent:** Recon burns context fast (WebSearch, Context7 queries, source verification). Fresh 200k context for investigation. Main context stays lean for user interaction.
+**Why subagent:** Research burns context fast (WebSearch, Context7 queries, source verification). Fresh 200k context for investigation. Main context stays lean for user interaction.
 </objective>
 
 <context>
@@ -66,13 +66,13 @@ grep -A5 "Stage ${STAGE}:" .ace/track.md 2>/dev/null
 
 **If not found:** Error and exit. **If found:** Extract stage number, name, description.
 
-## 2. Check Existing Recon
+## 2. Check Existing Research
 
 ```bash
-ls .ace/stages/${STAGE}-*/recon.md 2>/dev/null
+ls .ace/stages/${STAGE}-*/research.md 2>/dev/null
 ```
 
-**If exists:** Offer: 1) Update recon, 2) View existing, 3) Skip. Wait for response.
+**If exists:** Offer: 1) Update research, 2) View existing, 3) Skip. Wait for response.
 
 **If doesn't exist:** Continue.
 
@@ -89,12 +89,12 @@ Present summary with stage description, requirements, prior decisions.
 
 ## 4. Spawn ace-stage-scout Agent
 
-Recon modes: ecosystem (default), feasibility, implementation, comparison.
+Research modes: ecosystem (default), feasibility, implementation, comparison.
 
 ```markdown
-<recon_type>
-Stage Recon — investigating HOW to implement a specific stage well.
-</recon_type>
+<research_type>
+Stage Research — investigating HOW to implement a specific stage well.
+</research_type>
 
 <key_insight>
 The question is NOT "which library should I use?"
@@ -110,7 +110,7 @@ For this stage, discover:
 </key_insight>
 
 <objective>
-Recon implementation approach for Stage {stage_number}: {stage_name}
+Research implementation approach for Stage {stage_number}: {stage_name}
 Mode: ecosystem
 </objective>
 
@@ -122,7 +122,7 @@ Mode: ecosystem
 </context>
 
 <downstream_consumer>
-Your recon.md will be loaded by `/ace.plan-stage` which uses specific sections:
+Your research.md will be loaded by `/ace.plan-stage` which uses specific sections:
 - `## Standard Stack` → Runs use these libraries
 - `## Architecture Patterns` → Task structure follows these
 - `## Don't Hand-Roll` → Tasks NEVER build custom solutions for listed problems
@@ -142,7 +142,7 @@ Before declaring complete, verify:
 </quality_gate>
 
 <output>
-Write to: .ace/stages/${STAGE}-{slug}/${STAGE}-recon.md
+Write to: .ace/stages/${STAGE}-{slug}/${STAGE}-research.md
 </output>
 ```
 
@@ -151,27 +151,27 @@ Task(
   prompt="First, read ~/.claude/agents/ace-stage-scout.md for your role and instructions.\n\n" + filled_prompt,
   subagent_type="general-purpose",
   model="{scout_model}",
-  description="Recon Stage {stage}"
+  description="Research Stage {stage}"
 )
 ```
 
 ## 5. Handle Agent Return
 
-**`## RECON COMPLETE`:** Display summary, offer: Architect stage, Dig deeper, Review full, Done.
+**`## RESEARCH COMPLETE`:** Display summary, offer: Architect stage, Dig deeper, Review full, Done.
 
 **`## GATE REACHED ⏸`:** Present to user, get response, spawn continuation.
 
-**`## RECON INCONCLUSIVE`:** Show what was attempted, offer: Add context, Try different mode, Manual.
+**`## RESEARCH INCONCLUSIVE`:** Show what was attempted, offer: Add context, Try different mode, Manual.
 
 ## 6. Spawn Continuation Agent
 
 ```markdown
 <objective>
-Continue recon for Stage {stage_number}: {stage_name}
+Continue research for Stage {stage_number}: {stage_name}
 </objective>
 
 <prior_state>
-Recon file: @.ace/stages/${STAGE}-{slug}/${STAGE}-recon.md
+Research file: @.ace/stages/${STAGE}-{slug}/${STAGE}-research.md
 </prior_state>
 
 <checkpoint_response>
@@ -185,7 +185,7 @@ Task(
   prompt="First, read ~/.claude/agents/ace-stage-scout.md for your role and instructions.\n\n" + continuation_prompt,
   subagent_type="general-purpose",
   model="{scout_model}",
-  description="Continue recon Stage {stage}"
+  description="Continue research Stage {stage}"
 )
 ```
 
@@ -193,7 +193,7 @@ Task(
 
 <success_criteria>
 - [ ] Stage validated against track
-- [ ] Existing recon checked
+- [ ] Existing research checked
 - [ ] ace-stage-scout spawned with context
 - [ ] Gates handled correctly
 - [ ] User knows next steps

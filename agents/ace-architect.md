@@ -126,19 +126,19 @@ Discovery is MANDATORY unless you can prove current context exists.
 **Level 1 - Quick Verification** (2-5 min)
 - Single known library, confirming syntax/version
 - Low-risk decision (easily changed later)
-- Action: Context7 resolve-library-id + query-docs, no recon.md needed
+- Action: Context7 resolve-library-id + query-docs, no research.md needed
 
 **Level 2 - Standard Research** (15-30 min)
 - Choosing between 2-3 options
 - New external integration (API, service)
 - Medium-risk decision
-- Action: Route to recon workflow, produces recon.md
+- Action: Route to research workflow, produces research.md
 
 **Level 3 - Deep Dive** (1+ hour)
 - Architectural decision with long-term impact
 - Novel problem without clear patterns
 - High-risk, hard to change later
-- Action: Full research with recon.md
+- Action: Full research with research.md
 
 **Depth indicators:**
 - Level 2+: New library not in package.json, external API, "choose/select/evaluate" in description
@@ -368,7 +368,7 @@ Why 50% not 80%?
 - Multiple subsystems (DB + API + UI = separate runs)
 - Any task with >5 file modifications
 - Gate + implementation work in same run
-- Recon + implementation in same run
+- Research + implementation in same run
 
 **CONSIDER splitting:**
 - Estimated >5 files modified total
@@ -1078,13 +1078,13 @@ ls .ace/stages/
 
 If multiple stages available, ask which one to plan. If obvious (first incomplete stage), proceed.
 
-Read any existing run.md or recon.md in the stage directory.
+Read any existing run.md or research.md in the stage directory.
 
 **Check for --gaps flag:** If present, switch to gap_closure_mode.
 </step>
 
-<step name="mandatory_recon">
-Apply recon level protocol (see discovery_levels section).
+<step name="mandatory_research">
+Apply research level protocol (see discovery_levels section).
 </step>
 
 <step name="read_project_history">
@@ -1132,13 +1132,13 @@ STAGE_DIR=$(ls -d .ace/stages/$PADDED_STAGE-* .ace/stages/$STAGE-* 2>/dev/null |
 # Read intel.md if exists (from /ace.discuss-stage)
 cat "$STAGE_DIR"/*-intel.md 2>/dev/null
 
-# Read recon.md if exists (from /ace.research-stage)
-cat "$STAGE_DIR"/*-recon.md 2>/dev/null
+# Read research.md if exists (from /ace.research-stage)
+cat "$STAGE_DIR"/*-research.md 2>/dev/null
 ```
 
 **If intel.md exists:** Honor user's vision, prioritize their essential features, respect stated boundaries. These are locked decisions - do not revisit.
 
-**If recon.md exists:** Use standard_stack, architecture_patterns, dont_hand_roll, common_pitfalls. Research has already identified the right tools.
+**If research.md exists:** Use standard_stack, architecture_patterns, dont_hand_roll, common_pitfalls. Research has already identified the right tools.
 </step>
 
 <step name="break_into_tasks">
@@ -1231,7 +1231,7 @@ Update track.md to finalize stage placeholders created by add-stage or insert-st
 3. Update placeholders:
 
 **Goal** (only if placeholder):
-- `[To be planned]` → derive from intel.md > recon.md > stage description
+- `[To be planned]` → derive from intel.md > research.md > stage description
 - `[Urgent work - to be planned]` → derive from same sources
 - If Goal already has real content → leave it alone
 
@@ -1385,7 +1385,7 @@ Reviewer can now re-verify updated runs.
 
 Stage planning complete when:
 - [ ] pulse.md read, project history absorbed
-- [ ] Mandatory recon completed (Level 0-3)
+- [ ] Mandatory research completed (Level 0-3)
 - [ ] Prior decisions, issues, concerns synthesized
 - [ ] Dependency graph built (needs/creates for each task)
 - [ ] Tasks grouped into runs by batch, not by sequence

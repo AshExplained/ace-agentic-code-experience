@@ -14,7 +14,7 @@ allowed-tools:
 ---
 
 <objective>
-Execute small, ad-hoc tasks with ACE guarantees (atomic commits, pulse.md tracking) while skipping optional agents (recon, plan-reviewer, auditor).
+Execute small, ad-hoc tasks with ACE guarantees (atomic commits, pulse.md tracking) while skipping optional agents (research, plan-reviewer, auditor).
 
 Dash mode is the same system with a shorter path:
 - Spawns ace-architect (quick mode) + ace-runner(s)
@@ -156,7 +156,7 @@ Task(
 <constraints>
 - Create a SINGLE run with 1-3 focused tasks
 - Dash tasks should be atomic and self-contained
-- No recon stage, no reviewer stage
+- No research stage, no reviewer stage
 - Target ~30% context usage (simple, focused)
 </constraints>
 
