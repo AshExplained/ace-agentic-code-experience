@@ -125,8 +125,7 @@ Template for `.ace/codebase/STRUCTURE.md` - captures physical file organization.
 ```
 ace/
 ├── bin/                # Executable entry points
-├── commands/           # Slash command definitions
-│   └── ace/           # ACE-specific commands
+├── commands/           # Slash command definitions (ace.*.md)
 ├── ace/               # Skill resources
 │   ├── references/    # Principle documents
 │   ├── templates/     # File templates
@@ -146,10 +145,10 @@ ace/
 - Key files: install.js - handles npx installation
 - Subdirectories: None
 
-**commands/ace/**
+**commands/**
 - Purpose: Slash command definitions for Claude Code
-- Contains: *.md files (one per command)
-- Key files: start.md, plan-stage.md, run-stage.md
+- Contains: ace.*.md files (one per command)
+- Key files: ace.start.md, ace.plan-stage.md, ace.run-stage.md
 - Subdirectories: None (flat structure)
 
 **ace/references/**
@@ -213,7 +212,7 @@ ace/
 ## Where to Add New Code
 
 **New Slash Command:**
-- Primary code: `commands/ace/{command-name}.md`
+- Primary code: `commands/ace.{command-name}.md`
 - Tests: `tests/commands/{command-name}.test.js` (if testing implemented)
 - Documentation: Update `README.md` with new command
 

@@ -8,7 +8,7 @@ Reference for creating commands, agents, workflows, templates, and references th
 
 | Type | Location | Naming | Has Frontmatter |
 |------|----------|--------|-----------------|
-| Command | `commands/ace/*.md` | `kebab-case.md` | Yes (YAML) |
+| Command | `commands/ace.*.md` | `ace.kebab-case.md` | Yes (YAML) |
 | Agent | `agents/*.md` | `ace-*.md` | Yes (YAML) |
 | Workflow | `ace/workflows/*.md` | `kebab-case.md` | No |
 | Template | `ace/templates/*.md` | `kebab-case.md` | No |

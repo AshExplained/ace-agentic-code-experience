@@ -124,7 +124,7 @@ Template for `.ace/codebase/ARCHITECTURE.md` - captures conceptual code organiza
 **Command Layer:**
 - Purpose: Parse user input and route to appropriate handler
 - Contains: Command definitions, argument parsing, help text
-- Location: `commands/ace/*.md`
+- Location: `commands/ace.*.md`
 - Depends on: Workflow layer for execution logic
 - Used by: CLI entry point
 
@@ -177,7 +177,7 @@ Template for `.ace/codebase/ARCHITECTURE.md` - captures conceptual code organiza
 
 **Command:**
 - Purpose: CLI slash command definition
-- Examples: `commands/ace/run-stage.md`, `commands/ace/plan-stage.md`
+- Examples: `commands/ace.run-stage.md`, `commands/ace.plan-stage.md`
 - Pattern: Thin wrapper delegating to workflows
 
 **Workflow:**
@@ -198,7 +198,7 @@ Template for `.ace/codebase/ARCHITECTURE.md` - captures conceptual code organiza
 ## Entry Points
 
 **Commands:**
-- Location: `commands/ace/*.md`
+- Location: `commands/ace.*.md`
 - Triggers: User invokes slash command
 - Responsibilities: Load context, delegate to workflow, report results
 

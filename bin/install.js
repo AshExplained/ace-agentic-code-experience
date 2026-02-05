@@ -407,8 +407,8 @@ function convertClaudeToOpencodeFrontmatter(content) {
   convertedContent = convertedContent.replace(/\bAskUserQuestion\b/g, 'question');
   convertedContent = convertedContent.replace(/\bSlashCommand\b/g, 'skill');
   convertedContent = convertedContent.replace(/\bTodoWrite\b/g, 'todowrite');
-  // Replace /ace:command with /ace-command for opencode (flat command structure)
-  convertedContent = convertedContent.replace(/\/ace:/g, '/ace-');
+  // Replace /ace.command with /ace-command for opencode (flat command structure)
+  convertedContent = convertedContent.replace(/\/ace\./g, '/ace-');
   // Replace ~/.claude with ~/.config/opencode
   convertedContent = convertedContent.replace(/~\/\.claude\b/g, '~/.config/opencode');
 
@@ -515,15 +515,16 @@ function convertClaudeToGeminiToml(content) {
 }
 
 /**
- * Copy commands to a flat structure for OpenCode
+ * Copy ace.*.md commands to OpenCode's flat command/ directory
+ * Converts ace.{name}.md → ace-{name}.md (dot to dash)
  */
-function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime) {
-  if (!fs.existsSync(srcDir)) return;
+function copyCommandsForOpencode(commandsSrc, destDir, pathPrefix, runtime) {
+  if (!fs.existsSync(commandsSrc)) return;
 
   // Remove old ace-*.md files before copying new ones
   if (fs.existsSync(destDir)) {
     for (const file of fs.readdirSync(destDir)) {
-      if (file.startsWith(`${prefix}-`) && file.endsWith('.md')) {
+      if (file.startsWith('ace-') && file.endsWith('.md')) {
         fs.unlinkSync(path.join(destDir, file));
       }
     }
@@ -531,27 +532,59 @@ function copyFlattenedCommands(srcDir, destDir, prefix, pathPrefix, runtime) {
     fs.mkdirSync(destDir, { recursive: true });
   }
 
-  const entries = fs.readdirSync(srcDir, { withFileTypes: true });
+  const entries = fs.readdirSync(commandsSrc);
 
-  for (const entry of entries) {
-    const srcPath = path.join(srcDir, entry.name);
+  for (const file of entries) {
+    if (!file.startsWith('ace.') || !file.endsWith('.md')) continue;
 
-    if (entry.isDirectory()) {
-      copyFlattenedCommands(srcPath, destDir, `${prefix}-${entry.name}`, pathPrefix, runtime);
-    } else if (entry.name.endsWith('.md')) {
-      const baseName = entry.name.replace('.md', '');
-      const destName = `${prefix}-${baseName}.md`;
-      const destPath = path.join(destDir, destName);
+    const srcPath = path.join(commandsSrc, file);
+    // ace.run-stage.md → ace-run-stage.md
+    const destName = file.replace(/^ace\./, 'ace-');
+    const destPath = path.join(destDir, destName);
 
-      let content = fs.readFileSync(srcPath, 'utf8');
-      const claudeDirRegex = /~\/\.claude\//g;
-      const opencodeDirRegex = /~\/\.opencode\//g;
-      content = content.replace(claudeDirRegex, pathPrefix);
-      content = content.replace(opencodeDirRegex, pathPrefix);
-      content = processAttribution(content, getCommitAttribution(runtime));
-      content = convertClaudeToOpencodeFrontmatter(content);
+    let content = fs.readFileSync(srcPath, 'utf8');
+    content = content.replace(/~\/\.claude\//g, pathPrefix);
+    content = content.replace(/~\/\.opencode\//g, pathPrefix);
+    content = processAttribution(content, getCommitAttribution(runtime));
+    content = convertClaudeToOpencodeFrontmatter(content);
 
-      fs.writeFileSync(destPath, content);
+    fs.writeFileSync(destPath, content);
+  }
+}
+
+/**
+ * Copy ace.*.md commands to Claude/Gemini commands/ directory
+ */
+function copyCommandFiles(commandsSrc, commandsDir, pathPrefix, runtime) {
+  if (!fs.existsSync(commandsSrc)) return;
+
+  fs.mkdirSync(commandsDir, { recursive: true });
+
+  // Clean existing ace.*.md and ace.*.toml files before copying
+  for (const file of fs.readdirSync(commandsDir)) {
+    if (file.startsWith('ace.') && (file.endsWith('.md') || file.endsWith('.toml'))) {
+      fs.unlinkSync(path.join(commandsDir, file));
+    }
+  }
+
+  const entries = fs.readdirSync(commandsSrc);
+
+  for (const file of entries) {
+    if (!file.startsWith('ace.') || !file.endsWith('.md')) continue;
+
+    const srcPath = path.join(commandsSrc, file);
+
+    let content = fs.readFileSync(srcPath, 'utf8');
+    content = content.replace(/~\/\.claude\//g, pathPrefix);
+    content = processAttribution(content, getCommitAttribution(runtime));
+
+    if (runtime === 'gemini') {
+      content = stripSubTags(content);
+      const tomlContent = convertClaudeToGeminiToml(content);
+      const tomlName = file.replace(/\.md$/, '.toml');
+      fs.writeFileSync(path.join(commandsDir, tomlName), tomlContent);
+    } else {
+      fs.writeFileSync(path.join(commandsDir, file), content);
     }
   }
 }
@@ -699,11 +732,15 @@ function uninstall(isGlobal, runtime = 'claude') {
       console.log(`  ${green}\u2713${reset} Removed ACE commands from command/`);
     }
   } else {
-    const aceCommandsDir = path.join(targetDir, 'commands', 'ace');
-    if (fs.existsSync(aceCommandsDir)) {
-      fs.rmSync(aceCommandsDir, { recursive: true });
-      removedCount++;
-      console.log(`  ${green}\u2713${reset} Removed commands/ace/`);
+    const commandsDir = path.join(targetDir, 'commands');
+    if (fs.existsSync(commandsDir)) {
+      for (const file of fs.readdirSync(commandsDir)) {
+        if (file.startsWith('ace.') && (file.endsWith('.md') || file.endsWith('.toml'))) {
+          fs.unlinkSync(path.join(commandsDir, file));
+          removedCount++;
+        }
+      }
+      console.log(`  ${green}\u2713${reset} Removed ACE commands from commands/`);
     }
   }
 
@@ -955,8 +992,8 @@ function install(isGlobal, runtime = 'claude') {
     const commandDir = path.join(targetDir, 'command');
     fs.mkdirSync(commandDir, { recursive: true });
 
-    const aceSrc = path.join(src, 'commands', 'ace');
-    copyFlattenedCommands(aceSrc, commandDir, 'ace', pathPrefix, runtime);
+    const commandsSrc = path.join(src, 'commands');
+    copyCommandsForOpencode(commandsSrc, commandDir, pathPrefix, runtime);
     if (verifyInstalled(commandDir, 'command/ace-*')) {
       const count = fs.readdirSync(commandDir).filter(f => f.startsWith('ace-')).length;
       console.log(`  ${green}\u2713${reset} Installed ${count} commands to command/`);
@@ -967,13 +1004,13 @@ function install(isGlobal, runtime = 'claude') {
     const commandsDir = path.join(targetDir, 'commands');
     fs.mkdirSync(commandsDir, { recursive: true });
 
-    const aceSrc = path.join(src, 'commands', 'ace');
-    const aceDest = path.join(commandsDir, 'ace');
-    copyWithPathReplacement(aceSrc, aceDest, pathPrefix, runtime);
-    if (verifyInstalled(aceDest, 'commands/ace')) {
-      console.log(`  ${green}\u2713${reset} Installed commands/ace`);
+    const commandsSrc = path.join(src, 'commands');
+    copyCommandFiles(commandsSrc, commandsDir, pathPrefix, runtime);
+    const count = fs.readdirSync(commandsDir).filter(f => f.startsWith('ace.') && (f.endsWith('.md') || f.endsWith('.toml'))).length;
+    if (count > 0) {
+      console.log(`  ${green}\u2713${reset} Installed ${count} commands`);
     } else {
-      failures.push('commands/ace');
+      failures.push('commands');
     }
   }
 
