@@ -16,6 +16,7 @@ Enables "thought → capture → continue" flow without losing context or derail
 </objective>
 
 <context>
+$ARGUMENTS
 @.ace/pulse.md
 </context>
 

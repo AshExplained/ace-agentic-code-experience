@@ -40,11 +40,11 @@ function getFileType(filePath) {
 // ─── YAML frontmatter parsing ───
 
 function extractFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---/);
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
 
   const fields = {};
-  const lines = match[1].split('\n');
+  const lines = match[1].split(/\r?\n/);
   let currentKey = null;
   let inList = false;
   let listItems = [];
@@ -77,7 +77,7 @@ function extractFrontmatter(content) {
 }
 
 function hasFrontmatter(content) {
-  return /^---\n/.test(content);
+  return /^---\r?\n/.test(content);
 }
 
 // ─── Validation rules per file type ───
@@ -86,7 +86,11 @@ const COMMAND_REQUIRED_FRONTMATTER = ['name', 'description', 'allowed-tools'];
 const COMMAND_REQUIRED_SECTIONS = ['<objective>', '<process>', '<success_criteria>'];
 
 const AGENT_REQUIRED_FRONTMATTER = ['name', 'description', 'tools'];
-const AGENT_REQUIRED_SECTIONS = ['<role>', '<execution_flow>', '<success_criteria>'];
+const AGENT_REQUIRED_SECTIONS = [
+  '<role>',
+  ['<execution_flow>', '<verification_process>', '<process>'],
+  '<success_criteria>',
+];
 
 const WORKFLOW_REQUIRED_SECTIONS = ['<purpose>'];
 
@@ -160,8 +164,10 @@ function validateAgent(filePath, content) {
   }
 
   for (const section of AGENT_REQUIRED_SECTIONS) {
-    if (!content.includes(section)) {
-      errors.push(`${filePath}: Missing required section: ${section}`);
+    const alternatives = Array.isArray(section) ? section : [section];
+    const found = alternatives.some((s) => content.includes(s));
+    if (!found) {
+      errors.push(`${filePath}: Missing required section: ${alternatives[0]}`);
     }
   }
 }
@@ -193,15 +199,16 @@ function validateTemplate(filePath, content) {
 // ─── Cross-cutting validators (all file types) ───
 
 function validateXmlTagClosure(filePath, content) {
+  // Strip fenced code blocks and inline backtick code
+  const stripped = content.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]+`/g, '');
+
   for (const tag of CLOSEABLE_TAGS) {
-    const openPattern = new RegExp(`<${tag}[\\s>]`, 'g');
+    // Only match opening tags at line start (ignores prose/documentation references)
+    const openPattern = new RegExp(`^[ \\t]*<${tag}[\\s>]`, 'gm');
     const closePattern = new RegExp(`</${tag}>`, 'g');
 
-    // Ignore content inside code blocks
-    const contentOutsideCodeBlocks = content.replace(/```[\s\S]*?```/g, '');
-
-    const openCount = (contentOutsideCodeBlocks.match(openPattern) || []).length;
-    const closeCount = (contentOutsideCodeBlocks.match(closePattern) || []).length;
+    const openCount = (stripped.match(openPattern) || []).length;
+    const closeCount = (stripped.match(closePattern) || []).length;
 
     if (openCount > closeCount) {
       errors.push(`${filePath}: Unclosed <${tag}> tag (${openCount} opened, ${closeCount} closed)`);
@@ -210,9 +217,10 @@ function validateXmlTagClosure(filePath, content) {
 }
 
 function validateStepNames(filePath, content) {
-  const stepNamePattern = /name="([^"]+)"/g;
+  const stripped = content.replace(/```[\s\S]*?```/g, '');
+  const stepNamePattern = /<step\s[^>]*name="([^"]+)"/g;
   let match;
-  while ((match = stepNamePattern.exec(content)) !== null) {
+  while ((match = stepNamePattern.exec(stripped)) !== null) {
     const name = match[1];
     if (!/^[a-z][a-z0-9]*(_[a-z0-9]+)*$/.test(name)) {
       errors.push(`${filePath}: Step name "${name}" must be snake_case`);

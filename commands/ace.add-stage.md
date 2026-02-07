@@ -21,6 +21,10 @@ Purpose: Add planned work discovered during execution that belongs at the end of
 @.ace/pulse.md
 </execution_context>
 
+<context>
+$ARGUMENTS
+</context>
+
 <process>
 
 <step name="parse_arguments">

@@ -1,6 +1,10 @@
 ---
 name: ace.set-profile
 description: Switch horsepower profile for ACE agents (max/balanced/eco)
+allowed-tools:
+  - Read
+  - Write
+  - Bash
 arguments:
   - name: profile
     description: "Profile name: max, balanced, or eco"
@@ -104,3 +108,9 @@ Agents will now use:
 ```
 
 </examples>
+
+<success_criteria>
+- [ ] Profile validated as max, balanced, or eco
+- [ ] config.json updated with new horsepower value
+- [ ] Confirmation with model table displayed to user
+</success_criteria>

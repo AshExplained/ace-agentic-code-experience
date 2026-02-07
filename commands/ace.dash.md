@@ -1,7 +1,6 @@
 ---
 name: ace.dash
 description: Execute a quick task with ACE guarantees (atomic commits, state tracking) but skip optional agents
-argument-hint: ""
 allowed-tools:
   - Read
   - Write

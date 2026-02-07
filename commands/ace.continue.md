@@ -38,3 +38,9 @@ The workflow handles all resumption logic including:
 6. Routing to appropriate next command
 7. Session continuity updates
 </process>
+
+<success_criteria>
+- [ ] Project context restored from pulse.md (or reconstructed if missing)
+- [ ] Gates and incomplete work detected (checked .continue-here files and run.md without recap.md)
+- [ ] Visual status and context-aware next actions presented to user
+</success_criteria>

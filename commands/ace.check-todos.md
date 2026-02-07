@@ -17,6 +17,7 @@ Enables reviewing captured ideas and deciding what to work on next.
 </objective>
 
 <context>
+$ARGUMENTS
 @.ace/pulse.md
 @.ace/track.md
 </context>

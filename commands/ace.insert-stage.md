@@ -21,6 +21,10 @@ Purpose: Handle urgent work discovered during execution without renumbering enti
 @.ace/pulse.md
 </execution_context>
 
+<context>
+$ARGUMENTS
+</context>
+
 <process>
 
 <step name="parse_arguments">

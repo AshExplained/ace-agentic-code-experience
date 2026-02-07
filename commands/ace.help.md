@@ -1,6 +1,8 @@
 ---
 name: ace.help
 description: Show available ACE commands and usage guide
+allowed-tools:
+  - Read
 ---
 
 <objective>
@@ -453,3 +455,11 @@ Example config:
 - Check `.ace/track.md` for stage status
 - Run `/ace.status` to check where you're up to
   </reference>
+
+<process>
+Output the reference content above verbatim. Do not add project-specific analysis, git status, or commentary.
+</process>
+
+<success_criteria>
+- [ ] Complete command reference displayed to user
+</success_criteria>

@@ -24,16 +24,14 @@ Output: Milestone archived (track + specs), brief.md evolved, git tagged.
   </execution_context>
 
 <context>
+$ARGUMENTS
+
 **Project files:**
 - `.ace/track.md`
 - `.ace/specs.md`
 - `.ace/pulse.md`
 - `.ace/brief.md`
-
-**User input:**
-
-- Version: {{version}} (e.g., "1.0", "1.1", "2.0")
-  </context>
+</context>
 
 <process>
 

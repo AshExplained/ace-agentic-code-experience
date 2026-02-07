@@ -21,6 +21,10 @@ Output: Stage deleted, all subsequent stages renumbered, git commit as historica
 @.ace/pulse.md
 </execution_context>
 
+<context>
+$ARGUMENTS
+</context>
+
 <process>
 
 <step name="parse_arguments">
