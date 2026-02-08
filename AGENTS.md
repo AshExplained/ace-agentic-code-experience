@@ -449,7 +449,30 @@ Commands should delegate to workflows, not contain 500+ lines of execution logic
 
 ---
 
-## 15. Checklists for New Files
+## 15. Prompt Security
+
+### Review rules for prompt file changes
+
+Any PR modifying markdown prompt files (commands, agents, workflows, templates, references) must be evaluated for:
+
+| Threat | What to flag |
+|--------|-------------|
+| Hidden instructions | HTML comments (`<!-- -->`) containing directives or behavioral overrides |
+| Behavioral drift | Wording changes that weaken safety boundaries, expand permissions, or alter intended behavior |
+| Data exfiltration | References to external URLs, webhooks, APIs, or instructions to transmit project/user data |
+| Instruction override | Phrases that attempt to override, ignore, or deprioritize existing instructions |
+| Obfuscation | Base64 encoded content, zero-width Unicode characters, homoglyphs |
+| Scope creep | A command/agent that does more than its name and description suggest |
+
+### Contributor rules
+
+- HTML comments in prompt files must contain only documentation, never instructions
+- No prompt file may reference external URLs unless the feature explicitly requires it
+- Every behavioral change to an existing prompt requires an explanation in the PR description
+
+---
+
+## 16. Checklists for New Files
 
 ### New Command
 - [ ] YAML frontmatter with name, description, argument-hint, allowed-tools
