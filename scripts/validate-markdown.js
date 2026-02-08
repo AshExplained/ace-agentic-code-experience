@@ -421,10 +421,10 @@ function validateBannedPhrases(filePath, content) {
     { pattern: /^Let me\b/i, category: 'Filler' },
     { pattern: /^Just\s/i, category: 'Filler' },
     { pattern: /^Simply\s/i, category: 'Filler' },
-    { pattern: /\bGreat!\b/, category: 'Sycophancy' },
-    { pattern: /\bAwesome!\b/, category: 'Sycophancy' },
-    { pattern: /\bPerfect!\b/, category: 'Sycophancy' },
-    { pattern: /\bExcellent!\b/, category: 'Sycophancy' },
+    { pattern: /\bGreat\b!?/, category: 'Sycophancy' },
+    { pattern: /\bAwesome\b!?/, category: 'Sycophancy' },
+    { pattern: /\bPerfect\b!?/, category: 'Sycophancy' },
+    { pattern: /\bExcellent\b!?/, category: 'Sycophancy' },
     { pattern: /\bWe changed\b/i, category: 'History language' },
     { pattern: /\bPreviously\b/i, category: 'History language' },
     { pattern: /\bNo longer\b/i, category: 'History language' },
@@ -582,26 +582,72 @@ function collectFiles(dir, ext) {
   return results;
 }
 
-const args = process.argv.slice(2);
-const filesToValidate =
-  args.length > 0 ? args.filter((f) => f.endsWith('.md')) : collectFiles(ROOT, '.md');
+// ─── CLI entry point ───
 
-for (const file of filesToValidate) {
-  validateFile(path.resolve(file));
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  const filesToValidate =
+    args.length > 0 ? args.filter((f) => f.endsWith('.md')) : collectFiles(ROOT, '.md');
+
+  for (const file of filesToValidate) {
+    validateFile(path.resolve(file));
+  }
+
+  console.log(`\nACE Markdown Validator — ${filesChecked} files checked\n`);
+
+  if (warnings.length > 0) {
+    console.log(`⚠ ${warnings.length} warning(s):`);
+    for (const w of warnings) console.log(`  ${w}`);
+    console.log('');
+  }
+
+  if (errors.length > 0) {
+    console.log(`✗ ${errors.length} error(s):`);
+    for (const e of errors) console.log(`  ${e}`);
+    process.exit(1);
+  } else {
+    console.log('✓ All files valid');
+  }
 }
 
-console.log(`\nACE Markdown Validator — ${filesChecked} files checked\n`);
+// ─── Exports for testing ───
 
-if (warnings.length > 0) {
-  console.log(`⚠ ${warnings.length} warning(s):`);
-  for (const w of warnings) console.log(`  ${w}`);
-  console.log('');
-}
-
-if (errors.length > 0) {
-  console.log(`✗ ${errors.length} error(s):`);
-  for (const e of errors) console.log(`  ${e}`);
-  process.exit(1);
-} else {
-  console.log('✓ All files valid');
-}
+module.exports = {
+  getFileType,
+  extractFrontmatter,
+  hasFrontmatter,
+  validateCommand,
+  validateAgent,
+  validateWorkflow,
+  validateReference,
+  validateTemplate,
+  validateXmlTagClosure,
+  validateStepNames,
+  validateCrossReferences,
+  validateReferenceFormat,
+  validateArgumentsUsage,
+  validateBannedTerminology,
+  validateBannedXmlTags,
+  validateCommandSectionOrder,
+  validateAgentSectionOrder,
+  validateAgentCompletionMarkers,
+  validateAgentFirstStep,
+  validateCommandDelegation,
+  validateBannedPhrases,
+  validateTemplateStructure,
+  validateTaskXmlStructure,
+  validateFile,
+  collectFiles,
+  errors,
+  warnings,
+  _resetState() {
+    errors.length = 0;
+    warnings.length = 0;
+    filesChecked = 0;
+  },
+  _getFilesChecked() {
+    return filesChecked;
+  },
+  ROOT,
+  CLOSEABLE_TAGS,
+};

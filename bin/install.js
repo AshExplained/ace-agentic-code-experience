@@ -160,14 +160,18 @@ const explicitConfigDir = parseConfigDirArg();
 const hasHelp = args.includes('--help') || args.includes('-h');
 const forceStatusline = args.includes('--force-statusline');
 
-console.log(banner);
+// ─── CLI banner and help ───
 
-// Show help if requested
-if (hasHelp) {
-  console.log(
-    `  ${yellow}Usage:${reset} npx ace-experience [options]\n\n  ${yellow}Options:${reset}\n    ${cyan}-g, --global${reset}              Install globally (to config directory)\n    ${cyan}-l, --local${reset}               Install locally (to current directory)\n    ${cyan}--claude${reset}                  Install for Claude Code only\n    ${cyan}--opencode${reset}                Install for OpenCode only\n    ${cyan}--gemini${reset}                  Install for Gemini only\n    ${cyan}--all${reset}                     Install for all runtimes\n    ${cyan}-u, --uninstall${reset}           Uninstall ACE (remove all ACE files)\n    ${cyan}-c, --config-dir <path>${reset}   Specify custom config directory\n    ${cyan}-h, --help${reset}                Show this help message\n    ${cyan}--force-statusline${reset}        Replace existing statusline config\n\n  ${yellow}Examples:${reset}\n    ${dim}# Interactive install (prompts for runtime and location)${reset}\n    npx ace-experience\n\n    ${dim}# Install for Claude Code globally${reset}\n    npx ace-experience --claude --global\n\n    ${dim}# Install for all runtimes globally${reset}\n    npx ace-experience --all --global\n\n    ${dim}# Install to custom config directory${reset}\n    npx ace-experience --claude --global --config-dir ~/.claude-bc\n\n    ${dim}# Install to current project only${reset}\n    npx ace-experience --claude --local\n\n    ${dim}# Uninstall ACE from Claude Code globally${reset}\n    npx ace-experience --claude --global --uninstall\n`
-  );
-  process.exit(0);
+if (require.main === module) {
+  console.log(banner);
+
+  // Show help if requested
+  if (hasHelp) {
+    console.log(
+      `  ${yellow}Usage:${reset} npx ace-experience [options]\n\n  ${yellow}Options:${reset}\n    ${cyan}-g, --global${reset}              Install globally (to config directory)\n    ${cyan}-l, --local${reset}               Install locally (to current directory)\n    ${cyan}--claude${reset}                  Install for Claude Code only\n    ${cyan}--opencode${reset}                Install for OpenCode only\n    ${cyan}--gemini${reset}                  Install for Gemini only\n    ${cyan}--all${reset}                     Install for all runtimes\n    ${cyan}-u, --uninstall${reset}           Uninstall ACE (remove all ACE files)\n    ${cyan}-c, --config-dir <path>${reset}   Specify custom config directory\n    ${cyan}-h, --help${reset}                Show this help message\n    ${cyan}--force-statusline${reset}        Replace existing statusline config\n\n  ${yellow}Examples:${reset}\n    ${dim}# Interactive install (prompts for runtime and location)${reset}\n    npx ace-experience\n\n    ${dim}# Install for Claude Code globally${reset}\n    npx ace-experience --claude --global\n\n    ${dim}# Install for all runtimes globally${reset}\n    npx ace-experience --all --global\n\n    ${dim}# Install to custom config directory${reset}\n    npx ace-experience --claude --global --config-dir ~/.claude-bc\n\n    ${dim}# Install to current project only${reset}\n    npx ace-experience --claude --local\n\n    ${dim}# Uninstall ACE from Claude Code globally${reset}\n    npx ace-experience --claude --global --uninstall\n`
+    );
+    process.exit(0);
+  }
 }
 
 /**
@@ -1394,39 +1398,67 @@ function installAllRuntimes(runtimes, isGlobal, isInteractive) {
   }
 }
 
-// Main logic
-if (hasGlobal && hasLocal) {
-  console.error(`  ${yellow}Cannot specify both --global and --local${reset}`);
-  process.exit(1);
-} else if (explicitConfigDir && hasLocal) {
-  console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
-  process.exit(1);
-} else if (hasUninstall) {
-  if (!hasGlobal && !hasLocal) {
-    console.error(`  ${yellow}--uninstall requires --global or --local${reset}`);
+// ─── CLI entry point ───
+
+if (require.main === module) {
+  if (hasGlobal && hasLocal) {
+    console.error(`  ${yellow}Cannot specify both --global and --local${reset}`);
     process.exit(1);
-  }
-  const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ['claude'];
-  for (const runtime of runtimes) {
-    uninstall(hasGlobal, runtime);
-  }
-} else if (selectedRuntimes.length > 0) {
-  if (!hasGlobal && !hasLocal) {
-    promptLocation(selectedRuntimes);
+  } else if (explicitConfigDir && hasLocal) {
+    console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
+    process.exit(1);
+  } else if (hasUninstall) {
+    if (!hasGlobal && !hasLocal) {
+      console.error(`  ${yellow}--uninstall requires --global or --local${reset}`);
+      process.exit(1);
+    }
+    const runtimes = selectedRuntimes.length > 0 ? selectedRuntimes : ['claude'];
+    for (const runtime of runtimes) {
+      uninstall(hasGlobal, runtime);
+    }
+  } else if (selectedRuntimes.length > 0) {
+    if (!hasGlobal && !hasLocal) {
+      promptLocation(selectedRuntimes);
+    } else {
+      installAllRuntimes(selectedRuntimes, hasGlobal, false);
+    }
+  } else if (hasGlobal || hasLocal) {
+    installAllRuntimes(['claude'], hasGlobal, false);
   } else {
-    installAllRuntimes(selectedRuntimes, hasGlobal, false);
-  }
-} else if (hasGlobal || hasLocal) {
-  installAllRuntimes(['claude'], hasGlobal, false);
-} else {
-  if (!process.stdin.isTTY) {
-    console.log(
-      `  ${yellow}Non-interactive terminal detected, defaulting to Claude Code global install${reset}\n`
-    );
-    installAllRuntimes(['claude'], true, false);
-  } else {
-    promptRuntime((runtimes) => {
-      promptLocation(runtimes);
-    });
+    if (!process.stdin.isTTY) {
+      console.log(
+        `  ${yellow}Non-interactive terminal detected, defaulting to Claude Code global install${reset}\n`
+      );
+      installAllRuntimes(['claude'], true, false);
+    } else {
+      promptRuntime((runtimes) => {
+        promptLocation(runtimes);
+      });
+    }
   }
 }
+
+// ─── Exports for testing ───
+
+module.exports = {
+  expandTilde,
+  buildHookCommand,
+  getDirName,
+  getGlobalDir,
+  getOpencodeGlobalDir,
+  readSettings,
+  writeSettings,
+  processAttribution,
+  convertToolName,
+  convertGeminiToolName,
+  stripSubTags,
+  convertClaudeToGeminiAgent,
+  convertClaudeToOpencodeFrontmatter,
+  convertClaudeToGeminiToml,
+  buildBanner,
+  verifyInstalled,
+  verifyFileInstalled,
+  colorNameToHex,
+  claudeToOpencodeTools,
+  claudeToGeminiTools,
+};

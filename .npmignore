@@ -2,6 +2,7 @@
 .husky/
 .github/
 scripts/
+tests/
 hooks/ace-*.js
 *.md
 !README.md
