@@ -31,10 +31,6 @@ The installer walks you through setup — pick global or local install, choose y
 - Node.js 16.7+
 - One of: Claude Code, OpenCode, or Gemini CLI
 
-## Acknowledgments
-
-Built on ideas from [Get Shit Done](https://github.com/glittercowboy/get-shit-done) by Lex Christopherson.
-
 ## License
 
 [MIT](LICENSE)
