@@ -1,0 +1,13 @@
+# Default owner for everything
+* @AshExplained
+
+# CI pipeline files — only you can approve changes
+.github/ @AshExplained
+
+# Package configuration — only you can approve
+package.json @AshExplained
+package-lock.json @AshExplained
+
+# Installer and hooks — security sensitive
+bin/ @AshExplained
+hooks/ @AshExplained

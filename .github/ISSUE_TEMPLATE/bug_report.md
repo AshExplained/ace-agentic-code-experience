@@ -23,4 +23,4 @@ labels: bug
 - OS:
 - Node version:
 - ACE version:
-- Claude Code runtime:
+- CLI tool name and version:
