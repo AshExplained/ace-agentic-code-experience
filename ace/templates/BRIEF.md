@@ -2,6 +2,8 @@
 
 Template for `.ace/brief.md` — the living project context document.
 
+## File Template
+
 <template>
 
 ```markdown

@@ -91,7 +91,7 @@ To use uncommitted mode:
    .ace/
    ```
 
-3. **Existing tracked files:** If `.ace/` was previously tracked:
+3. **Existing tracked files:** If `.ace/` is currently tracked by git:
    ```bash
    git rm -r --cached .ace/
    git commit -m "chore: stop tracking planning docs"

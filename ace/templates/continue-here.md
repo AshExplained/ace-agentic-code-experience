@@ -2,6 +2,8 @@
 
 Copy and fill this structure for `.ace/stages/XX-name/.continue-here.md`:
 
+## File Template
+
 ```yaml
 ---
 stage: XX-name

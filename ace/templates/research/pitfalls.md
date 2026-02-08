@@ -2,6 +2,8 @@
 
 Template for `.ace/research/pitfalls.md` — common mistakes to avoid in the project domain.
 
+## File Template
+
 <template>
 
 ```markdown

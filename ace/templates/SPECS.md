@@ -2,6 +2,8 @@
 
 Template for `.ace/specs.md` — checkable requirements that define "done."
 
+## File Template
+
 <template>
 
 ```markdown

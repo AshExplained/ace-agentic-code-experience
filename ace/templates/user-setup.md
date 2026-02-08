@@ -302,6 +302,8 @@ curl -X POST http://localhost:3000/api/test-email \
 
 ---
 
+<guidelines>
+
 ## Guidelines
 
 **Never include:** Actual secret values. Steps Claude can automate (package installs, code changes).
@@ -309,3 +311,5 @@ curl -X POST http://localhost:3000/api/test-email \
 **Naming:** `{stage}-USER-SETUP.md` matches the stage number pattern.
 **Status tracking:** User marks checkboxes and updates status line when complete.
 **Searchability:** `grep -r "USER-SETUP" .ace/` finds all stages with user requirements.
+
+</guidelines>

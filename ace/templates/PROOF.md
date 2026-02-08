@@ -159,6 +159,8 @@ None — all verifiable items checked programmatically.
 
 ---
 
+<guidelines>
+
 ## Guidelines
 
 **Status values:**
@@ -182,6 +184,8 @@ None — all verifiable items checked programmatically.
 - Group related fixes into single runs
 - Keep to 2-3 tasks per run
 - Include verification task in each run
+
+</guidelines>
 
 ---
 

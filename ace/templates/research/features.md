@@ -2,6 +2,8 @@
 
 Template for `.ace/research/features.md` — feature landscape for the project domain.
 
+## File Template
+
 <template>
 
 ```markdown

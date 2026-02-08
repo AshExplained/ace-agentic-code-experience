@@ -823,9 +823,10 @@ The file IS the debugging brain.
 <execution_flow>
 
 <step name="check_active_session">
-**First:** Check for active debug sessions.
+**First:** Load project state and check for active debug sessions.
 
 ```bash
+cat .ace/pulse.md 2>/dev/null
 ls .ace/debug/*.md 2>/dev/null | grep -v resolved
 ```
 

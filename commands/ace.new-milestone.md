@@ -48,7 +48,7 @@ Milestone name: $ARGUMENTS (optional - will prompt if not provided)
 ## Stage 1: Load Context
 
 - Read brief.md (existing project, Validated requirements, decisions)
-- Read milestones.md (what shipped previously)
+- Read milestones.md (completed milestones, shipping history)
 - Read pulse.md (pending todos, blockers)
 
 ## Stage 2: Gather Milestone Goals

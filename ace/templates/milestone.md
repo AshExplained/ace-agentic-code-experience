@@ -2,6 +2,8 @@
 
 Add this entry to `.ace/milestones.md` when completing a milestone:
 
+## File Template
+
 ```markdown
 ## v[X.Y] [Name] (Shipped: YYYY-MM-DD)
 

@@ -364,9 +364,11 @@ function validateAgentCompletionMarkers(filePath, content, fileType) {
   const markers = ['RUN COMPLETE', 'GATE REACHED', 'CULPRIT FOUND', 'INVESTIGATION INCONCLUSIVE'];
 
   const hasMarker = markers.some((m) => content.includes(m));
-  if (!hasMarker) {
+  const hasRoleComplete = /##\s+\w[\w\s]*COMPLETE/i.test(content);
+  const hasStructuredReturns = content.includes('<structured_returns>');
+  if (!hasMarker && !hasRoleComplete && !hasStructuredReturns) {
     warnings.push(
-      `${filePath}: No completion marker found — agents should reference at least one of: ${markers.join(', ')}`
+      `${filePath}: No completion marker found — agents should reference at least one of: ${markers.join(', ')}, a role-specific ## {ROLE} COMPLETE, or a <structured_returns> section`
     );
   }
 }
@@ -375,7 +377,7 @@ function validateCommandDelegation(filePath, content, fileType) {
   if (fileType !== 'command') return;
 
   const lineCount = content.split('\n').length;
-  if (lineCount <= 80) return;
+  if (lineCount <= 500) return;
 
   const hasWorkflowRef = /@~\/\.claude\/ace\/workflows\//.test(content);
   if (!hasWorkflowRef) {

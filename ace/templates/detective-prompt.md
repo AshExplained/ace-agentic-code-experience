@@ -1,10 +1,12 @@
 # Detective Prompt Template
 
-Template for spawning ace-detective agent. The agent contains all debugging expertise - this template provides problem context only.
+<purpose>
+Template for spawning ace-detective agent. The agent contains all debugging expertise — this template provides problem context only.
+</purpose>
 
 ---
 
-## Template
+## File Template
 
 ```markdown
 <objective>

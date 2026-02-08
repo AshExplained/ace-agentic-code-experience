@@ -2,7 +2,9 @@
 
 Template for `.ace/track.md`.
 
-## Initial Track (v1.0 Greenfield)
+## File Template
+
+### Initial Track (v1.0 Greenfield)
 
 ```markdown
 # Track: [Project Name]
@@ -133,7 +135,7 @@ Stages execute in numeric order: 2 → 2.1 → 2.2 → 3 → 3.1 → 4
 - `Deferred` - Pushed to later (with reason)
 </status_values>
 
-## Milestone-Grouped Track (After v1.0 Ships)
+### Milestone-Grouped Track (After v1.0 Ships)
 
 After completing first milestone, reorganize with milestone groupings:
 

@@ -520,6 +520,8 @@ function useVehicleControls(rigidBodyRef) {
 
 ---
 
+<guidelines>
+
 ## Guidelines
 
 **When to create:**
@@ -550,3 +552,5 @@ function useVehicleControls(rigidBodyRef) {
 - File lives in stage directory: `.ace/stages/XX-name/{stage}-research.md`
 - Referenced during planning workflow
 - plan-stage loads it automatically when present
+
+</guidelines>

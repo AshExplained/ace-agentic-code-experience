@@ -255,7 +255,7 @@ cat .ace/stages/*-*/*-recap.md
 
    **Out of Scope audit:**
    - Review each item — is the reasoning still valid?
-   - Remove items that are no longer relevant
+   - Remove items that lack current relevance
    - Add any specs invalidated during this milestone
 
 4. **Context update:**

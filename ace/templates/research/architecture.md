@@ -2,6 +2,8 @@
 
 Template for `.ace/research/architecture.md` — system structure patterns for the project domain.
 
+## File Template
+
 <template>
 
 ```markdown

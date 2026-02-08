@@ -133,7 +133,7 @@ Where we are right now:
 Progress calculation: (completed runs) / (total runs across all stages) × 100%
 
 ### Performance Metrics
-Track velocity to understand execution patterns:
+Track execution speed to identify patterns:
 - Total runs completed
 - Average duration per run
 - Per-stage breakdown

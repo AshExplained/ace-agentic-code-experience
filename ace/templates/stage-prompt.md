@@ -456,6 +456,8 @@ files_modified: [...]
 
 ---
 
+<guidelines>
+
 ## Guidelines
 
 - Always use XML structure for Claude parsing
@@ -464,6 +466,8 @@ files_modified: [...]
 - Only reference prior RECAPs when genuinely needed
 - Group gates with related auto tasks in same run
 - 2-3 tasks per run, ~50% context max
+
+</guidelines>
 
 ---
 

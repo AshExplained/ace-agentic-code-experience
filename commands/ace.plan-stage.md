@@ -14,10 +14,6 @@ allowed-tools:
   - mcp__context7__*
 ---
 
-<execution_context>
-@~/.claude/ace/references/ui-brand.md
-</execution_context>
-
 <objective>
 Create executable stage prompts (run.md files) for a track stage with integrated research and verification.
 
@@ -27,6 +23,10 @@ Create executable stage prompts (run.md files) for a track stage with integrated
 
 **Why subagents:** Research and planning burn context fast. Verification uses fresh context. User sees the flow between agents in main context.
 </objective>
+
+<execution_context>
+@~/.claude/ace/references/ui-brand.md
+</execution_context>
 
 <context>
 Stage number: $ARGUMENTS (optional - auto-detects next unplanned stage if not provided)

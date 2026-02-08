@@ -117,10 +117,12 @@ Create recap.md or return structured result.
 ```
 
 **Agent return formats:**
-- `## RUN COMPLETE` — Success
-- `## GATE REACHED` — Pause for user
-- `## CULPRIT FOUND` — Debug result
-- `## INVESTIGATION INCONCLUSIVE` — Blocked
+Agents signal completion with a role-appropriate `## HEADING` marker. Common markers:
+- `## RUN COMPLETE` — Runner finished executing a stage run
+- `## GATE REACHED` — Any agent pausing for user input
+- `## CULPRIT FOUND` — Detective located the root cause
+- `## INVESTIGATION INCONCLUSIVE` — Detective blocked
+- `## {ROLE} COMPLETE` — Role-specific success (e.g., `## AUDIT COMPLETE`, `## REVIEW COMPLETE`)
 
 ---
 

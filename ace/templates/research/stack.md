@@ -2,6 +2,8 @@
 
 Template for `.ace/research/stack.md` — recommended technologies for the project domain.
 
+## File Template
+
 <template>
 
 ```markdown

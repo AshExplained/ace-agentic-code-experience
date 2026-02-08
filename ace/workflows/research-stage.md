@@ -43,7 +43,7 @@ Route to appropriate level workflow below.
 </step>
 
 <step name="level_1_quick_verify">
-**Level 1: Quick Verification (2-5 minutes)**
+**Level 1: Quick Verification**
 
 For: Single known library, confirming syntax/version still correct.
 
@@ -77,7 +77,7 @@ For: Single known library, confirming syntax/version still correct.
 </step>
 
 <step name="level_2_standard">
-**Level 2: Standard Research (15-30 minutes)**
+**Level 2: Standard Research**
 
 For: Choosing between options, new external integration.
 

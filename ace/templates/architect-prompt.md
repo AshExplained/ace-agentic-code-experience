@@ -1,10 +1,12 @@
 # Architect Subagent Prompt Template
 
-Template for spawning ace-architect agent. The agent contains all planning expertise - this template provides planning context only.
+<purpose>
+Template for spawning ace-architect agent. The agent contains all planning expertise — this template provides planning context only.
+</purpose>
 
 ---
 
-## Template
+## File Template
 
 ```markdown
 <planning_context>

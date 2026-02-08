@@ -2,6 +2,8 @@
 
 Template for `.ace/research/recap.md` — executive summary of project research with track implications.
 
+## File Template
+
 <template>
 
 ```markdown
