@@ -6,7 +6,7 @@ If you discover a security vulnerability in ACE, please report it responsibly.
 
 **Do not open a public GitHub issue for security vulnerabilities.**
 
-Instead, email the maintainer directly or use [GitHub's private vulnerability reporting](https://github.com/AshExplained/ace-agentic-code-experience/security/advisories/new).
+Instead, use [GitHub's private vulnerability reporting](https://github.com/AshExplained/ace-agentic-code-experience/security/advisories/new).
 
 ### What to include
 
