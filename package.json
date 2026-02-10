@@ -50,6 +50,9 @@
     "*.json": [
       "prettier --write"
     ],
+    "*.{yml,yaml}": [
+      "prettier --write"
+    ],
     "commands/*.md": [
       "node scripts/validate-markdown.js"
     ],
