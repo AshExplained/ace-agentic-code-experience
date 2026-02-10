@@ -1,0 +1,11 @@
+# ─── Sync check: warn if dev is behind origin/main ───
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [ "$branch" = "dev" ]; then
+  git fetch origin main --quiet 2>/dev/null
+  behind=$(git rev-list --count dev..origin/main 2>/dev/null)
+  if [ "$behind" -gt 0 ] 2>/dev/null; then
+    echo "⚠ dev is $behind commit(s) behind origin/main."
+    echo "  Run: git merge origin/main"
+    exit 1
+  fi
+fi
