@@ -46,5 +46,7 @@ jobs:
       - name: Build hooks
         run: npm run build:hooks
 
+      # No NODE_AUTH_TOKEN needed — uses OIDC Trusted Publishing
+      # configured at npmjs.com/settings/ashexplained
       - name: Publish to npm
         run: npm publish --provenance --access public
