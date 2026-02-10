@@ -16,7 +16,7 @@ The installer walks you through setup — pick global or local install, choose y
 
 - **25 slash commands** — structured actions like `/ace.run-stage`, `/ace.add-todo`, `/ace.audit`
 - **11 specialized agents** — architect, runner, detective, auditor, and more
-- **12 workflows** — reusable processes the commands delegate to
+- **15 workflows** — reusable processes the commands delegate to
 - **State files** — `pulse.md` (living memory), `track.md` (stage structure), `brief.md` (project context)
 
 ## How it works

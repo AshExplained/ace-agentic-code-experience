@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - 25 slash commands for stage-driven project execution
 - 11 specialized agents (architect, runner, detective, auditor, and more)
-- 12 reusable workflows
+- 15 reusable workflows
 - Interactive installer supporting Claude Code, OpenCode, and Gemini
 - State management via pulse.md, track.md, brief.md, specs.md
 - Global and local install modes
