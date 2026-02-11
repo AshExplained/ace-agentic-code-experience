@@ -511,6 +511,12 @@ Verify what actually exists in the code.",
 grep "^status:" "$STAGE_DIR"/*-proof.md | cut -d: -f2 | tr -d ' '
 ```
 
+**Safety check — override status if human verification items exist in proof.md:**
+
+If status is `passed` but proof.md body contains a "Human Verification" section with items,
+override status to `human_needed`. The auditor may have miscategorized — the orchestrator
+should trust the data over the label.
+
 **Route by status:**
 
 | Status | Action |
