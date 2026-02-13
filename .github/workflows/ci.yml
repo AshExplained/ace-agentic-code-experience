@@ -10,7 +10,6 @@ jobs:
   lint:
     name: Lint & Format
     runs-on: ubuntu-latest
-    if: github.actor != 'release-please[bot]'
     steps:
       - uses: actions/checkout@v6
 
@@ -39,7 +38,6 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
-    if: github.actor != 'release-please[bot]'
     steps:
       - uses: actions/checkout@v6
         with:
@@ -64,7 +62,6 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     needs: lint
-    if: github.actor != 'release-please[bot]'
     steps:
       - uses: actions/checkout@v6
 

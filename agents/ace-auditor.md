@@ -463,7 +463,7 @@ Some things can't be verified programmatically:
 - All artifacts pass level 1-3
 - All key links WIRED
 - No blocker anti-patterns
-- (Human verification items are OK — will be prompted)
+- No items flagged for human verification
 
 **Status: gaps_found**
 
@@ -475,8 +475,8 @@ Some things can't be verified programmatically:
 **Status: human_needed**
 
 - All automated checks pass
-- BUT items flagged for human verification
-- Can't determine goal achievement without human
+- AND one or more items flagged for human verification
+- Can't determine goal achievement without human input
 
 **Calculate score:**
 

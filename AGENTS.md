@@ -356,7 +356,7 @@ git add src/   # FORBIDDEN
 | Agents | `ace-kebab` | `ace-runner` |
 | Step names | snake_case | `name="load_state"` |
 | Bash vars | CAPS_SNAKE | `STAGE_ARG` |
-| State files | UPPERCASE | `pulse.md` |
+| State files | lowercase | `pulse.md` |
 | Stage dirs | `NN-kebab` | `01-authentication` |
 
 ---
