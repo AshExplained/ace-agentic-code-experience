@@ -226,12 +226,15 @@ Define the three keyword lists:
 ```
 STRONG_POSITIVE = [ui, frontend, dashboard, interface, page, screen, layout, form,
                    component, widget, view, display, navigation, sidebar, header,
-                   footer, modal, dialog]
+                   footer, modal, dialog, login, signup, register, onboarding,
+                   checkout, wizard, portal, gallery, carousel, menu, toolbar,
+                   toast, notification, badge, avatar, card, table, grid]
 
 MODERATE_POSITIVE = [visual, render, prototype, style, theme, responsive, landing,
-                     home, profile, settings]
+                     home, profile, settings, account, billing, search, filter,
+                     admin, panel]
 
-STRONG_NEGATIVE = [api, backend, cli, migration, database, schema, auth, middleware,
+STRONG_NEGATIVE = [api, backend, cli, migration, database, schema, middleware,
                    config, devops, deploy, test, refactor, security, performance]
 ```
 
