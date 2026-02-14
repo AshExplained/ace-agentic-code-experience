@@ -513,16 +513,52 @@ If `## REVIEW PASSED`:
 - Reset `auto_revision_count = 0`
 - Proceed to approval gate
 
+### Auto-Open Prototypes in Browser
+
+Before displaying the approval gate, open all review-listed HTML files in the user's default browser.
+
+Build the file list based on mode:
+- Full mode: `.ace/design/stylekit-preview.html` + all `{stage_dir}/design/*.html` files
+- Screens-only mode: all `{stage_dir}/design/*.html` files only
+
+Open each file using platform-detected commands:
+
+```bash
+# Platform-specific browser open (best-effort, non-blocking)
+for file in $GATE_FILES; do
+  if [[ -f "$file" ]]; then
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+      start "" "$file"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+      open "$file"
+    elif command -v xdg-open &>/dev/null; then
+      xdg-open "$file" &>/dev/null &
+    elif command -v cmd.exe &>/dev/null; then
+      cmd.exe /c start "" "$file"
+    fi
+    sleep 0.5
+  fi
+done
+```
+
+Important:
+- Open files BEFORE displaying the gate prompt (user sees prototypes while reading the gate text)
+- Use `sleep 0.5` between opens to avoid overwhelming the browser with simultaneous tab opens
+- Wrap in best-effort pattern -- if open fails (headless environment, missing command), proceed silently
+- The `start ""` pattern on Windows is required because `start` interprets the first quoted argument as a window title
+- The `cmd.exe` fallback handles WSL and native Windows PowerShell where `$OSTYPE` may not be `msys`
+
 ### Human-Verify Approval Gate (PLAN-06)
 
 Present `checkpoint:human-verify`:
 
 Full mode gate:
 ```
-what-built: "Design system and prototypes for Stage {N}: {stage_name}"
+what-built: "Design system and screen prototypes for Stage {N}: {stage_name}"
 how-to-verify:
-  1. Review HTML prototypes in browser:
-     {list all .html files from designer return}
+  1. Review design preview in browser (auto-opened):
+     - .ace/design/stylekit-preview.html (design system overview: colors, typography, spacing, components)
+     - {list only screen prototype .html files from {stage_dir}/design/ -- NOT component HTMLs from .ace/design/components/}
   2. Check that layout matches your vision
   3. Verify components look intentional (not generic AI defaults)
   4. Review stylekit token choices (colors, typography, spacing)
@@ -535,8 +571,8 @@ Screens-only mode gate:
 ```
 what-built: "Screen prototypes for Stage {N}: {stage_name}"
 how-to-verify:
-  1. Review HTML prototypes in browser:
-     {list all .html files from designer return}
+  1. Review screen prototypes in browser (auto-opened):
+     - {list only screen prototype .html files from {stage_dir}/design/}
   2. Check screens use existing design system consistently
   3. Verify new components (if any) match existing style
   {IF revision exists:}
