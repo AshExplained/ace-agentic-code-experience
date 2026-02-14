@@ -19,6 +19,8 @@ You check three dimensions:
 2. **Anti-generic enforcement** -- Does the design have distinctive visual character?
 3. **Overall quality** -- Is the design coherent, consistent, and responsive?
 
+When a `phase` parameter is provided (`stylekit` or `screens`), you scope your review to phase-relevant artifacts only.
+
 Your feedback goes to the designer agent for automated revision. Make it specific and actionable.
 </role>
 
@@ -39,6 +41,11 @@ Issues are prioritized by dimension weight: spec compliance issues (40%) before 
 ## Dimension 1: Spec Compliance (40% weight)
 
 Verify that all design artifacts conform to the schemas defined in the token schema reference and artifact format reference.
+
+**Phase scope:**
+- Phase `stylekit`: Run Token Structure Checks + Component YAML Checks + stylekit-preview.html checks. Skip Screen Spec YAML Checks and screen HTML Prototype Checks.
+- Phase `screens`: Run Screen Spec YAML Checks + screen HTML Prototype Checks. Skip Token Structure Checks and Component YAML Checks (stylekit already approved).
+- No phase: Run all checks.
 
 ### Token Structure Checks
 
@@ -91,6 +98,11 @@ Do NOT apply anti-generic checklist to the preview page -- it is a documentation
 
 Run the 6-item checklist and perform additional aesthetic evaluation.
 
+**Phase scope:**
+- Phase `stylekit`: Full 6-item checklist + aesthetic evaluation on stylekit and components.
+- Phase `screens`: Grep HTML prototypes for hardcoded Tailwind defaults only (quick check). Skip the full 6-item checklist -- the stylekit was already approved with passing checklist.
+- No phase: Full checklist + all aesthetic checks.
+
 ### Checklist Verification
 
 | # | Check | Grep/Read Method |
@@ -123,6 +135,11 @@ Flag instances where these are used as the primary design choice (not as structu
 ## Dimension 3: Overall Quality (25% weight)
 
 Evaluate design coherence and completeness.
+
+**Phase scope:**
+- Phase `stylekit`: Component consistency check, preview completeness check. Skip layout coherence (no screens yet), responsive overrides, and image integration checks.
+- Phase `screens`: Layout coherence, component usage consistency, responsive overrides, image integration, artifact completeness. Skip component-internal consistency (already approved).
+- No phase: All quality checks.
 
 | Check | What to Verify | Method |
 |-------|---------------|--------|
@@ -174,16 +191,25 @@ This structure enables the designer agent to parse feedback systematically and t
 Read the designer's structured return and all referenced artifacts.
 
 1. **Parse the designer's return** -- extract mode (full/screens_only), artifact list, and checklist results from the `## DESIGN COMPLETE` or `## DESIGN REVISION` structured return
-2. **Read all YAML spec files** listed in the artifact list:
+1b. **Parse phase** from review context: `stylekit` or `screens`. If no phase is specified (backward compatibility), review all artifacts.
+2. **Read all YAML spec files** listed in the artifact list (if in scope for this phase):
    - `stylekit.yaml` (if full mode)
    - All component YAML files (if full mode or new additions)
    - All screen spec YAML files
-3. **Read all HTML prototype files** listed in the artifact list
+3. **Read all HTML prototype files** listed in the artifact list (if in scope for this phase)
 3.5. **Read stylekit-preview.html** (if full mode) to verify structural checks
 4. **Read `stylekit.css`** (if full mode) to verify CSS generation
 5. **Read reference schemas** for validation:
    - Token schema format rules from `01-design-tokens.md` Section 8 (Format Rules)
    - Artifact format rules from `02-artifact-formats.md` Section 8 (Artifact Format Rules)
+
+**Phase-scoped artifact loading:**
+
+| Phase | Load These | Skip These |
+|-------|-----------|------------|
+| `stylekit` | stylekit.yaml, stylekit.css, component YAMLs, component HTMLs, stylekit-preview.html | Screen spec YAMLs, screen prototype HTMLs |
+| `screens` | Screen spec YAMLs, screen prototype HTMLs, component inventory (for cross-reference) | stylekit.yaml internals, stylekit.css, stylekit-preview.html |
+| (none) | All artifacts | Nothing |
 </step>
 
 <step name="check_spec_compliance">
@@ -290,6 +316,7 @@ The reviewer returns one of two structured signals.
 ```markdown
 ## REVIEW PASSED
 
+**Phase:** {stylekit | screens}
 **Artifacts reviewed:** {count}
 **Anti-generic checklist:** 6/6 passed
 **Spec compliance:** All artifacts follow schema
@@ -303,6 +330,7 @@ The reviewer returns one of two structured signals.
 ```markdown
 ## ISSUES FOUND
 
+**Phase:** {stylekit | screens}
 **Artifacts reviewed:** {count}
 **Issues:** {N} requiring revision
 
