@@ -387,7 +387,7 @@ First, read ./.claude/agents/ace-designer.md for your role and instructions.
 {component_names}
 
 {IF full mode:}
-**Token Schema Reference:** Follow the 3-layer architecture (primitive, semantic, component) from the design token specification. W3C DTCG $type/$value structure. Namespace mapping: primitive.color.* -> --color-*, primitive.typography.family.* -> --font-*, primitive.typography.size.* -> --text-*, etc. All @theme values resolved to concrete CSS (no var() references inside @theme block). Reset Tailwind default colors with --color-*: initial.
+**Token Schema Reference:** Follow the 3-layer architecture (primitive, semantic, component) from the design token specification. W3C DTCG $type/$value structure. Namespace mapping: primitive.color.* -> --color-*, primitive.typography.family.* -> --font-*, primitive.typography.size.* -> --text-*, etc. All :root values resolved to concrete CSS (no var() references inside :root block). Stylekit.css uses plain :root {} custom properties, not Tailwind v4 @theme syntax. HTML boilerplate uses Tailwind v3 CDN with inline tailwind.config mapping tokens to theme extensions.
 **Component Schema Reference:** Follow the component inventory format: required fields are name, description, category, properties, tokens, states, responsive, accessibility, preview. State vocabulary fixed at 8: default, hover, active, focus, disabled, loading, error, empty. Token-driven preview using semantic Tailwind classes.
 
 **Pexels API Key:** {pexels_key}
@@ -413,7 +413,7 @@ For revisions, append a `<revision_context>` block:
 **Current artifacts on disk:**
 {list of existing artifact paths}
 
-Revise the design based on the feedback above. Create -before.html copies of current prototypes before overwriting.
+Revise the design based on the feedback above. Overwrite prototype files in place (git tracks previous versions).
 Return ## DESIGN REVISION (not ## DESIGN COMPLETE) to signal this is a revision.
 
 </revision_context>
@@ -504,7 +504,7 @@ how-to-verify:
   3. Verify components look intentional (not generic AI defaults)
   4. Review stylekit token choices (colors, typography, spacing)
   {IF revision exists:}
-  5. Compare with previous version: {list -before.html files}
+  5. Compare with previous version using git diff or browser tab comparison
 resume-signal: Type "approved" or describe what to change
 ```
 
@@ -517,7 +517,7 @@ how-to-verify:
   2. Check screens use existing design system consistently
   3. Verify new components (if any) match existing style
   {IF revision exists:}
-  4. Compare with previous version: {list -before.html files}
+  4. Compare with previous version using git diff or browser tab comparison
 resume-signal: Type "approved" or describe what to change
 ```
 
