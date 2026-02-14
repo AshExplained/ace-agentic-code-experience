@@ -365,6 +365,22 @@ For each screen spec YAML, generate an HTML prototype:
    - If no API key: use descriptive placeholder divs per the fallback format.
 
 4. **Production-fidelity standard:** Prototypes must have proper spacing, complete component rendering, real typography (Google Fonts loaded), realistic content, and consistent token-derived styling. What the user approves is what gets built.
+
+5. **Demo toggle controls:** Add a fixed-position control panel (`fixed bottom-4 right-4 z-[60] flex gap-2`) to every screen prototype. For each state defined in the screen spec's `states` field (beyond `default`), render a toggle button. Each button calls a state toggle function (e.g., `toggleErrorState()`, `toggleLoadingState()`) that shows/hides the corresponding state's DOM elements using `classList.toggle('hidden')` or `style.display` changes. Include a "Reset" button that returns all states to default. Button styling adapts to the project's token system. See `design-artifacts.md` Prototype Interactivity section for the HTML pattern.
+
+6. **Working JavaScript interactions:** Add a `<script>` block at the bottom of each prototype with demo-quality JavaScript for interactions defined in the screen spec's `interactions` field. Required behaviors (implement whichever apply to the screen):
+
+   - **Form validation:** Input fields show error state styling (red border, shake animation, error message) on empty submit or invalid input
+   - **Tag/chip input:** Enter or comma key adds a tag chip, Backspace on empty input removes last tag, duplicate prevention
+   - **Modal open/close:** Button click opens modal (scale-in animation, backdrop blur), Escape key or backdrop click closes
+   - **Loading transitions:** Button click triggers loading state (spinner + "Saving..."), then success ("Saved!" + checkmark), then auto-reset
+   - **Delete confirmation:** Click delete swaps footer to confirm/cancel buttons with slide animation
+
+   JavaScript is demo-quality: global variables, global functions, plain DOM manipulation (`getElementById`, `querySelector`, `classList`). No state management libraries. See `design-artifacts.md` Prototype Interactivity section for code patterns.
+
+7. **Multi-state rendering:** For each state in the screen spec's `states` field, render the corresponding DOM elements within the same HTML file. States beyond `default` start with `class="hidden"`. The demo toggle buttons (item 5) show/hide these state sections. The designer renders ALL states in the HTML -- each state is a complete representation of how the screen looks in that state (e.g., loading shows skeleton placeholders, empty shows centered empty-state message with CTA button).
+
+8. **Modal/dialog context:** For screens that ARE modals or dialogs (identified by layout type or screen description mentioning "modal", "dialog", "overlay", "popup"): render the parent screen at reduced opacity behind the modal overlay. Use skeleton content (colored divs with rounded corners) at `opacity-40` with `aria-hidden="true"` for the parent, a backdrop overlay (`fixed inset-0 bg-black/60 backdrop-blur-sm z-40`), and the modal content at `z-50`. See `design-artifacts.md` Modal Context Pattern for the layered HTML structure.
 </step>
 
 <step name="self_check">
