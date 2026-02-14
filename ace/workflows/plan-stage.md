@@ -326,36 +326,149 @@ Select: use-existing or restyle
 If `use-existing`: Continue with `DESIGN_MODE="screens_only"`.
 If `restyle`: Set `DESIGN_MODE="full"`. Designer receives existing stylekit as reference context.
 
-### Pexels API Key Check
+### Design Interview
+
+**If `DESIGN_MODE="screens_only"`: Skip interview entirely.** Preferences are already baked into the existing stylekit.
+
+**If `DESIGN_MODE="full"`:** Run the progressive design interview.
+
+Display banner:
+
+```
+ACE > DESIGNING STAGE {X} -- DESIGN INTERVIEW
+
+Before creating your design system, let me understand your vision.
+```
+
+If this is a restyle (DESIGN_MODE was set to "full" via the restyle trigger), acknowledge it: "You're restyling. Let me ask about your new direction."
+
+#### Step 1: Analyze Project Context
+
+Read available project context to generate design-relevant gray areas:
+
+1. Read brief.md for project domain and value proposition
+2. Read stage goal from track.md for what's being built
+3. Read research.md (if exists) for technical context
+4. Read intel.md (if exists) for existing decisions
+
+Generate 3-5 gray areas SPECIFIC to this project. These are design decisions that would change the outcome and the user should weigh in on. Examples:
+
+For a "personal dashboard" project:
+- "Visual density" -- Dense data tables vs. spacious cards?
+- "Brand personality" -- Professional tool feel vs. friendly personal app?
+- "Interaction patterns" -- Drag-and-drop? Inline editing? Modal workflows?
+
+For a "documentation site" project:
+- "Content hierarchy" -- Hero-focused or content-first?
+- "Visual identity" -- Technical/precise or approachable/warm?
+- "Navigation density" -- Mega menu? Simple top nav? Sidebar?
+
+NOT generic: "UI layout", "Color scheme", "Typography choices" -- these are categories, not gray areas.
+
+**Map core design questions to gray areas.** Each of the 6 core design preferences should have a natural home in one of the generated gray areas:
+
+| Core Question | Natural Fit Examples |
+|---------------|---------------------|
+| Visual style (professional/minimal/warm/bold) | Brand personality, Visual identity |
+| Color direction (warm/cool/neutral/vibrant) | Brand personality, Visual identity |
+| Typography (serif/sans/mono pairing) | Content presentation, Reading experience |
+| Layout density (spacious/comfortable/dense) | Content density, Information architecture |
+| Dark mode (dark-default/toggle/light-only) | Can be its own area or fit under Technical preferences |
+| Responsive (desktop-first/fully-responsive/desktop-only) | Can be its own area or fit under Device strategy |
+
+Track which core questions are mapped to which gray areas.
+
+#### Step 2: Present Gray Areas for Selection
+
+Use AskUserQuestion with multiSelect: true:
+
+```
+- header: "Design Direction"
+- question: "Which design areas should we discuss for [stage name]?"
+- options: [3-5 project-specific gray areas, each with a short description of what questions it covers]
+```
+
+Do NOT include a "skip all" option. The user ran design to get design -- give them real choices. Core design questions embedded in unselected areas will be caught by the fallback round (Step 4).
+
+#### Step 3: Deep-Dive Each Selected Area
+
+For each selected area, in order:
+
+1. Announce the area: "Let's talk about [area]."
+
+2. Ask 3-4 questions using AskUserQuestion, each with 2-4 concrete options:
+   - Include the core design question(s) mapped to this area as structured AskUserQuestion calls
+   - Every question MUST include a "Let Claude decide" option
+   - For subjective/brand questions (visual style, color direction): recommend a specific option (label it "(Recommended)")
+   - For opinionated/technical questions (typography pairing, spacing rhythm, border radius): recommend "Let Claude decide" (label it "(Recommended)")
+   - For mixed questions (layout density, dark mode, responsive): recommend a specific option
+   - Each subsequent question informed by previous answers in this area
+   - After the core question(s), ask 1-2 project-specific follow-up questions for the gray area
+
+3. After 3-4 questions for the area, offer: "More questions about [area], or move to next?"
+   - If "More questions": ask 2-3 more, then check again
+   - If "Next area": proceed to next selected area
+
+**Scope guardrail:** If the user suggests something outside the stage domain during discussion:
+```
+"[Feature] sounds like a new capability -- that belongs in its own stage.
+Let's focus on the design direction for [current stage]."
+```
+
+**Target 8-15 total questions across all areas.** The interview should take 2-3 minutes, not 10.
+
+#### Step 4: Core Question Fallback
+
+After all selected gray areas are discussed, check which core design questions were NOT asked (because their containing gray area was deselected or no gray area naturally contained them).
+
+```
+CORE_QUESTIONS = [visual_style, color_direction, typography, layout_density, dark_mode, responsive]
+ASKED_QUESTIONS = [questions already embedded in gray area discussions]
+REMAINING = CORE_QUESTIONS - ASKED_QUESTIONS
+```
+
+If REMAINING is not empty, present: "A few more design essentials:"
+
+For each remaining core question, use AskUserQuestion with the standard options:
+
+- **Visual style:** Professional/minimal, Clean/modern, Warm/editorial, Bold/expressive, Let Claude decide
+- **Color direction:** Warm tones, Cool tones, Neutral/monochrome, Vibrant/saturated, Let Claude decide (Recommended)
+- **Typography:** Sans-serif (modern), Serif (editorial), Mono (technical), Mixed pairing, Let Claude decide (Recommended)
+- **Layout density:** Spacious (lots of whitespace), Comfortable (balanced), Dense (information-heavy), Let Claude decide (Recommended)
+- **Dark mode:** Dark by default, Light with dark toggle, Light only, Let Claude decide
+- **Responsive:** Desktop-first (responsive down), Fully responsive (mobile-first), Desktop only, Let Claude decide
+
+#### Step 5: Pexels API Key Collection
+
+After all design questions are answered, collect the Pexels API key as part of the same flow.
 
 ```bash
 PEXELS_KEY=$(cat .ace/secrets.json 2>/dev/null | grep -o '"pexels_api_key"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "")
 ```
 
-If empty or missing, use the subagent's interactive prompt (AskUserQuestion tool or equivalent) to present:
+If key already exists in secrets.json: read silently, no prompt. Display: "Pexels key found."
+
+If empty or missing, present as AskUserQuestion:
 
 ```
-Pexels API key not found.
-
-This key enables real stock images in design prototypes.
-Get a free key at: https://www.pexels.com/api/
-
-Paste your API key below, or type 'skip' to use placeholder images:
+- header: "One last thing"
+- question: "Pexels API key enables real stock images in prototypes. Get a free key at https://www.pexels.com/api/"
+- options:
+  - "Paste my key" -- I have a key ready
+  - "Skip" -- Use placeholder images instead
 ```
 
-If the user provides a key (non-empty string that is not "skip"):
+If user selects "Paste my key", prompt for the key value. Then:
 1. Read existing `.ace/secrets.json` content (if file exists) to preserve other fields
 2. Merge `{"pexels_api_key": "{user_input}"}` into the existing JSON object
 3. Write merged JSON back to `.ace/secrets.json`
 4. Set `PEXELS_KEY` to the provided value
-5. Display: "Pexels API key saved to .ace/secrets.json"
+5. Display: "Pexels API key saved."
 
-If the user types "skip":
+If user selects "Skip":
 1. Set `PEXELS_KEY="NOT_AVAILABLE"`
-2. Display: "Skipping Pexels -- using placeholder images."
+2. Display: "Using placeholder images."
 3. Do NOT create or modify secrets.json
-
-This prompt appears only when no key exists. On subsequent UI stages where secrets.json already has the key, it is read silently (no prompt).
 
 Ensure `.ace/secrets.json` is gitignored:
 
@@ -363,7 +476,59 @@ Ensure `.ace/secrets.json` is gitignored:
 grep -q "secrets.json" .gitignore 2>/dev/null || echo ".ace/secrets.json" >> .gitignore
 ```
 
-If key is present: `PEXELS_KEY` holds the value. If absent after prompt: `PEXELS_KEY="NOT_AVAILABLE"`.
+#### Step 6: Compile Design Preferences
+
+Compile all collected answers into a `DESIGN_PREFERENCES` variable using this format:
+
+```xml
+<design_preferences>
+
+## Design Direction
+
+### Visual Style
+Pick: {user's choice OR "Designer's choice"}
+Context: {any elaboration from follow-up questions}
+
+### Color Direction
+Pick: {user's choice OR "Designer's choice"}
+Context: {any elaboration}
+
+### Typography
+Pick: {user's choice OR "Designer's choice"}
+Context: {any elaboration}
+
+### Layout
+Pick: {user's choice OR "Designer's choice"}
+Context: {any elaboration}
+
+### Dark Mode
+Pick: {user's choice OR "Designer's choice"}
+
+### Responsive
+Pick: {user's choice OR "Designer's choice"}
+
+## Project-Specific Insights
+
+### [Gray Area 1 that was discussed]
+- {Decision or preference captured}
+- {Another decision}
+
+### [Gray Area 2 that was discussed]
+- {Decision or preference captured}
+
+## Designer Autonomy
+
+The following aspects are marked as "Designer's choice" -- you have creative autonomy:
+- {list of items where user picked "Let Claude decide"}
+
+For these items, make opinionated choices that serve the project's domain and stage goals. Explain your reasoning in the design return.
+
+</design_preferences>
+```
+
+Store in `DESIGN_PREFERENCES` for use in the Phase 1 spawn template.
+
+Display: "Design preferences captured. Proceeding to design system creation..."
 
 ### Initialize Counters
 
