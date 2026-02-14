@@ -186,6 +186,47 @@ All prototype files (component previews and screen prototypes) use this template
 
 **Notes:** The inline `tailwind.config` maps stylekit.yaml token values to Tailwind theme extensions, enabling standard utility classes (bg-primary, text-neutral-900, font-display). The `stylekit.css` link provides CSS custom properties for dark mode overrides and any values not covered by the inline config. Font families in the Google Fonts link match `primitive.typography.family` tokens. No build system -- files open directly in any browser. MUST use Tailwind v3 CDN (`cdn.tailwindcss.com` without version suffix), NOT v4.
 
+## Stylekit Preview (Composed Design System View)
+
+The stylekit preview is a single HTML page at `.ace/design/stylekit-preview.html` that presents the entire design system on one page. It is the primary artifact users review during the design approval gate.
+
+**Generated:** Full mode only (first UI stage). Not generated in screens-only mode.
+**Regenerated:** During revisions in full mode (always reflects current token/component state).
+**Purpose:** Replace the need to open 7+ individual component HTML files. User reviews one composed page instead.
+
+### Page Structure
+
+The preview has 4 mandatory sections in order:
+
+1. **Color Palette** -- Grid of all `primitive.color` tokens with visual swatches, token names, and values
+2. **Typography** -- Specimens of each font family at each defined size
+3. **Spacing Scale** -- Visual bars showing spacing token values
+4. **Components Gallery** -- Each component rendered in its default state
+
+### Key Differences from Screen Prototypes
+
+| Aspect | Screen Prototypes | Stylekit Preview |
+|--------|-------------------|------------------|
+| Location | `{stage_dir}/design/{screen}.html` | `.ace/design/stylekit-preview.html` |
+| CSS path | Relative multi-level (`../../../design/stylekit.css`) | Same directory (`stylekit.css`) |
+| Content | Page layouts with real content | Token documentation + component gallery |
+| Anti-generic checks | Yes (reviewed for design quality) | No (documentation artifact) |
+| Mode | Both full and screens-only | Full mode only |
+| User-facing | Yes (in approval gate) | Yes (in approval gate, full mode) |
+
+### File List in Approval Gate
+
+The approval gate lists only these HTML files for user review:
+
+**Full mode:**
+- `.ace/design/stylekit-preview.html` (design system overview)
+- `{stage_dir}/design/{screen-name}.html` (screen prototypes)
+
+**Screens-only mode:**
+- `{stage_dir}/design/{screen-name}.html` (screen prototypes only)
+
+Individual component HTMLs at `.ace/design/components/{name}/{name}.html` exist on disk for agent use but are NOT listed in the approval gate.
+
 ## Format Rules
 
 1. **Token-driven previews:** All visual values in component preview HTML trace to design tokens via Tailwind utility classes. No hardcoded hex colors, pixel sizes, or font names in preview snippets.
