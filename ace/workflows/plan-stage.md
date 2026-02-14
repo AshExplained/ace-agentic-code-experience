@@ -34,6 +34,8 @@ Default to "balanced" if not set.
 | ace-stage-scout | opus | sonnet | haiku |
 | ace-architect | opus | opus | sonnet |
 | ace-plan-reviewer | sonnet | sonnet | haiku |
+| ace-designer | opus | sonnet | sonnet |
+| ace-design-reviewer | sonnet | sonnet | haiku |
 
 Store resolved models for use in Task calls below.
 </step>
@@ -209,6 +211,364 @@ Task(
 - Display blocker information
 - Offer: 1) Provide more context, 2) Skip research and plan anyway, 3) Abort
 - Wait for user response
+</step>
+
+<step name="handle_design">
+
+**If `--gaps` flag:** Skip handle_design entirely (gap closure does not re-run design).
+
+**If `--skip-research` flag was used AND no research exists:** Design still runs if triggered -- design does not require research.
+
+### UI Detection (PLAN-02)
+
+Define the three keyword lists:
+
+```
+STRONG_POSITIVE = [ui, frontend, dashboard, interface, page, screen, layout, form,
+                   component, widget, view, display, navigation, sidebar, header,
+                   footer, modal, dialog]
+
+MODERATE_POSITIVE = [visual, render, prototype, style, theme, responsive, landing,
+                     home, profile, settings]
+
+STRONG_NEGATIVE = [api, backend, cli, migration, database, schema, auth, middleware,
+                   config, devops, deploy, test, refactor, security, performance]
+```
+
+Detection algorithm:
+
+```
+function detect_ui_stage(stage_name, goal_text, intel_content, specs_content):
+  strong_pos = 0
+  strong_neg = 0
+  moderate   = 0
+
+  for keyword in STRONG_POSITIVE:
+    if keyword in lower(stage_name): strong_pos++
+    if keyword in lower(goal_text):  strong_pos++
+  for keyword in MODERATE_POSITIVE:
+    if keyword in lower(stage_name): moderate++
+    if keyword in lower(goal_text):  moderate++
+  for keyword in STRONG_NEGATIVE:
+    if keyword in lower(stage_name): strong_neg++
+    if keyword in lower(goal_text):  strong_neg++
+
+  if intel_content and has_visual_mentions(intel_content): strong_pos++
+  if specs_content and has_ui_requirements(specs_content): strong_pos++
+
+  if strong_pos > 0 and strong_neg == 0: return DESIGN_NEEDED
+  if strong_pos > 0 and strong_neg > 0:  return UNCERTAIN
+  if moderate > 0:                        return UNCERTAIN
+  return NO_DESIGN
+```
+
+`has_visual_mentions()` scans intel for layout/screen/style/component terms. `has_ui_requirements()` scans specs for component/screen/UI/layout/visual/prototype terms.
+
+### Routing by Detection Result
+
+- `NO_DESIGN`: Skip to check_existing_runs. Zero side effects -- no directory creation, no file reads beyond detection, no state changes, no messages emitted.
+
+- `UNCERTAIN`: Present a `checkpoint:decision`:
+
+```
+This stage may need design. Include design phase?
+
+Context:
+  Stage: {stage_name}
+  Goal: {goal text from track.md}
+  Signals found: {list of matched keywords and sources}
+
+Options:
+  Yes - Run design phase (stylekit + screen specs)
+  No  - Skip design, proceed to architect
+```
+
+User selects No -> skip to check_existing_runs. User selects Yes -> proceed as DESIGN_NEEDED.
+
+- `DESIGN_NEEDED`: Continue to existing design detection.
+
+### Existing Design Detection (PLAN-03 partial)
+
+```bash
+ls "${STAGE_DIR}"/design/*.yaml 2>/dev/null
+```
+
+If files exist and no `--force` flag: Display "Using existing design: ${STAGE_DIR}/design/". Store design paths for read_context. Skip to check_existing_runs.
+
+### Mode Determination (PLAN-03)
+
+```bash
+ls .ace/design/stylekit.yaml 2>/dev/null
+```
+
+If stylekit does NOT exist: `DESIGN_MODE="full"` (first UI stage).
+If stylekit exists: `DESIGN_MODE="screens_only"` (subsequent UI stage).
+
+### Restyle Trigger (PLAN-07)
+
+Only when `DESIGN_MODE="screens_only"` (existing stylekit detected):
+
+Present `checkpoint:decision`:
+
+```
+Existing stylekit found at .ace/design/stylekit.yaml
+
+Options:
+  Use existing - Create new screens using current design system
+  Restyle - Create a new visual direction (replaces current stylekit)
+
+Select: use-existing or restyle
+```
+
+If `use-existing`: Continue with `DESIGN_MODE="screens_only"`.
+If `restyle`: Set `DESIGN_MODE="full"`. Designer receives existing stylekit as reference context.
+
+### Pexels API Key Check
+
+```bash
+PEXELS_KEY=$(cat .ace/secrets.json 2>/dev/null | grep -o '"pexels_api_key"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "")
+```
+
+If empty or missing: Display informational nudge: "Pexels API key not found. Add to .ace/secrets.json for real stock images, or continue with placeholder fallbacks." This is NOT blocking.
+
+Ensure `.ace/secrets.json` is gitignored:
+
+```bash
+grep -q "secrets.json" .gitignore 2>/dev/null || echo ".ace/secrets.json" >> .gitignore
+```
+
+If key is present: `PEXELS_KEY` holds the value. If absent: `PEXELS_KEY="NOT_AVAILABLE"`.
+
+### Initialize Counters
+
+```
+auto_revision_count = 0
+user_revision_count = 0
+```
+
+### Assemble Designer Context and Spawn (PLAN-04)
+
+9 context variables:
+
+| Variable | Source |
+|----------|--------|
+| `design_mode` | Mode determination / restyle trigger result |
+| `stage_name` | parse_args |
+| `stage_goal` | track.md stage details |
+| `research_content` | `${STAGE_DIR}/research.md` content |
+| `intel_content` | INTEL_CONTENT (loaded in ensure_stage_directory) |
+| `stylekit_content` | `.ace/design/stylekit.yaml` content (screens_only mode only; omit in full mode) |
+| `component_names` | `ls .ace/design/components/` directory listing (screens_only mode only) |
+| `pexels_key` | Pexels API key check result |
+| `stage_dir` | STAGE_DIR path |
+
+Designer spawn template:
+
+```
+First, read ./.claude/agents/ace-designer.md for your role and instructions.
+
+<design_context>
+
+**Mode:** {design_mode}
+**Stage:** {stage_name}
+**Goal:** {stage_goal}
+
+**Research:**
+{research_content}
+
+**Intel (raw -- extract design-relevant decisions yourself):**
+{intel_content}
+
+{IF screens_only mode:}
+**Existing Stylekit:**
+{stylekit_content}
+
+**Existing Components:**
+{component_names}
+
+{IF full mode:}
+**Token Schema Reference:** Follow the 3-layer architecture (primitive, semantic, component) from the design token specification. W3C DTCG $type/$value structure. Namespace mapping: primitive.color.* -> --color-*, primitive.typography.family.* -> --font-*, primitive.typography.size.* -> --text-*, etc. All @theme values resolved to concrete CSS (no var() references inside @theme block). Reset Tailwind default colors with --color-*: initial.
+**Component Schema Reference:** Follow the component inventory format: required fields are name, description, category, properties, tokens, states, responsive, accessibility, preview. State vocabulary fixed at 8: default, hover, active, focus, disabled, loading, error, empty. Token-driven preview using semantic Tailwind classes.
+
+**Pexels API Key:** {pexels_key}
+
+**Output Directories:**
+- Stylekit (full mode only): .ace/design/
+- Components (full mode only): .ace/design/components/
+- Screen specs: {stage_dir}/design/
+
+</design_context>
+```
+
+For revisions, append a `<revision_context>` block:
+
+```
+<revision_context>
+
+**Revision:** {N} of 3
+**Source:** {reviewer | user}
+**Feedback:**
+{feedback_text}
+
+**Current artifacts on disk:**
+{list of existing artifact paths}
+
+Revise the design based on the feedback above. Create -before.html copies of current prototypes before overwriting.
+Return ## DESIGN REVISION (not ## DESIGN COMPLETE) to signal this is a revision.
+
+</revision_context>
+```
+
+Display stage banner before spawning:
+
+```
+ACE > DESIGNING STAGE {X}
+
+Spawning designer (mode: {design_mode})...
+```
+
+Spawn:
+
+```
+Task(
+  prompt=designer_prompt,
+  subagent_type="general-purpose",
+  model="{designer_model}",
+  description="Design Stage {stage}"
+)
+```
+
+Parse designer return: `## DESIGN COMPLETE` or `## DESIGN REVISION` as the completion marker. Extract artifact paths from the "Artifacts Created" section.
+
+### Spawn Reviewer (PLAN-04)
+
+Reviewer spawn template:
+
+```
+First, read ./.claude/agents/ace-design-reviewer.md for your role and instructions.
+
+<review_context>
+
+**Mode:** {design_mode}
+**Designer Output:**
+{designer_return}
+
+**Artifact Paths:**
+{artifact_paths}
+
+Review all listed artifacts for spec compliance, anti-generic aesthetics, and overall quality.
+Return REVIEW PASSED or ISSUES FOUND with actionable feedback.
+
+</review_context>
+```
+
+```
+Task(
+  prompt=reviewer_prompt,
+  subagent_type="general-purpose",
+  model="{reviewer_model}",
+  description="Review design for Stage {stage}"
+)
+```
+
+Parse reviewer return: `## REVIEW PASSED` or `## ISSUES FOUND`.
+
+### Auto-Revision Loop (PLAN-05)
+
+If `## ISSUES FOUND`:
+1. Increment `auto_revision_count`
+2. If `auto_revision_count <= 2`:
+   - Display: "Reviewer found issues. Auto-revising... (attempt {auto_revision_count}/2)"
+   - Re-spawn designer with standard design_context + `<revision_context>` block (source: "reviewer", feedback: reviewer's issue list)
+   - After designer returns: re-spawn reviewer on revised output
+   - Loop back to check reviewer return
+3. If `auto_revision_count > 2`:
+   - Display: "Auto-revision limit reached. Escalating to user."
+   - Present escalation gate (see Escalation Flow below)
+
+If `## REVIEW PASSED`:
+- Reset `auto_revision_count = 0`
+- Proceed to approval gate
+
+### Human-Verify Approval Gate (PLAN-06)
+
+Present `checkpoint:human-verify`:
+
+Full mode gate:
+```
+what-built: "Design system and prototypes for Stage {N}: {stage_name}"
+how-to-verify:
+  1. Review HTML prototypes in browser:
+     {list all .html files from designer return}
+  2. Check that layout matches your vision
+  3. Verify components look intentional (not generic AI defaults)
+  4. Review stylekit token choices (colors, typography, spacing)
+  {IF revision exists:}
+  5. Compare with previous version: {list -before.html files}
+resume-signal: Type "approved" or describe what to change
+```
+
+Screens-only mode gate:
+```
+what-built: "Screen prototypes for Stage {N}: {stage_name}"
+how-to-verify:
+  1. Review HTML prototypes in browser:
+     {list all .html files from designer return}
+  2. Check screens use existing design system consistently
+  3. Verify new components (if any) match existing style
+  {IF revision exists:}
+  4. Compare with previous version: {list -before.html files}
+resume-signal: Type "approved" or describe what to change
+```
+
+### User Revision Loop (PLAN-06)
+
+If user types "approved": Store design output paths. Continue to check_existing_runs.
+
+If user provides feedback (anything other than "approved"):
+1. Increment `user_revision_count`
+2. If `user_revision_count <= 3`:
+   - Re-spawn designer with standard design_context + `<revision_context>` block (source: "user", feedback: user's text)
+   - After designer returns: re-spawn reviewer on revised output
+   - If reviewer passes: present updated approval gate to user
+   - If reviewer fails: enter auto-revision loop, then present to user
+3. If `user_revision_count > 3`:
+   - Present escalation gate
+
+### Escalation Flow (PLAN-06)
+
+Present `checkpoint:decision`:
+
+```
+Design has reached the revision limit.
+
+Current state: {summary of latest designer output}
+{IF reviewer issues exist:} Reviewer concerns: {summary of latest issues}
+
+Options:
+  Accept - Use current design as-is (proceed to architect)
+  Restart - Start over with a completely new design direction
+  Skip - Skip design for this stage (proceed to architect without screen specs)
+
+Select: accept, restart, or skip
+```
+
+Behavior:
+- `accept`: Store current design artifacts as approved. Continue to check_existing_runs.
+- `restart`: Delete `{stage_dir}/design/` contents. Reset both counters to 0. Re-run from designer spawn. Stylekit NOT deleted if from a previous stage.
+- `skip`: Delete `{stage_dir}/design/` contents. Continue to check_existing_runs without design context.
+
+### Store Design Output
+
+After approval (or accept-as-is escalation), store the design output paths for `read_context_files`:
+
+```
+DESIGN_SCREEN_SPECS=$(ls ${STAGE_DIR}/design/*.yaml 2>/dev/null)
+DESIGN_STYLEKIT_PATH=".ace/design/stylekit.yaml"
+DESIGN_STAGE_DIR="${STAGE_DIR}/design"
+HAS_DESIGN=true
+```
+
 </step>
 
 <step name="check_existing_runs">
