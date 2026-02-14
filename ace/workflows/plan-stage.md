@@ -372,30 +372,45 @@ auto_revision_count = 0
 user_revision_count = 0
 ```
 
-### Assemble Designer Context and Spawn (PLAN-04)
+### Two-Phase Design Orchestration
 
-9 context variables:
+The design workflow runs in two phases with an approval gate between them. Each phase has its own designer spawn, reviewer spawn, auto-revision loop, approval gate, and user revision loop.
+
+- **Full mode:** Phase 1 (stylekit) then Phase 2 (screens)
+- **screens_only mode:** Phase 2 only (stylekit already approved from a prior stage)
+
+---
+
+### Phase 1: Design System (ONLY when DESIGN_MODE="full")
+
+**If `DESIGN_MODE="screens_only"`: Skip Phase 1 entirely. Jump to Phase 2.**
+
+#### Phase 1 -- Assemble Designer Context and Spawn
+
+9 context variables (plus `phase`):
 
 | Variable | Source |
 |----------|--------|
-| `design_mode` | Mode determination / restyle trigger result |
+| `design_mode` | "full" (always full in Phase 1) |
+| `phase` | "stylekit" |
 | `stage_name` | parse_args |
 | `stage_goal` | track.md stage details |
 | `research_content` | `${STAGE_DIR}/research.md` content |
 | `intel_content` | INTEL_CONTENT (loaded in ensure_stage_directory) |
-| `stylekit_content` | `.ace/design/stylekit.yaml` content (screens_only mode only; omit in full mode) |
-| `component_names` | `ls .ace/design/components/` directory listing (screens_only mode only) |
 | `pexels_key` | Pexels API key check result |
 | `stage_dir` | STAGE_DIR path |
 
-Designer spawn template:
+Note: `stylekit_content` and `component_names` are NOT passed in Phase 1 (they don't exist yet).
+
+Phase 1 designer spawn template:
 
 ```
 First, read ./.claude/agents/ace-designer.md for your role and instructions.
 
 <design_context>
 
-**Mode:** {design_mode}
+**Mode:** full
+**Phase:** stylekit
 **Stage:** {stage_name}
 **Goal:** {stage_goal}
 
@@ -405,33 +420,26 @@ First, read ./.claude/agents/ace-designer.md for your role and instructions.
 **Intel (raw -- extract design-relevant decisions yourself):**
 {intel_content}
 
-{IF screens_only mode:}
-**Existing Stylekit:**
-{stylekit_content}
-
-**Existing Components:**
-{component_names}
-
-{IF full mode:}
 **Token Schema Reference:** Follow the 3-layer architecture (primitive, semantic, component) from the design token specification. W3C DTCG $type/$value structure. Namespace mapping: primitive.color.* -> --color-*, primitive.typography.family.* -> --font-*, primitive.typography.size.* -> --text-*, etc. All :root values resolved to concrete CSS (no var() references inside :root block). Stylekit.css uses plain :root {} custom properties, not Tailwind v4 @theme syntax. HTML boilerplate uses Tailwind v3 CDN with inline tailwind.config mapping tokens to theme extensions.
 **Component Schema Reference:** Follow the component inventory format: required fields are name, description, category, properties, tokens, states, responsive, accessibility, preview. State vocabulary fixed at 8: default, hover, active, focus, disabled, loading, error, empty. Token-driven preview using semantic Tailwind classes.
 
 **Pexels API Key:** {pexels_key}
 
 **Output Directories:**
-- Stylekit (full mode only): .ace/design/
-- Components (full mode only): .ace/design/components/
-- Screen specs: {stage_dir}/design/
+- Stylekit: .ace/design/
+- Components: .ace/design/components/
+- Preview: .ace/design/stylekit-preview.html
 
 </design_context>
 ```
 
-For revisions, append a `<revision_context>` block:
+For Phase 1 revisions, append a `<revision_context>` block:
 
 ```
 <revision_context>
 
 **Revision:** {N} of 3
+**Phase:** stylekit
 **Source:** {reviewer | user}
 **Feedback:**
 {feedback_text}
@@ -439,18 +447,18 @@ For revisions, append a `<revision_context>` block:
 **Current artifacts on disk:**
 {list of existing artifact paths}
 
-Revise the design based on the feedback above. Overwrite prototype files in place (git tracks previous versions).
+Revise the design system based on the feedback above. When changing tokens, cascade changes to all affected components and the preview (see Cascading Token Revisions rule). Overwrite files in place (git tracks previous versions).
 Return ## DESIGN REVISION (not ## DESIGN COMPLETE) to signal this is a revision.
 
 </revision_context>
 ```
 
-Display stage banner before spawning:
+Display banner before spawning:
 
 ```
-ACE > DESIGNING STAGE {X}
+ACE > DESIGNING STAGE {X} -- PHASE 1: DESIGN SYSTEM
 
-Spawning designer (mode: {design_mode})...
+Spawning designer (mode: full, phase: stylekit)...
 ```
 
 Spawn:
@@ -460,13 +468,13 @@ Task(
   prompt=designer_prompt,
   subagent_type="general-purpose",
   model="{designer_model}",
-  description="Design Stage {stage}"
+  description="Design Stage {stage} - Phase 1 (stylekit)"
 )
 ```
 
-Parse designer return: `## DESIGN COMPLETE` or `## DESIGN REVISION` as the completion marker. Extract artifact paths from the "Artifacts Created" section.
+Parse designer return: `## DESIGN COMPLETE` or `## DESIGN REVISION`. Verify `**Phase:** stylekit` in the return.
 
-### Spawn Reviewer (PLAN-04)
+#### Phase 1 -- Spawn Reviewer
 
 Reviewer spawn template:
 
@@ -475,14 +483,16 @@ First, read ./.claude/agents/ace-design-reviewer.md for your role and instructio
 
 <review_context>
 
-**Mode:** {design_mode}
+**Mode:** full
+**Phase:** stylekit
 **Designer Output:**
 {designer_return}
 
 **Artifact Paths:**
 {artifact_paths}
 
-Review all listed artifacts for spec compliance, anti-generic aesthetics, and overall quality.
+Review stylekit, components, and preview for spec compliance, anti-generic aesthetics, and overall quality.
+Phase scope: token structure, component YAML, preview HTML, full anti-generic checklist, component consistency.
 Return REVIEW PASSED or ISSUES FOUND with actionable feedback.
 
 </review_context>
@@ -493,41 +503,38 @@ Task(
   prompt=reviewer_prompt,
   subagent_type="general-purpose",
   model="{reviewer_model}",
-  description="Review design for Stage {stage}"
+  description="Review design Phase 1 (stylekit) for Stage {stage}"
 )
 ```
 
-Parse reviewer return: `## REVIEW PASSED` or `## ISSUES FOUND`.
+#### Phase 1 -- Auto-Revision Loop
 
-### Auto-Revision Loop (PLAN-05)
+Same logic as the standard auto-revision pattern, using the shared `auto_revision_count`:
 
 If `## ISSUES FOUND`:
 1. Increment `auto_revision_count`
 2. If `auto_revision_count <= 2`:
    - Display: "Reviewer found issues. Auto-revising... (attempt {auto_revision_count}/2)"
-   - Re-spawn designer with standard design_context + `<revision_context>` block (source: "reviewer", feedback: reviewer's issue list)
-   - After designer returns: re-spawn reviewer on revised output
+   - Re-spawn designer with Phase 1 context + revision_context (source: "reviewer", feedback: reviewer's issue list)
+   - After designer returns: re-spawn reviewer (phase: stylekit)
    - Loop back to check reviewer return
 3. If `auto_revision_count > 2`:
    - Display: "Auto-revision limit reached. Escalating to user."
-   - Present escalation gate (see Escalation Flow below)
+   - Present Phase 1 escalation (see Phase 1 Escalation below)
 
 If `## REVIEW PASSED`:
 - Reset `auto_revision_count = 0`
-- Proceed to Human-Verify Approval Gate (which auto-opens files first, then presents the gate)
+- Proceed to Phase 1 Approval Gate
 
-### Human-Verify Approval Gate (PLAN-06)
+#### Phase 1 -- Approval Gate
 
-**Step 1 -- Auto-open prototypes in browser:**
+**Step 1 -- Auto-open preview in browser:**
 
-Execute this bash command NOW to open all review-listed HTML files in the user's default browser before presenting the gate:
-
-Build the file list based on mode:
-- Full mode: `.ace/design/stylekit-preview.html` + all `{stage_dir}/design/*.html` files
-- Screens-only mode: all `{stage_dir}/design/*.html` files only
+Build the file list for Phase 1: `.ace/design/stylekit-preview.html` ONLY.
 
 ```bash
-# EXECUTE THIS NOW -- open files before showing gate prompt
+# EXECUTE THIS NOW -- open Phase 1 preview before showing gate
+GATE_FILES=".ace/design/stylekit-preview.html"
 for file in $GATE_FILES; do
   if [[ -f "$file" ]]; then
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
@@ -544,81 +551,313 @@ for file in $GATE_FILES; do
 done
 ```
 
-Silent failure: if no open command works (headless environment), proceed without error. The `start ""` pattern on Windows is required because `start` interprets the first quoted argument as a window title. The `cmd.exe` fallback handles WSL where `$OSTYPE` may not be `msys`.
-
 **Step 2 -- Present checkpoint:human-verify:**
 
-Full mode gate:
 ```
-what-built: "Design system and screen prototypes for Stage {N}: {stage_name}"
+what-built: "Design system for Stage {N}: {stage_name}"
 how-to-verify:
-  1. Review design preview in browser (auto-opened):
-     - .ace/design/stylekit-preview.html (design system overview: colors, typography, spacing, components)
-     - {list only screen prototype .html files from {stage_dir}/design/ -- NOT component HTMLs from .ace/design/components/}
-  2. Check that layout matches your vision
-  3. Verify components look intentional (not generic AI defaults)
-  4. Review stylekit token choices (colors, typography, spacing)
-  {IF revision exists:}
-  5. Compare with previous version using git diff or browser tab comparison
-resume-signal: Type "approved" or describe what to change
+  1. Review design system preview in browser (auto-opened):
+     - .ace/design/stylekit-preview.html (colors, typography, spacing, components)
+  2. Check that color palette matches your brand vision
+  3. Verify typography feels right for your project
+  4. Review component styling (buttons, cards, inputs, etc.)
+  Note: Screen layouts are created in the next phase after you approve this design system.
+resume-signal: Type "approved" or describe what to change (e.g., "make primary color darker", "switch to a serif font")
 ```
 
-Screens-only mode gate:
-```
-what-built: "Screen prototypes for Stage {N}: {stage_name}"
-how-to-verify:
-  1. Review screen prototypes in browser (auto-opened):
-     - {list only screen prototype .html files from {stage_dir}/design/}
-  2. Check screens use existing design system consistently
-  3. Verify new components (if any) match existing style
-  {IF revision exists:}
-  4. Compare with previous version using git diff or browser tab comparison
-resume-signal: Type "approved" or describe what to change
-```
+#### Phase 1 -- User Revision Loop
 
-### User Revision Loop (PLAN-06)
+If user types "approved": Proceed to Phase 1 -> Phase 2 transition.
 
-If user types "approved": Store design output paths. Continue to check_existing_runs.
-
-If user provides feedback (anything other than "approved"):
+If user provides feedback:
 1. Increment `user_revision_count`
 2. If `user_revision_count <= 3`:
-   - Re-spawn designer with standard design_context + `<revision_context>` block (source: "user", feedback: user's text)
-   - After designer returns: re-spawn reviewer on revised output
-   - If reviewer passes: present updated approval gate to user
-   - If reviewer fails: enter auto-revision loop, then present to user
-3. If `user_revision_count > 3`:
-   - Present escalation gate
+   - Re-spawn designer with Phase 1 context + revision_context (source: "user", feedback: user's text). Note: revision_context includes the cascade instruction.
+   - After designer returns: re-spawn reviewer (phase: stylekit)
+   - If reviewer passes: present updated Phase 1 gate
+   - If reviewer fails: enter Phase 1 auto-revision loop, then present to user
+3. If `user_revision_count > 3`: Present Phase 1 escalation
 
-### Escalation Flow (PLAN-06)
+#### Phase 1 -- Escalation
 
 Present `checkpoint:decision`:
 
 ```
-Design has reached the revision limit.
+Design system has reached the revision limit.
 
 Current state: {summary of latest designer output}
 {IF reviewer issues exist:} Reviewer concerns: {summary of latest issues}
 
 Options:
-  Accept - Use current design as-is (proceed to architect)
+  Accept - Use current design system as-is (proceed to screen design)
   Restart - Start over with a completely new design direction
-  Skip - Skip design for this stage (proceed to architect without screen specs)
+  Skip - Skip ALL design for this stage (no screens will be created)
 
 Select: accept, restart, or skip
 ```
 
 Behavior:
-- `accept`: Store current design artifacts as approved. Continue to check_existing_runs.
-- `restart`: Delete `{stage_dir}/design/` contents. Reset both counters to 0. Re-run from designer spawn. Stylekit NOT deleted if from a previous stage.
-- `skip`: Delete `{stage_dir}/design/` contents. Continue to check_existing_runs without design context.
+- `accept`: Proceed to Phase 2 with current stylekit (treated as approved).
+- `restart`: Delete `.ace/design/` contents (stylekit, CSS, components, preview). Reset both counters to 0. Re-run Phase 1 from designer spawn.
+- `skip`: Delete `.ace/design/` contents. Set `HAS_DESIGN=false`. Skip Phase 2. Continue to check_existing_runs.
+
+**CRITICAL:** Phase 1 skip aborts BOTH phases. There is no path where Phase 1 is skipped but Phase 2 runs.
+
+#### Phase 1 -> Phase 2 Transition
+
+After Phase 1 approval (or accept-as-is):
+
+1. Reset counters for Phase 2:
+   ```
+   auto_revision_count = 0
+   user_revision_count = 0
+   ```
+
+2. Store Phase 1 artifacts for Phase 2 context:
+   ```
+   APPROVED_STYLEKIT_PATH=".ace/design/stylekit.yaml"
+   APPROVED_COMPONENT_NAMES=$(ls .ace/design/components/ 2>/dev/null)
+   ```
+
+3. Proceed to Phase 2.
+
+---
+
+### Phase 2: Screen Prototypes (runs for BOTH full and screens_only modes)
+
+#### Phase 2 -- Assemble Designer Context and Spawn
+
+| Variable | Source |
+|----------|--------|
+| `design_mode` | Original mode determination result (full or screens_only) |
+| `phase` | "screens" |
+| `stage_name` | parse_args |
+| `stage_goal` | track.md stage details |
+| `research_content` | `${STAGE_DIR}/research.md` content |
+| `intel_content` | INTEL_CONTENT |
+| `stylekit_content` | Content of `.ace/design/stylekit.yaml` (read now -- locked, do not modify) |
+| `component_names` | `ls .ace/design/components/` directory listing |
+| `pexels_key` | Pexels API key check result |
+| `stage_dir` | STAGE_DIR path |
+
+Phase 2 designer spawn template:
+
+```
+First, read ./.claude/agents/ace-designer.md for your role and instructions.
+
+<design_context>
+
+**Mode:** {design_mode}
+**Phase:** screens
+**Stage:** {stage_name}
+**Goal:** {stage_goal}
+
+**Research:**
+{research_content}
+
+**Intel (raw -- extract design-relevant decisions yourself):**
+{intel_content}
+
+**Approved Stylekit:** (locked -- do not modify)
+{stylekit_content}
+
+**Available Components:**
+{component_names}
+
+**Pexels API Key:** {pexels_key}
+
+**Output Directories:**
+- Screen specs: {stage_dir}/design/
+- Screen prototypes: {stage_dir}/design/
+
+</design_context>
+```
+
+For Phase 2 revisions, append:
+
+```
+<revision_context>
+
+**Revision:** {N} of 3
+**Phase:** screens
+**Source:** {reviewer | user}
+**Feedback:**
+{feedback_text}
+
+**Current artifacts on disk:**
+{list of existing artifact paths}
+
+Revise screen prototypes based on the feedback above. The design system (stylekit, components) is locked -- do not modify tokens or existing components. Overwrite prototype files in place (git tracks previous versions).
+Return ## DESIGN REVISION (not ## DESIGN COMPLETE) to signal this is a revision.
+
+</revision_context>
+```
+
+Display banner:
+
+```
+ACE > DESIGNING STAGE {X} -- PHASE 2: SCREEN PROTOTYPES
+
+Spawning designer (mode: {design_mode}, phase: screens)...
+```
+
+Spawn:
+
+```
+Task(
+  prompt=designer_prompt,
+  subagent_type="general-purpose",
+  model="{designer_model}",
+  description="Design Stage {stage} - Phase 2 (screens)"
+)
+```
+
+Parse designer return: `## DESIGN COMPLETE` or `## DESIGN REVISION`. Verify `**Phase:** screens` in the return.
+
+#### Phase 2 -- Spawn Reviewer
+
+```
+First, read ./.claude/agents/ace-design-reviewer.md for your role and instructions.
+
+<review_context>
+
+**Mode:** {design_mode}
+**Phase:** screens
+**Designer Output:**
+{designer_return}
+
+**Artifact Paths:**
+{artifact_paths}
+
+Review screen specs and prototypes for spec compliance and overall quality.
+Phase scope: screen spec YAML, screen prototype HTML, layout coherence, responsive overrides, images. Skip stylekit/component checks (already approved).
+Return REVIEW PASSED or ISSUES FOUND with actionable feedback.
+
+</review_context>
+```
+
+```
+Task(
+  prompt=reviewer_prompt,
+  subagent_type="general-purpose",
+  model="{reviewer_model}",
+  description="Review design Phase 2 (screens) for Stage {stage}"
+)
+```
+
+#### Phase 2 -- Auto-Revision Loop
+
+Same logic as Phase 1, using the reset `auto_revision_count`:
+
+If `## ISSUES FOUND`:
+1. Increment `auto_revision_count`
+2. If `auto_revision_count <= 2`:
+   - Display: "Reviewer found issues. Auto-revising... (attempt {auto_revision_count}/2)"
+   - Re-spawn designer with Phase 2 context + revision_context (source: "reviewer", feedback: reviewer's issue list)
+   - After designer returns: re-spawn reviewer (phase: screens)
+   - Loop back to check reviewer return
+3. If `auto_revision_count > 2`:
+   - Display: "Auto-revision limit reached. Escalating to user."
+   - Present Phase 2 escalation (see Phase 2 Escalation below)
+
+If `## REVIEW PASSED`:
+- Reset `auto_revision_count = 0`
+- Proceed to Phase 2 Approval Gate
+
+#### Phase 2 -- Approval Gate
+
+**Step 1 -- Auto-open prototypes in browser:**
+
+Build the file list for Phase 2: `{stage_dir}/design/*.html` ONLY (screen prototypes, not stylekit-preview.html).
+
+```bash
+# EXECUTE THIS NOW -- open Phase 2 prototypes before showing gate
+GATE_FILES=$(ls ${STAGE_DIR}/design/*.html 2>/dev/null)
+for file in $GATE_FILES; do
+  if [[ -f "$file" ]]; then
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+      start "" "$file"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+      open "$file"
+    elif command -v xdg-open &>/dev/null; then
+      xdg-open "$file" &>/dev/null &
+    elif command -v cmd.exe &>/dev/null; then
+      cmd.exe /c start "" "$file"
+    fi
+    sleep 0.5
+  fi
+done
+```
+
+**Step 2 -- Present checkpoint:human-verify:**
+
+```
+what-built: "Screen prototypes for Stage {N}: {stage_name}"
+how-to-verify:
+  1. Review screen prototypes in browser (auto-opened):
+     - {list screen prototype .html files from {stage_dir}/design/}
+  2. Check that layouts match your vision for each screen
+  3. Verify components are used consistently across screens
+  4. Review responsive behavior if applicable
+  Note: The design system (colors, fonts, spacing) was approved in the previous phase. Screen feedback should be about layout and content, not colors/fonts.
+  {IF DESIGN_MODE is screens_only:}
+  Note: Using existing design system from a prior stage. If you want to change the visual identity, restart with a restyle.
+resume-signal: Type "approved" or describe what to change
+```
+
+#### Phase 2 -- User Revision Loop
+
+If user types "approved": Store design output. Continue to check_existing_runs.
+
+If user provides feedback:
+1. Increment `user_revision_count`
+2. If `user_revision_count <= 3`:
+   - Re-spawn designer with Phase 2 context + revision_context (source: "user", feedback: user's text)
+   - After designer returns: re-spawn reviewer (phase: screens)
+   - If reviewer passes: present updated Phase 2 gate
+   - If reviewer fails: enter Phase 2 auto-revision loop, then present to user
+3. If `user_revision_count > 3`: Present Phase 2 escalation
+
+#### Phase 2 -- Escalation
+
+Present `checkpoint:decision`:
+
+```
+Screen prototypes have reached the revision limit.
+
+Current state: {summary of latest designer output}
+{IF reviewer issues exist:} Reviewer concerns: {summary of latest issues}
+
+Options:
+  Accept - Use current screen prototypes as-is (proceed to architect)
+  Restart - Start over with new screen layouts (design system stays locked)
+  Skip - Skip screen design (stylekit exists but no screen specs for this stage)
+
+Select: accept, restart, or skip
+```
+
+Behavior:
+- `accept`: Store current screen artifacts as approved. Continue to Store Design Output.
+- `restart`: Delete `{stage_dir}/design/` contents only (NOT .ace/design/ -- stylekit stays). Reset Phase 2 counters to 0. Re-run Phase 2 from designer spawn.
+- `skip`: Delete `{stage_dir}/design/` contents. Stylekit remains. Continue to Store Design Output (HAS_DESIGN still true since stylekit exists, but no screen specs for this stage).
+
+---
 
 ### Store Design Output
 
-After approval (or accept-as-is escalation), store the design output paths for `read_context_files`:
+After Phase 2 approval (or accept-as-is escalation), store the design output paths for `read_context_files`:
 
 ```
 DESIGN_SCREEN_SPECS=$(ls ${STAGE_DIR}/design/*.yaml 2>/dev/null)
+DESIGN_STYLEKIT_PATH=".ace/design/stylekit.yaml"
+DESIGN_STAGE_DIR="${STAGE_DIR}/design"
+HAS_DESIGN=true
+```
+
+If Phase 2 was skipped but Phase 1 completed (Phase 2 skip escalation):
+
+```
+DESIGN_SCREEN_SPECS=""
 DESIGN_STYLEKIT_PATH=".ace/design/stylekit.yaml"
 DESIGN_STAGE_DIR="${STAGE_DIR}/design"
 HAS_DESIGN=true
