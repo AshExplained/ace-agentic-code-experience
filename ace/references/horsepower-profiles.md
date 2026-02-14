@@ -16,6 +16,8 @@ Horsepower profiles control which Claude model each ACE agent uses. This allows 
 | ace-codebase-mapper | sonnet | haiku | haiku |
 | ace-auditor | sonnet | sonnet | haiku |
 | ace-plan-reviewer | sonnet | sonnet | haiku |
+| ace-designer | opus | sonnet | sonnet |
+| ace-design-reviewer | sonnet | sonnet | haiku |
 | ace-integration-checker | sonnet | sonnet | haiku |
 
 ## Profile Philosophy
@@ -71,3 +73,9 @@ Verification requires goal-backward reasoning - checking if code *delivers* what
 
 **Why Haiku for ace-codebase-mapper?**
 Read-only exploration and pattern extraction. No reasoning required, just structured output from file contents.
+
+**Why Opus for ace-designer?**
+Design requires aesthetic judgment, visual reasoning, and creative problem-solving. Model quality has the highest impact on creative output distinctiveness. In balanced/eco modes, sonnet follows the structured spec and produces compliant output, though with less creative flair.
+
+**Why Sonnet for ace-design-reviewer?**
+Reviewer checks structured criteria (schema compliance, token references, checklist items), not subjective aesthetics. Sonnet handles systematic verification well. In eco mode, haiku handles the formulaic checks (field presence, value comparison) adequately.
