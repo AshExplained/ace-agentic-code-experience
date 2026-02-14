@@ -72,7 +72,7 @@ Verify that all design artifacts conform to the schemas defined in the token sch
 | Check | What to Verify | Method |
 |-------|---------------|--------|
 | stylekit.css linked | HTML includes a `<link>` to `stylekit.css` | Read HTML head section |
-| Required CDN resources | Tailwind CSS v4 CDN script, Google Fonts link, Material Symbols link present | Read HTML head section |
+| Required CDN resources | Tailwind CSS v3 CDN script (`cdn.tailwindcss.com` without version suffix), inline `tailwind.config` block, Google Fonts link, Material Symbols link present | Read HTML head section |
 | Body classes correct | Body has `bg-background-page text-text-primary font-body antialiased` | Read body tag |
 
 ---
@@ -198,7 +198,8 @@ Validate each artifact against its schema (Dimension 1: 40% weight).
 
 4. **HTML prototype validation:**
    - Verify each prototype includes `stylekit.css` link in the head
-   - Verify Tailwind CSS v4 CDN script is present
+   - Verify Tailwind CSS v3 CDN script is present (`<script src="https://cdn.tailwindcss.com"></script>` without `/4` suffix)
+   - Verify inline `tailwind.config` block exists (maps stylekit tokens to Tailwind theme)
    - Verify Google Fonts link is present
    - Verify Material Symbols link is present
    - Verify body classes include token-derived classes
