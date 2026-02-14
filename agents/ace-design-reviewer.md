@@ -83,12 +83,17 @@ Verify that all design artifacts conform to the schemas defined in the token sch
 | Body classes correct | Body has `bg-background-page text-text-primary font-body antialiased` | Read body tag |
 | stylekit-preview.html exists (full mode) | `.ace/design/stylekit-preview.html` file exists on disk when mode is `full` | `ls .ace/design/stylekit-preview.html` |
 
-**stylekit-preview.html (full mode only):**
-The composed design system preview receives minimal structural checks only:
+**stylekit-preview.html (full mode, phase `stylekit` only):**
+The composed design system preview receives structural quality checks:
 - File exists at `.ace/design/stylekit-preview.html`
 - Links `stylekit.css` (relative path: `stylekit.css`, same directory)
 - Uses Tailwind v3 CDN (`cdn.tailwindcss.com` without version suffix)
-- Contains the 4 required sections: Color Palette, Typography, Spacing Scale, Components
+- Contains sticky section navigation with jump links
+- Contains 5 mandatory sections: Color Palette, Typography, Spacing Scale, Components Gallery, Patterns/Compositions
+- Typography section uses contextual project text (not generic "quick brown fox" or "lorem ipsum")
+- Components Gallery shows multiple states per component (not just default)
+- If `@keyframes` are defined in stylekit.css, an Animations section with replay buttons exists
+- If `themes.dark` exists in stylekit.yaml, a theme toggle button exists in the navigation
 
 Do NOT apply anti-generic checklist to the preview page -- it is a documentation artifact, not a design deliverable. The anti-generic checks apply to the stylekit tokens themselves, which are already reviewed separately.
 

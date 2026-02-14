@@ -196,12 +196,24 @@ The stylekit preview is a single HTML page at `.ace/design/stylekit-preview.html
 
 ### Page Structure
 
-The preview has 4 mandatory sections in order:
+The preview has 5 mandatory sections, 2 conditional sections, and optional project-specific additions:
 
-1. **Color Palette** -- Grid of all `primitive.color` tokens with visual swatches, token names, and values
-2. **Typography** -- Specimens of each font family at each defined size
-3. **Spacing Scale** -- Visual bars showing spacing token values
-4. **Components Gallery** -- Each component rendered in its default state
+**Navigation:** Sticky top bar with page title, jump links to each section, and a theme toggle button (conditional on `themes.dark` existing in stylekit.yaml).
+
+**Mandatory sections:**
+
+1. **Color Palette** -- Grid of all `primitive.color` tokens with visual swatches, token names, and hex/oklch values
+2. **Typography** -- Contextual specimens using real project text (not generic placeholder), labeled with typographic role (h1, h2, body, small, mono), showing font family, size, weight, and line-height
+3. **Spacing Scale** -- Visual bars with semantic names (card-padding, section-gap) alongside raw values
+4. **Components Gallery** -- Each component rendered in ALL relevant states (default, hover, focus, disabled, loading), not just default
+5. **Patterns / Compositions** -- 3-5 compositions of components into real UI patterns (header, modal, toast, empty state)
+
+**Conditional sections:**
+
+6. **Animations** -- Included when `@keyframes` are defined in `stylekit.css`. Shows each animation with label, preview element, and replay button using CSS class toggle pattern
+7. **Responsive Breakpoints** -- Included when project breakpoints differ from Tailwind v3 defaults. Shows breakpoint table with values and layout notes
+
+The 5+2 sections are the floor. The designer may add 1-2 project-specific sections (icon gallery, illustration guide, data visualization palette) based on project context.
 
 ### Key Differences from Screen Prototypes
 
@@ -213,6 +225,31 @@ The preview has 4 mandatory sections in order:
 | Anti-generic checks | Yes (reviewed for design quality) | No (documentation artifact) |
 | Mode | Both full and screens-only | Full mode only |
 | User-facing | Yes (in approval gate) | Yes (in approval gate, full mode) |
+
+### Preview Implementation Patterns
+
+**Theme toggle:**
+```javascript
+function toggleTheme() {
+  document.documentElement.classList.toggle('dark');
+  const icon = document.getElementById('theme-icon');
+  icon.textContent = document.documentElement.classList.contains('dark') ? 'light_mode' : 'dark_mode';
+}
+```
+Conditional: only render the toggle button if `themes.dark` exists in `stylekit.yaml`.
+
+**Animation replay:**
+```javascript
+function replay(btn, className) {
+  btn.classList.remove(className);
+  btn.offsetHeight; // force reflow to restart CSS animation
+  btn.classList.add(className);
+}
+```
+Each animation gets a button calling `onclick="replay(this, 'animate-{name}')"`.
+
+**Component state rendering:**
+For each component, render states side-by-side. Simulate non-interactive states with CSS classes: hover with explicit hover-state classes, focus with `ring-2 ring-primary`, disabled with `opacity-50 cursor-not-allowed`, loading with an inline spinner icon. Use the component's YAML `states` field to determine which states to render.
 
 ### File List in Approval Gate
 
