@@ -592,10 +592,25 @@ SPECS_CONTENT=$(cat .ace/specs.md 2>/dev/null)
 # INTEL_CONTENT already loaded in ensure_stage_directory
 RESEARCH_CONTENT=$(cat "${STAGE_DIR}"/*-research.md 2>/dev/null)
 
+# Design context (only if handle_design produced approved artifacts)
+if [ "$HAS_DESIGN" = "true" ]; then
+  # Read screen spec YAML files to build summaries
+  DESIGN_SCREEN_SPECS=$(ls "${STAGE_DIR}"/design/*.yaml 2>/dev/null)
+  DESIGN_SUMMARIES=""
+  for spec in $DESIGN_SCREEN_SPECS; do
+    screen_name=$(grep -m1 "^screen:" "$spec" | sed 's/screen: //')
+    description=$(grep -m1 "^description:" "$spec" | sed 's/description: //')
+    DESIGN_SUMMARIES="${DESIGN_SUMMARIES}\n- ${screen_name}: ${description} (${spec})"
+  done
+  DESIGN_STYLEKIT_PATH=".ace/design/stylekit.yaml"
+fi
+
 # Gap closure files (only if --gaps mode)
 PROOF_CONTENT=$(cat "${STAGE_DIR}"/*-proof.md 2>/dev/null)
 UAT_CONTENT=$(cat "${STAGE_DIR}"/*-uat.md 2>/dev/null)
 ```
+
+The `HAS_DESIGN` variable is set by `handle_design`. If design was skipped (NO_DESIGN, user declined, or --gaps mode), `HAS_DESIGN` is unset and no design context is loaded.
 </step>
 
 <step name="spawn_architect">
@@ -641,6 +656,27 @@ IMPORTANT: If stage intel exists below, it contains USER DECISIONS from /ace.dis
 {proof_content}
 {uat_content}
 
+{IF HAS_DESIGN is true:}
+
+**Design:**
+Global stylekit: .ace/design/stylekit.yaml
+Screen specs for this stage: {stage_dir}/design/
+
+Screen summary:
+{design_summaries}
+
+IMPORTANT: Every UI implementation task MUST reference the specific screen spec
+it implements. Include the screen spec path in the task's <context> section as an
+@ reference. Example:
+
+  <context>
+  @.ace/design/stylekit.yaml
+  @.ace/stages/{NN}-{stage-name}/design/{screen-name}.yaml
+  </context>
+
+Tasks that implement UI without referencing their screen spec will produce
+output inconsistent with the approved design.
+
 </planning_context>
 
 <downstream_consumer>
@@ -673,6 +709,8 @@ Task(
   description="Plan Stage {stage}"
 )
 ```
+
+When design was not triggered (non-UI stage), the `**Design:**` section is omitted entirely. The planning_context remains unchanged from the current template.
 </step>
 
 <step name="handle_architect_return">
