@@ -1058,7 +1058,7 @@ If exists, load relevant documents based on stage type:
 
 | Stage Keywords | Load These |
 |----------------|------------|
-| UI, frontend, components | CONVENTIONS.md, STRUCTURE.md |
+| UI, frontend, components | CONVENTIONS.md, STRUCTURE.md, DESIGN.md |
 | API, backend, endpoints | ARCHITECTURE.md, CONVENTIONS.md |
 | database, schema, models | ARCHITECTURE.md, STACK.md |
 | testing, tests | TESTING.md, CONVENTIONS.md |
