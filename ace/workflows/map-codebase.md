@@ -3,7 +3,7 @@ Orchestrate parallel codebase mapper agents to analyze codebase and produce stru
 
 Each agent has fresh context, explores a specific focus area, and **writes documents directly**. The orchestrator only receives confirmation + line counts, then writes a summary.
 
-Output: .ace/codebase/ folder with 7 structured documents about the codebase state.
+Output: .ace/codebase/ folder with 7-8 structured documents (8th conditional on UI detection).
 </purpose>
 
 <philosophy>
@@ -84,16 +84,37 @@ mkdir -p .ace/codebase
 - CONVENTIONS.md (from quality mapper)
 - TESTING.md (from quality mapper)
 - CONCERNS.md (from concerns mapper)
+- DESIGN.md (from design mapper, conditional -- only for UI codebases)
 
 Continue to spawn_agents.
 </step>
 
 <step name="spawn_agents">
-Spawn 4 parallel ace-codebase-mapper agents.
+Spawn 4 parallel ace-codebase-mapper agents (plus conditional 5th for UI codebases).
 
 Use Task tool with `subagent_type="ace-codebase-mapper"`, `model="{mapper_model}"`, and `run_in_background=true` for parallel execution.
 
 **CRITICAL:** Use the dedicated `ace-codebase-mapper` agent, NOT `Explore`. The mapper agent writes documents directly.
+
+### UI Indicator Detection
+
+Before spawning agents, check if the codebase has UI patterns:
+
+```bash
+UI_INDICATORS=0
+# Style configuration files
+ls tailwind.config.* postcss.config.* .stylelintrc* 2>/dev/null && ((UI_INDICATORS++))
+# Component directories
+ls src/components/ components/ src/ui/ app/components/ 2>/dev/null && ((UI_INDICATORS++))
+# CSS/SCSS/LESS files (excluding node_modules)
+find . -maxdepth 3 \( -name "*.css" -o -name "*.scss" -o -name "*.less" \) -not -path "*/node_modules/*" -not -path "*/.next/*" 2>/dev/null | head -1 | grep -q . && ((UI_INDICATORS++))
+# Android resources
+find . -name "styles.xml" -path "*/res/*" 2>/dev/null | head -1 | grep -q . && ((UI_INDICATORS++))
+# iOS asset catalogs
+find . -name "*.xcassets" 2>/dev/null | head -1 | grep -q . && ((UI_INDICATORS++))
+```
+
+Store `UI_INDICATORS` count for conditional 5th agent spawn.
 
 **Agent 1: Tech Focus**
 
@@ -186,11 +207,39 @@ Write this document to .ace/codebase/:
 Explore thoroughly. Write document directly using template. Return confirmation only.
 ```
 
+**Agent 5: Design Focus (conditional -- UI codebases only)**
+
+**Only spawn if UI_INDICATORS >= 2.**
+
+If UI_INDICATORS < 2: Log "No UI patterns detected (indicators: {UI_INDICATORS}), skipping design analysis." and skip this agent.
+
+If UI_INDICATORS >= 2:
+
+Task tool parameters:
+```
+subagent_type: "ace-codebase-mapper"
+model: "{mapper_model}"
+run_in_background: true
+description: "Map codebase design patterns"
+```
+
+Prompt:
+```
+Focus: design
+
+Analyze this codebase for visual design patterns, component inventory, and styling approach.
+
+Write this document to .ace/codebase/:
+- DESIGN.md - Color system, typography, spacing, shadows, component inventory, visual patterns, dark mode, styling technology
+
+Explore thoroughly. Write document directly using template. Return confirmation only.
+```
+
 Continue to collect_confirmations.
 </step>
 
 <step name="collect_confirmations">
-Wait for all 4 agents to complete.
+Wait for all agents to complete (4 or 5 depending on UI detection).
 
 Read each agent's output file to collect confirmations.
 
@@ -222,8 +271,9 @@ wc -l .ace/codebase/*.md
 ```
 
 **Verification checklist:**
-- All 7 documents exist
+- All expected documents exist (7 for non-UI codebases, 8 for UI codebases)
 - No empty documents (each should have >20 lines)
+- If 5th agent was spawned, verify DESIGN.md exists and has >20 lines
 
 If any documents missing or empty, note which agents may have failed.
 
@@ -256,6 +306,7 @@ docs: map existing codebase
 - TESTING.md - Test structure
 - INTEGRATIONS.md - External services
 - CONCERNS.md - Technical debt and issues
+- DESIGN.md - Visual design patterns (if UI codebase)
 EOF
 )"
 ```
@@ -284,6 +335,7 @@ Created .ace/codebase/:
 - TESTING.md ([N] lines) - Test structure and practices
 - INTEGRATIONS.md ([N] lines) - External services and APIs
 - CONCERNS.md ([N] lines) - Technical debt and issues
+- DESIGN.md ([N] lines) - Visual design patterns (UI codebases only)
 
 
 ---
@@ -313,10 +365,10 @@ End workflow.
 
 <success_criteria>
 - .ace/codebase/ directory created
-- 4 parallel ace-codebase-mapper agents spawned with run_in_background=true
+- 4-5 parallel ace-codebase-mapper agents spawned with run_in_background=true (5th conditional on UI detection)
 - Agents write documents directly (orchestrator doesn't receive document contents)
 - Read agent output files to collect confirmations
-- All 7 codebase documents exist
+- All expected codebase documents exist (7 or 8 depending on UI detection)
 - Clear completion summary with line counts
 - User offered clear next steps in ACE style
 </success_criteria>

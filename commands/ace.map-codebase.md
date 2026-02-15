@@ -16,7 +16,7 @@ Analyze existing codebase using parallel ace-codebase-mapper agents to produce s
 
 Each mapper agent explores a focus area and **writes documents directly** to `.ace/codebase/`. The orchestrator only receives confirmations, keeping context usage minimal.
 
-Output: .ace/codebase/ folder with 7 structured documents about the codebase state.
+Output: .ace/codebase/ folder with 7-8 structured documents about the codebase state.
 </objective>
 
 <execution_context>
@@ -51,20 +51,21 @@ Check for .ace/pulse.md - loads context if project already initialized
 <process>
 1. Check if .ace/codebase/ already exists (offer to refresh or skip)
 2. Create .ace/codebase/ directory structure
-3. Spawn 4 parallel ace-codebase-mapper agents:
+3. Spawn 4-5 parallel ace-codebase-mapper agents (5th conditional on UI detection):
    - Agent 1: tech focus → writes STACK.md, INTEGRATIONS.md
    - Agent 2: arch focus → writes ARCHITECTURE.md, STRUCTURE.md
    - Agent 3: quality focus → writes CONVENTIONS.md, TESTING.md
    - Agent 4: concerns focus → writes CONCERNS.md
+   - Agent 5: design focus (conditional) → writes DESIGN.md (only for UI codebases)
 4. Wait for agents to complete, collect confirmations (NOT document contents)
-5. Verify all 7 documents exist with line counts
+5. Verify all expected documents exist with line counts (7 or 8)
 6. Commit codebase map
 7. Offer next steps (typically: ace.start or ace.plan-stage)
 </process>
 
 <success_criteria>
 - [ ] .ace/codebase/ directory created
-- [ ] All 7 codebase documents written by mapper agents
+- [ ] All expected codebase documents (7 or 8) written by mapper agents
 - [ ] Documents follow template structure
 - [ ] Parallel agents completed without errors
 - [ ] User knows next steps
