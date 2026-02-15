@@ -429,12 +429,15 @@ Categorize findings:
 ## Step 7.5: Design Conformance (Conditional)
 
 **Trigger condition:** Check BOTH:
-1. `{stage_dir}/design/` directory exists
-2. The directory contains `.yaml` screen spec files
+1. `.ace/design/screens/` directory exists
+2. The directory contains `.yaml` screen spec files referenced by this stage's runs
 
 ```bash
-DESIGN_SPECS=$(ls "${STAGE_DIR}"/design/*.yaml 2>/dev/null)
+# Check for screen specs referenced by this stage's runs
+DESIGN_SPECS=$(ls .ace/design/screens/*.yaml 2>/dev/null)
 ```
+
+If screen specs exist, identify which ones are relevant to this stage by checking run.md and recap.md file references. Only audit screens that the current stage's runs implement or modify.
 
 **If either condition is false:** Skip this step entirely. No design conformance section in proof.md.
 
@@ -717,7 +720,7 @@ design_conformance:  # Only include if design specs exist
 
 {Only include this section if Step 7.5 was triggered (design specs exist).}
 
-**Screen specs verified:** {count} screens from {stage_dir}/design/
+**Screen specs verified:** {count} screens from .ace/design/screens/ (scoped to current stage)
 
 #### {screen-name}.yaml
 

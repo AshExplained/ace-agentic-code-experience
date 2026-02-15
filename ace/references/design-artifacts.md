@@ -167,7 +167,7 @@ All prototype files (component previews and screen prototypes) use this template
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
   <!-- Project stylekit (custom properties for dark mode + values not in tailwind.config) -->
-  <link rel="stylesheet" href="{relative path to stylekit.css}">
+  <link rel="stylesheet" href="../stylekit.css">
 
   <style>
     .material-symbols-rounded {
@@ -184,7 +184,7 @@ All prototype files (component previews and screen prototypes) use this template
 </html>
 ```
 
-**Notes:** The inline `tailwind.config` maps stylekit.yaml token values to Tailwind theme extensions, enabling standard utility classes (bg-primary, text-neutral-900, font-display). The `stylekit.css` link provides CSS custom properties for dark mode overrides and any values not covered by the inline config. Font families in the Google Fonts link match `primitive.typography.family` tokens. No build system -- files open directly in any browser. MUST use Tailwind v3 CDN (`cdn.tailwindcss.com` without version suffix), NOT v4.
+**Notes:** The inline `tailwind.config` maps stylekit.yaml token values to Tailwind theme extensions, enabling standard utility classes (bg-primary, text-neutral-900, font-display). The `stylekit.css` link provides CSS custom properties for dark mode overrides and any values not covered by the inline config. Font families in the Google Fonts link match `primitive.typography.family` tokens. No build system -- files open directly in any browser. MUST use Tailwind v3 CDN (`cdn.tailwindcss.com` without version suffix), NOT v4. For screen prototypes at `.ace/design/screens/`, the relative path is `../stylekit.css`. For the stylekit preview at `.ace/design/`, the path is `stylekit.css` (same directory).
 
 ## Stylekit Preview (Composed Design System View)
 
@@ -219,8 +219,8 @@ The 5+2 sections are the floor. The designer may add 1-2 project-specific sectio
 
 | Aspect | Screen Prototypes | Stylekit Preview |
 |--------|-------------------|------------------|
-| Location | `{stage_dir}/design/{screen}.html` | `.ace/design/stylekit-preview.html` |
-| CSS path | Relative multi-level (`../../../design/stylekit.css`) | Same directory (`stylekit.css`) |
+| Location | `.ace/design/screens/{screen}.html` | `.ace/design/stylekit-preview.html` |
+| CSS path | One level up (`../stylekit.css`) | Same directory (`stylekit.css`) |
 | Content | Page layouts with real content | Token documentation + component gallery |
 | Anti-generic checks | Yes (reviewed for design quality) | No (documentation artifact) |
 | Mode | Both full and screens-only | Full mode only |
@@ -257,20 +257,20 @@ The approval gate lists only these HTML files for user review:
 
 **Full mode:**
 - `.ace/design/stylekit-preview.html` (design system overview)
-- `{stage_dir}/design/{screen-name}.html` (screen prototypes)
+- `.ace/design/screens/{screen-name}.html` (screen prototypes -- new and modified only)
 
 **Screens-only mode:**
-- `{stage_dir}/design/{screen-name}.html` (screen prototypes only)
+- `.ace/design/screens/{screen-name}.html` (screen prototypes -- new and modified only)
 
 Individual component HTMLs at `.ace/design/components/{name}/{name}.html` exist on disk for agent use but are NOT listed in the approval gate.
 
 ## Prototype Interactivity
 
-Screen prototypes are interactive state machines, not static layouts. Each prototype supports multiple UI states via toggle controls and includes working JavaScript for form interactions.
+Screen prototypes with multiple states are interactive state machines, not static layouts. Prototypes with states beyond `default` support UI state switching via toggle controls and include working JavaScript for form interactions. Single-state screens (only `default`) have no toggle controls — they are static layouts with optional interaction JavaScript (form validation, modals, etc.).
 
 ### Demo Toggle Controls
 
-Every screen prototype includes a floating control panel for state switching:
+Screen prototypes with states beyond `default` include a floating control panel for state switching. Single-state screens omit this entirely.
 
 ```html
 <!-- Fixed bottom-right toggle controls -->
