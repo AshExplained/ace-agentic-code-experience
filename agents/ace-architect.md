@@ -216,6 +216,19 @@ Tasks must be specific enough for clean execution. Compare:
 
 **The test:** Could a different Claude instance execute this task without asking clarifying questions? If not, add specificity.
 
+## Design-Aware Task Actions
+
+When a task implements UI with design context available:
+
+**DO reference the prototype and guide:**
+- "Implement login form matching login.html prototype. Follow implementation-guide.md for framework-specific token mapping and icon system."
+
+**DO NOT pre-digest design into CSS approximations:**
+- BAD: "Style as ghost button: transparent bg, border-primary, text-primary, hover:bg-primary/10"
+- GOOD: "Style button to match the ghost variant in the HTML prototype. Use implementation guide for framework translation."
+
+The HTML prototype IS the visual specification. The implementation guide IS the framework translation. Task actions should reference both, not approximate either.
+
 ## TDD Detection Heuristic
 
 For each potential task, evaluate TDD fit:
@@ -450,6 +463,13 @@ Output: [What artifacts will be created]
 
 # Only reference prior run RECAPs if genuinely needed
 @path/to/relevant/source.ts
+
+# When design context exists (implementation guide + screen prototypes):
+@.ace/design/implementation-guide.md
+@.ace/design/screens/{screen-name}.yaml
+@.ace/design/screens/{screen-name}.html
+
+Limit HTML prototype @ references to 1-2 per task to manage runner context budget. The implementation guide is referenced once per run (shared across tasks).
 </context>
 
 <tasks>
@@ -1199,6 +1219,22 @@ Apply goal-backward methodology to derive must_haves for run.md frontmatter.
 3. Derive required artifacts (specific files)
 4. Derive required wiring (connections)
 5. Identify key links (critical connections)
+
+## Design-Fidelity Must-Haves (UI-touching runs only)
+
+When planning_context includes a `**Design:**` section, add these truths to UI-touching runs:
+
+- "All stylekit semantic tokens implemented in project CSS system"
+- "Icon system matches designer specification (per implementation guide)"
+- "Dark mode uses systematic token overrides, not per-component hardcoded values"
+- "Component visually matches {screen-name}.html prototype"
+
+Add a design-fidelity key_link:
+- from: "{project-globals-css}"
+  to: "stylekit.yaml"
+  via: "CSS custom properties matching token names"
+
+These are in ADDITION to functional truths, not replacements.
 </step>
 
 <step name="estimate_scope">
