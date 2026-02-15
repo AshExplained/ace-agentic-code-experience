@@ -1428,24 +1428,69 @@ IMPORTANT: If stage intel exists below, it contains USER DECISIONS from /ace.dis
 **Design:**
 Global stylekit: .ace/design/stylekit.yaml
 All screen specs: .ace/design/screens/
+Implementation guide: .ace/design/implementation-guide.md
 
 Screen summary (all screens -- [NEW] = created this stage, [EXISTING] = from prior stages):
 {design_summaries}
 
-IMPORTANT: Every UI implementation task MUST reference the specific screen spec
-it implements. Include the screen spec path in the task's <context> section as an
-@ reference. The path is STABLE across stages (always .ace/design/screens/).
+**Implementation Guide (framework translation):**
+{IMPLEMENTATION_GUIDE}
+
+IMPORTANT: Every UI implementation task MUST include these @ references in
+the task's <context> section. The paths are STABLE across stages:
 
   <context>
   @.ace/design/stylekit.yaml
-  @.ace/design/screens/{screen-name}.yaml
+  @.ace/design/screens/{screen-name}.yaml  (structure spec)
+  @.ace/design/screens/{screen-name}.html  (visual source of truth)
+  @.ace/design/implementation-guide.md     (framework translation)
   </context>
+
+The HTML prototype is the VISUAL SOURCE OF TRUTH. The YAML spec describes
+structure. The implementation guide provides framework-specific translation.
+
+Task actions must NOT pre-translate design into approximate CSS classes.
+Reference the implementation guide for framework-specific patterns and the
+HTML prototype for visual specification. Do NOT approximate styling in task
+action text -- let the runner read the prototype and guide directly.
+
+**Context budget:** Limit each task to at most 1-2 HTML prototype @ references
+to manage runner context budget. Multi-screen runs should split screen
+implementations across tasks.
 
 For screens marked [NEW]: task implements the full screen from scratch.
 For screens from prior stages that this stage modifies: task modifies the existing implementation to match updated screen spec. Use `git diff .ace/design/screens/{screen-name}.yaml` to see what changed.
 
-Tasks that implement UI without referencing their screen spec will produce
-output inconsistent with the approved design.
+Tasks that implement UI without referencing their screen spec and HTML
+prototype will produce output inconsistent with the approved design.
+
+**Design-fidelity must_haves:** When a run touches UI, include these
+design-fidelity truths in the run's must_haves alongside functional truths:
+
+```yaml
+must_haves:
+  truths:
+    # Functional truths (stage-specific)
+    - "..."
+    # Design-fidelity truths (add for UI-touching runs)
+    - "All stylekit semantic tokens implemented in project CSS system"
+    - "Icon system uses {icon-library-from-guide} not hand-drawn SVGs"
+    - "Dark mode uses token overrides not per-component hardcoded values"
+  artifacts:
+    - path: "{project-globals-css}"
+      provides: "Design token system"
+      contains: "semantic color tokens from stylekit.yaml"
+  key_links:
+    - from: "{globals-css}"
+      to: "stylekit.yaml"
+      via: "CSS custom properties matching token names"
+      pattern: "--color-primary|--color-secondary|--color-background"
+```
+
+Omit dark mode truth if stylekit has no dark theme. Replace
+`{icon-library-from-guide}` with the actual icon library from the
+implementation guide. Replace `{project-globals-css}` with the project's
+actual CSS entry point.
 
 </planning_context>
 
