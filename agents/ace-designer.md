@@ -208,7 +208,7 @@ Generate `.ace/design/stylekit-preview.html` -- a single-page composed view of t
    <body class="font-body bg-neutral-50 text-neutral-900 antialiased">
    ```
 
-   The relative path to `stylekit.css` is simply `stylekit.css` (same directory). This is different from screen prototypes which use a multi-level relative path from `{stage_dir}/design/` back to `.ace/design/`.
+   The relative path to `stylekit.css` is simply `stylekit.css` (same directory). Screen prototypes at `.ace/design/screens/` use `../stylekit.css` (one directory up).
 
 2. **Page wrapper:** A sticky top navigation bar containing the page title on the left and jump links to each section on the right. The navigation uses sticky positioning with a backdrop blur effect so content scrolls beneath it. Include a theme toggle button (light/dark icon) that only appears when `themes.dark` exists in `stylekit.yaml`. The toggle calls `document.documentElement.classList.toggle('dark')` and swaps the icon between `dark_mode` and `light_mode` using Material Symbols. Main content below the navigation in a centered container with generous vertical spacing between sections.
 
@@ -247,9 +247,31 @@ Generate `.ace/design/stylekit-preview.html` -- a single-page composed view of t
 
 Create screen layout specs for every screen the stage needs:
 
-1. **Create directory:** `{stage_dir}/design/` (the stage-scoped design directory)
+1. **Create directory:** `.ace/design/screens/` (the global screens directory, alongside stylekit and components)
 
-2. **For each screen**, write `{screen-name}.yaml` with all required fields:
+2. **Read existing screens:** Before creating any screen specs, check what already exists:
+
+   ```bash
+   ls .ace/design/screens/*.yaml 2>/dev/null
+   ```
+
+   For each existing screen spec:
+   - Read the screen name and description from the YAML
+   - Store as `EXISTING_SCREENS` context: `{screen-name}: {description}`
+
+   For each screen the current stage needs:
+   - If no matching screen exists in `.ace/design/screens/`: **create new** screen spec and prototype
+   - If a matching screen exists: **read its current content** and apply additive updates for the current stage's requirements
+
+   **Additive update rules for existing screens:**
+   - ADD new sections to an existing screen (e.g., add a "recent activity" section to a dashboard)
+   - ADD new components within existing sections
+   - MODIFY component props (e.g., change a card's content-zone hint for this stage's context)
+   - DO NOT remove existing sections unless the stage goal explicitly requires restructuring
+   - DO NOT change the screen's overall layout type without explicit justification in the stage goal
+   - Preserve all existing `images`, `interactions`, and `developer-notes` entries -- only add new ones
+
+3. **For each screen**, write `{screen-name}.yaml` with all required fields:
    - `screen`: kebab-case identifier
    - `title`: display name
    - `description`: purpose and context
@@ -261,9 +283,9 @@ Create screen layout specs for every screen the stage needs:
    - `interactions`: trigger/action pairs describing user interactions
    - `developer-notes`: implementation hints
 
-3. **Component references** use `component:` fields pointing to inventory component names. Props include variant selection and content-zone hints (descriptive strings guiding content generation).
+4. **Component references** use `component:` fields pointing to inventory component names. Props include variant selection and content-zone hints (descriptive strings guiding content generation).
 
-4. **Content-zone hints** are descriptive strings, not placeholder text:
+5. **Content-zone hints** are descriptive strings, not placeholder text:
    - Good: `"Metric value with label and trend indicator (e.g., Total Users: 2,847 +12.5%)"`
    - Bad: `"Lorem ipsum dolor sit amet"`
 
@@ -294,7 +316,7 @@ For each screen spec YAML, generate an HTML prototype:
 
 1. **If this is a revision** (not first render): overwrite `{screen-name}.html` in place. Git tracks previous versions -- do NOT create `-before.html` copies.
 
-2. **Write `{screen-name}.html`** at `{stage_dir}/design/{screen-name}.html`:
+2. **Write `{screen-name}.html`** at `.ace/design/screens/{screen-name}.html`:
    - Use this HTML boilerplate template:
 
    ```html
@@ -341,8 +363,8 @@ For each screen spec YAML, generate an HTML prototype:
      <!-- Material Symbols -->
      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
-     <!-- Project stylekit (custom properties for dark mode + values not in tailwind.config) -->
-     <link rel="stylesheet" href="{relative path to .ace/design/stylekit.css}">
+     <!-- Project stylekit (stable relative path: screens/ -> design/) -->
+     <link rel="stylesheet" href="../stylekit.css">
 
      <style>
        /* CSS Keyframe animations from stylekit */
@@ -359,7 +381,7 @@ For each screen spec YAML, generate an HTML prototype:
 
    - Populate `tailwind.config` by reading resolved token values from `stylekit.yaml` and mapping them to Tailwind theme extensions
    - Populate Google Fonts `<link>` with the actual font families from the stylekit
-   - Link `stylekit.css` using a relative path from `{stage_dir}/design/` to `.ace/design/stylekit.css`
+   - Link `stylekit.css` using the stable relative path `../stylekit.css` (from `.ace/design/screens/` up to `.ace/design/`)
    - Body class uses Tailwind utility classes that resolve through the inline config (not token CSS custom property names)
    - Construct the page layout from the screen spec's `layout` type
    - For each section: build the section structure from the `layout` and `children` fields
@@ -416,19 +438,19 @@ Produce ALL artifacts before returning. Do not return after creating the styleki
 3. `.ace/design/stylekit-preview.html` -- composed design system preview
 4. `.ace/design/components/{name}/{name}.yaml` -- component specs (one per component)
 5. `.ace/design/components/{name}/{name}.html` -- component previews (one per component)
-6. `{stage_dir}/design/{screen-name}.yaml` -- screen specs (one per screen)
-7. `{stage_dir}/design/{screen-name}.html` -- screen prototypes (one per screen)
+6. `.ace/design/screens/{screen-name}.yaml` -- screen specs (one per screen)
+7. `.ace/design/screens/{screen-name}.html` -- screen prototypes (one per screen)
 
 **Screens_only mode produces:**
-1. `{stage_dir}/design/{screen-name}.yaml` -- screen specs (one per screen)
-2. `{stage_dir}/design/{screen-name}.html` -- screen prototypes (one per screen)
+1. `.ace/design/screens/{screen-name}.yaml` -- screen specs (one per screen)
+2. `.ace/design/screens/{screen-name}.html` -- screen prototypes (one per screen)
 3. `.ace/design/components/{name}/{name}.yaml` + `.html` -- ONLY for newly added components (if any)
 
 **Phase-scoped output (when phase parameter is present):**
 
 Phase `stylekit` produces items 1-5 only (stylekit, CSS, preview, components). Screen specs and prototypes are NOT created.
 
-Phase `screens` produces items 6-7 only (screen specs, prototypes) plus any newly added components (item 3 if new components needed). Stylekit, CSS, and preview are NOT modified.
+Phase `screens` produces items 6-7 only (screen specs and prototypes at `.ace/design/screens/`) plus any newly added components (item 3 if new components needed). Stylekit, CSS, and preview are NOT modified.
 
 ALL artifacts must exist on disk before you return your structured completion signal.
 
@@ -569,9 +591,14 @@ Return this when completing the first render or first render in a new mode:
 - .ace/design/components/{name}/{name}.html
 - ...
 
-**Screen Specs:**
-- {stage_dir}/design/{screen-name}.yaml -- {one-line description}
-- {stage_dir}/design/{screen-name}.html -- prototype
+**Screen Specs (new):**
+- .ace/design/screens/{screen-name}.yaml -- {one-line description} [NEW]
+- .ace/design/screens/{screen-name}.html -- prototype [NEW]
+- ...
+
+**Screen Specs (modified from prior stages):**
+- .ace/design/screens/{screen-name}.yaml -- {modification summary} [MODIFIED]
+- .ace/design/screens/{screen-name}.html -- prototype updated [MODIFIED]
 - ...
 
 ### Design Reasoning
@@ -647,12 +674,12 @@ Return this after receiving feedback from reviewer or user:
 
 ### Artifacts Modified
 
-- {file path} -- {what changed}
+- {file path} -- {what changed} [MODIFIED]
 - ...
 
 ### Artifacts Created
 
-- {file path} -- {description} (if any new artifacts were needed)
+- {file path} -- {description} [NEW]
 - ...
 
 ### Design Reasoning
