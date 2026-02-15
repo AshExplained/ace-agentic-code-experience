@@ -264,6 +264,135 @@ The approval gate lists only these HTML files for user review:
 
 Individual component HTMLs at `.ace/design/components/{name}/{name}.html` exist on disk for agent use but are NOT listed in the approval gate.
 
+## Implementation Guide Schema
+
+The implementation guide bridges the designer's Tailwind v3 CDN prototypes to the project's actual CSS framework. It is a summary translation document (target: 100-200 lines) that maps design patterns to framework-specific equivalents. The runner consults it alongside HTML prototypes to produce framework-native code that matches the approved visual design.
+
+**File location:** `.ace/design/implementation-guide.md`
+
+**Generated:** After Phase 2 design approval, before architect spawn (see `generate_implementation_guide` step in plan-stage). Not generated when `HAS_DESIGN=false`.
+
+**Regenerated:** When design artifacts change after the guide was last generated (timestamp comparison against `.ace/design/screens/*.html`, `stylekit.yaml`, `stylekit.css`).
+
+**Consumed by:** Architect (inlined in planning_context via `IMPLEMENTATION_GUIDE` variable), runner (via `@.ace/design/implementation-guide.md` reference in task context).
+
+### Required Sections
+
+The implementation guide has 5 required sections:
+
+**1. Framework Detection**
+
+| Field | Description |
+|-------|-------------|
+| `CSS framework` | Detected framework name (tailwind-v3, tailwind-v4, styled-components, css-modules, vanilla-css) |
+| `Version` | Framework version from package.json |
+| `Configuration approach` | How the framework is configured (e.g., "Tailwind v4 CSS-first config", "CSS custom properties in :root", "styled-components ThemeProvider") |
+
+**2. Token System Translation**
+
+Maps stylekit.yaml tokens to the project's CSS system. Content varies by framework:
+
+| Framework | Translation Approach |
+|-----------|---------------------|
+| vanilla-css | CSS custom properties in `:root {}` -- stylekit.css is directly usable |
+| tailwind-v3 | `tailwind.config.js` theme extensions mapping token names to values |
+| tailwind-v4 | CSS-first `@theme` declarations in the project's CSS entry point |
+| css-modules | Shared CSS custom properties imported in each module via `:root {}` |
+| styled-components | Theme object with token values passed through `ThemeProvider` |
+
+Fields: token namespace mapping (stylekit names to project equivalents), exact file path for token definitions, syntax examples for each token layer (primitive, semantic, component).
+
+**3. Icon System**
+
+| Field | Description |
+|-------|-------------|
+| `Icon library` | Library used in prototypes (typically Material Symbols Rounded) |
+| `npm install` | Install command for the project (e.g., `npm install @material-symbols/font-400`) |
+| `Import pattern` | How to import in the project's framework (CSS link, JS import, font declaration) |
+| `Usage syntax` | How to render icons (component syntax, font class, SVG import) |
+
+**4. Animation Patterns**
+
+| Field | Description |
+|-------|-------------|
+| `Animations list` | Each `@keyframes` animation found in prototypes and stylekit.css |
+| `Definition location` | Where to put keyframes in the project (globals.css, tailwind config, CSS module) |
+| `Reference syntax` | How to apply animations (utility class, CSS class name, `animation` property) |
+
+**5. Component Class Mapping**
+
+For each screen prototype, lists key visual sections with their Tailwind v3 CDN classes and the project-framework equivalent. Focuses on classes that DIFFER between v3 CDN and the project framework. Structural classes (flex, grid, items-center) that are identical across frameworks are skipped.
+
+Example entry:
+```
+### dashboard.html
+| Section | v3 CDN Class | Project Equivalent |
+|---------|-------------|-------------------|
+| Header gradient | bg-gradient-to-r from-primary to-secondary | bg-gradient-to-r from-primary to-secondary (same -- project uses Tailwind v3) |
+| Card shadow | shadow-md | shadow-card (project defines semantic shadow token) |
+| Icon | material-symbols-rounded font class | <Icon name="..." /> component import |
+```
+
+### Notes
+
+- The guide is a summary document, not a full prototype inline. Target 100-200 lines.
+- For vanilla CSS projects, the guide maps to CSS custom properties in `:root {}`. The designer-generated `stylekit.css` is directly usable as the project's token source.
+- For projects already using Tailwind v3, the guide may be minimal (prototypes already match the project's framework).
+- The guide does NOT include full HTML prototype content. It maps patterns. The architect references paths and the runner reads prototypes directly.
+
+## Prototype as Visual Spec
+
+HTML prototypes are visual specifications, not code to copy. They show the approved visual design using Tailwind v3 CDN for fast, reliable static rendering. The project's actual implementation uses whatever CSS framework the project has. The implementation guide bridges this gap.
+
+### Principle
+
+The designer produces pixel-perfect HTML prototypes as the visual source of truth. These prototypes demonstrate exact spacing, color relationships, typography hierarchies, animation timing, icon usage, opacity effects, hover states, and responsive breakpoints. The runner reads the prototype to understand visual intent, then expresses that intent using the project's own framework and the implementation guide's translation mappings.
+
+### What to Read from Prototypes
+
+When a task references an HTML prototype (`@.ace/design/screens/{screen}.html`), the runner extracts:
+
+- **Exact spacing relationships** between elements (padding, margin, gap patterns)
+- **Animation and transition details** (timing, easing, what triggers them)
+- **Icon usage** (which icons, where, what size, what weight)
+- **Opacity and backdrop effects** (blur, overlay darkness, transparency levels)
+- **Hover and focus states** (what changes on interaction, transition properties)
+- **Color relationships** (which semantic tokens apply to which elements)
+- **Typography hierarchy** (which font sizes, weights, line-heights for each text role)
+- **Responsive breakpoint behavior** (what changes at each breakpoint)
+
+### What NOT to Do
+
+- **Copy v3 CDN classes directly** into a non-v3 project (e.g., pasting `bg-primary` into a styled-components project)
+- **Use inline SVGs** when the implementation guide specifies an icon font or component library
+- **Hardcode hex colors** instead of using the project's token system (`#3b82f6` instead of `var(--color-primary)`)
+- **Skip animations and transitions** shown in the prototype (they are part of the approved design)
+- **Pre-translate design into approximate CSS** in task action text (let the runner read the prototype and guide directly)
+- **Ignore responsive behavior** documented in the prototype (breakpoint changes are intentional design decisions)
+
+### Translation Flow
+
+```
+HTML Prototype          Implementation Guide        Project Code
+(visual intent)    -->  (framework mapping)     -->  (framework-native)
+
+What it looks like      How to express it            Actual implementation
+- exact spacing         - token name mapping         - project CSS classes
+- icon choices          - icon library import        - icon component usage
+- animation timing      - animation location         - keyframe + class
+- color relationships   - CSS custom property names  - theme token references
+```
+
+The prototype answers "what should it look like?" The implementation guide answers "how do I express that in this framework?" The project code is the result.
+
+### Context Budget
+
+HTML prototypes are typically 200-400 lines. To manage runner context:
+
+- Limit each task to at most **1-2 HTML prototype** `@` references
+- Multi-screen runs should split screen implementations across tasks
+- The implementation guide (100-200 lines) is referenced once per run, not per task
+
 ## Prototype Interactivity
 
 Screen prototypes with multiple states are interactive state machines, not static layouts. Prototypes with states beyond `default` support UI state switching via toggle controls and include working JavaScript for form interactions. Single-state screens (only `default`) have no toggle controls — they are static layouts with optional interaction JavaScript (form validation, modals, etc.).
