@@ -302,10 +302,103 @@ If files exist and no `--force` flag: Display "Using existing design: ${STAGE_DI
 
 ```bash
 ls .ace/design/stylekit.yaml 2>/dev/null
+ls .ace/codebase/DESIGN.md 2>/dev/null
 ```
 
-If stylekit does NOT exist: `DESIGN_MODE="full"` (first UI stage).
-If stylekit exists: `DESIGN_MODE="screens_only"` (subsequent UI stage).
+Priority order (check in this sequence):
+1. If stylekit.yaml exists: `DESIGN_MODE="screens_only"` (approved design system takes precedence)
+2. Else if .ace/codebase/DESIGN.md exists: `DESIGN_MODE="translate"` (brownfield design detected)
+3. Else: `DESIGN_MODE="full"` (greenfield, no existing design)
+
+### Translate Mode Checkpoint (only when DESIGN_MODE="translate")
+
+**If `DESIGN_MODE` is NOT "translate": Skip this subsection.**
+
+Present `checkpoint:decision`:
+
+```
+Existing design patterns detected in .ace/codebase/DESIGN.md
+
+Your project already has a visual design system. How should ACE handle it?
+
+Options:
+  Absorb - Extract existing patterns into ACE stylekit as-is (fastest, no interview)
+  Extend - Extract existing patterns + discuss enhancements (balanced)
+  Replace - Ignore existing patterns, create fresh design system (full interview)
+
+Select: absorb, extend, or replace
+```
+
+Routing:
+- `absorb`: Set `TRANSLATE_STRATEGY="absorb"`. Skip the design interview entirely. Read `.ace/codebase/DESIGN.md` content into `TRANSLATION_CONTEXT`. Display: "Absorbing existing design. Skipping interview..."
+- `extend`: Set `TRANSLATE_STRATEGY="extend"`. Read `.ace/codebase/DESIGN.md` content into `TRANSLATION_CONTEXT`. Continue to the scoped interview (see Scoped Interview below).
+- `replace`: Set `DESIGN_MODE="full"`. Display: "Replacing existing design. Running full interview..." Continue to existing greenfield flow (design interview, Phase 1, etc.) as if DESIGN.md did not exist.
+
+### Scoped Interview (only when TRANSLATE_STRATEGY="extend")
+
+**If `TRANSLATE_STRATEGY` is NOT "extend": Skip this subsection.**
+
+This is a shortened version of the full design interview, focused on gaps in the existing design.
+
+#### Step 1: Analyze DESIGN.md for Gaps
+
+Read TRANSLATION_CONTEXT (the DESIGN.md content). For each core design question, determine if DESIGN.md already answers it:
+
+| Core Question | Already Answered If |
+|---------------|---------------------|
+| Visual style | DESIGN.md describes a clear visual personality |
+| Color direction | Color System section has a defined palette |
+| Typography | Typography section has specific font families |
+| Layout density | Component Inventory shows consistent spacing patterns |
+| Dark mode | Dark Mode section has a strategy other than "not implemented" |
+| Responsive | Component Inventory or Visual Patterns show responsive behavior |
+
+Track which questions are UNANSWERED (gaps).
+
+#### Step 2: Generate Extension Gray Areas
+
+Generate 2-3 gray areas based on what DESIGN.md is MISSING. These are aspects where the existing design has no clear direction and the user should weigh in.
+
+Example: If DESIGN.md has colors and fonts but no dark mode and no spacing scale:
+- "Dark mode strategy" -- Should we add dark mode support?
+- "Spacing refinement" -- Your current spacing seems ad-hoc. Standardize to a scale?
+
+#### Step 3: Deep-Dive Gaps
+
+For each unanswered core question and generated gray area, use AskUserQuestion with 2-4 options (following the same pattern as the full interview):
+- Include "Let Claude decide" option on every question
+- Follow the same recommendation guidelines (subjective = recommend specific, technical = recommend "Let Claude decide")
+
+Target: 3-7 total questions (shorter than the full interview's 8-15).
+
+#### Step 4: Compile Extension Preferences
+
+Compile answers into `DESIGN_EXTENSION_PREFERENCES` using this format:
+
+```xml
+<design_extension_preferences>
+
+## Extension Direction
+
+### Aspects Preserved from Existing Design
+- Color system: {summary from DESIGN.md}
+- Typography: {summary from DESIGN.md}
+- {other preserved aspects}
+
+### Aspects Extended
+{For each gap where user answered:}
+### [Gap Area]
+Pick: {user's choice OR "Designer's choice"}
+Context: {any elaboration}
+
+### Designer Autonomy
+The following aspects are marked as "Designer's choice":
+- {list of "Let Claude decide" items}
+
+</design_extension_preferences>
+```
+
+Display: "Extension preferences captured. Proceeding to design system creation..."
 
 ### Restyle Trigger (PLAN-07)
 
@@ -329,6 +422,10 @@ If `restyle`: Set `DESIGN_MODE="full"`. Designer receives existing stylekit as r
 ### Design Interview
 
 **If `DESIGN_MODE="screens_only"`: Skip interview entirely.** Preferences are already baked into the existing stylekit.
+
+**If `DESIGN_MODE="translate"` and `TRANSLATE_STRATEGY="absorb"`: Skip interview entirely.** Designer will extract existing patterns as-is.
+
+**If `DESIGN_MODE="translate"` and `TRANSLATE_STRATEGY="extend"`: Skip this section.** The scoped interview above already captured extension preferences.
 
 **If `DESIGN_MODE="full"`:** Run the progressive design interview.
 
@@ -556,7 +653,7 @@ The design workflow runs in two phases with an approval gate between them. Each 
 
 | Variable | Source |
 |----------|--------|
-| `design_mode` | "full" (always full in Phase 1) |
+| `design_mode` | DESIGN_MODE ("full" or "translate") |
 | `phase` | "stylekit" |
 | `stage_name` | parse_args |
 | `stage_goal` | track.md stage details |
@@ -565,6 +662,9 @@ The design workflow runs in two phases with an approval gate between them. Each 
 | `design_preferences` | DESIGN_PREFERENCES (compiled from design interview Step 6) |
 | `pexels_key` | Pexels API key check result |
 | `stage_dir` | STAGE_DIR path |
+| `translation_context` | TRANSLATION_CONTEXT (DESIGN.md content, only when DESIGN_MODE="translate") |
+| `translation_strategy` | TRANSLATE_STRATEGY ("absorb" or "extend", only when DESIGN_MODE="translate") |
+| `design_extension_preferences` | DESIGN_EXTENSION_PREFERENCES (only when TRANSLATE_STRATEGY="extend") |
 
 Note: `stylekit_content` and `component_names` are NOT passed in Phase 1 (they don't exist yet).
 
@@ -575,12 +675,35 @@ First, read ./.claude/agents/ace-designer.md for your role and instructions.
 
 <design_context>
 
-**Mode:** full
+**Mode:** {DESIGN_MODE}
 **Phase:** stylekit
 **Stage:** {stage_name}
 **Goal:** {stage_goal}
 
 {DESIGN_PREFERENCES}
+
+{IF DESIGN_MODE == "translate":}
+
+**Translation Mode:**
+**Strategy:** {TRANSLATE_STRATEGY}
+
+<translation_context>
+{TRANSLATION_CONTEXT}
+</translation_context>
+
+{IF TRANSLATE_STRATEGY == "extend":}
+{DESIGN_EXTENSION_PREFERENCES}
+{END IF}
+
+**Translation Instructions:**
+- Extract concrete values from the existing design into the three-layer token architecture
+- Map colors, fonts, spacing, shadows, border radii to proper primitive/semantic/component tokens
+- For absorb: reproduce existing design faithfully, fill gaps with sensible defaults based on the extracted palette
+- For extend: reproduce existing design, then enhance using the extension preferences above
+- SKIP the anti-generic checklist (existing design is intentional, not AI-generated)
+- Generate stylekit-preview.html for user verification: "Does this represent your existing design?"
+
+{END IF}
 
 **Research:**
 {research_content}
@@ -625,8 +748,11 @@ Display banner before spawning:
 
 ```
 ACE > DESIGNING STAGE {X} -- PHASE 1: DESIGN SYSTEM
-
+{IF DESIGN_MODE == "translate":}
+Spawning designer (mode: translate, strategy: {TRANSLATE_STRATEGY}, phase: stylekit)...
+{ELSE:}
 Spawning designer (mode: full, phase: stylekit)...
+{END IF}
 ```
 
 Spawn:
