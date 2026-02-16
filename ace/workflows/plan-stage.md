@@ -318,6 +318,140 @@ fi
 Store `UI_STAGE` and `UX_BRIEF` for downstream use.
 </step>
 
+<step name="handle_dx_interview">
+**Skip conditions (check in order):**
+1. `--gaps` flag set -> skip (gap closure does not re-run interviews)
+2. `UI_STAGE` is true -> skip (UX handled by design-stage)
+3. UX.md does not exist -> skip (display: "No UX.md found. Skipping DX interview.")
+4. UX.md has no DX content -> skip
+
+**Check for DX content in UX.md:**
+
+```bash
+DX_CONTENT=""
+if [ -f ".ace/research/UX.md" ]; then
+  if grep -q "Proven DX Patterns\|Project Type: CLI\|Project Type: API\|Project Type: Library" .ace/research/UX.md; then
+    DX_CONTENT=$(cat .ace/research/UX.md)
+  fi
+fi
+if [ -z "$DX_CONTENT" ]; then
+  echo "No DX patterns found in UX.md. Skipping DX interview."
+  DX_INTERVIEW_ANSWERS=""
+  DX_QUESTIONS_ASKED=0
+  # Skip to check_existing_runs
+fi
+```
+
+**Display banner:**
+
+```
+ACE > DX INTERVIEW FOR STAGE {X}
+
+Before planning, let's discuss the developer experience for this stage.
+```
+
+**Generate 3-5 questions dynamically from UX.md DX findings:**
+
+Read DX_CONTENT and generate questions from these categories:
+
+1. **Proven DX Patterns (1-2 questions):** From the "Proven DX Patterns" table, generate questions about which patterns to adopt for this stage's specific functionality.
+   - Template: "DX research found [pattern] works well for [evidence]. Should this stage use [pattern]?"
+   - Options: 2-3 concrete implementations + "Let Claude decide (Research suggests: [recommendation])"
+
+2. **Anti-Patterns (0-1 questions):** From the "Anti-Patterns" table, generate an awareness question if a relevant anti-pattern exists.
+   - Template: "DX research flagged [anti-pattern] as common in [domain]. When a developer encounters [scenario], how should we handle it?"
+   - Options: 2-3 alternatives + "Let Claude decide"
+
+3. **Critical DX Flows (1-2 questions):** From the "Critical Flows" table, generate questions about high-friction flows in this stage.
+   - Template: "When a developer [flow description], should the experience prioritize [option A] or [option B]?"
+   - Options: 2-3 DX approaches + "Let Claude decide"
+
+4. **Emotional Design (1 question):** From the "Emotional Design Goals" section, generate one calibration question.
+   - Template: "DX research targets '[emotion]' as the primary developer feeling. For this stage, which approach better achieves that?"
+   - Options: 2-3 concrete approaches + "Let Claude decide"
+
+**Question format (same AskUserQuestion conventions as UX interview):**
+- 2-4 concrete options per question
+- EVERY question includes "Let Claude decide" with research-backed default
+- Third-person framing for flow questions, direct framing for preference questions
+- Target 3-5 total questions (shorter than UX interview's 4-6)
+- Track `DX_QUESTIONS_ASKED` count
+
+**Compile answers:**
+
+```xml
+<dx_interview_answers>
+### [Question Topic 1]
+Question: {question text}
+Answer: {user's choice or "Let Claude decide"}
+Research default: {what UX.md recommends}
+
+### [Question Topic 2]
+Question: {question text}
+Answer: {user's choice or "Let Claude decide"}
+Research default: {what UX.md recommends}
+
+...
+</dx_interview_answers>
+```
+
+**Store for downstream:**
+- `DX_INTERVIEW_ANSWERS` -- compiled answers
+- `DX_QUESTIONS_ASKED` -- count
+- `DX_CONTENT` -- original UX.md DX content for synthesis
+</step>
+
+<step name="dx_synthesis">
+**Skip conditions:**
+1. handle_dx_interview was skipped (`DX_INTERVIEW_ANSWERS` is empty) -> skip
+2. `UI_STAGE` is true -> skip
+
+**Synthesize inline (no agent spawn):**
+
+Read:
+- `DX_CONTENT` (DX sections from UX.md)
+- `DX_INTERVIEW_ANSWERS` (user decisions from DX interview)
+
+Produce `DX_BRIEF` by combining both sources into concrete DX implications:
+
+```markdown
+## DX Direction for Stage {X}: {Name}
+
+### Developer Workflow
+- [From interview answers, e.g., "CLI commands use consistent --flag naming per clig.dev"]
+- [Research defaults for "Let Claude decide" answers]
+
+### Error Handling
+- [From adopted patterns, e.g., "Errors write to stderr with actionable suggestions"]
+- [From anti-pattern avoidance, e.g., "No stack traces unless --verbose"]
+
+### API/Interface Design
+- [From adopted patterns + interview answers]
+- [From critical flow decisions]
+
+### Emotional Guardrails
+- Primary: [from DX emotional design, e.g., "productive -- fast startup, minimal config"]
+- Avoid: [from DX anti-emotion, e.g., "lost -- clear help text, discoverable commands"]
+
+### Research References
+- [Cross-references to UX.md DX sections that informed decisions]
+```
+
+**Rules for synthesis:**
+- For answers where user made a choice: use the user's choice verbatim
+- For "Let Claude decide" answers: use the research-backed default from UX.md
+- Translate abstract DX principles into concrete implementation guidance
+- If all answers were "Let Claude decide": produce DX_BRIEF entirely from UX.md research defaults
+- Keep DX_BRIEF concise (20-40 lines). Digest, not report.
+
+**Persist DX_BRIEF to file:**
+
+Write DX_BRIEF to `${STAGE_DIR}/${STAGE}-dx-brief.md` as plain markdown (no XML tags, no frontmatter). Same convention as ux-brief.md.
+
+Display: "DX brief synthesized and saved to ${STAGE_DIR}/${STAGE}-dx-brief.md."
+
+**Store:** `DX_BRIEF` variable for read_context_files and architect context.
+</step>
 
 <step name="check_existing_runs">
 ```bash
@@ -344,6 +478,12 @@ RESEARCH_CONTENT=$(cat "${STAGE_DIR}"/*-research.md 2>/dev/null)
 # UX_BRIEF may already be loaded from handle_ui_stage_redirect
 if [ -z "$UX_BRIEF" ]; then
   UX_BRIEF=$(cat "${STAGE_DIR}"/${STAGE}-ux-brief.md 2>/dev/null)
+fi
+
+# Load DX brief from dx_synthesis output (if non-UI stage with DX interview)
+# DX_BRIEF may already be loaded from dx_synthesis step
+if [ -z "$DX_BRIEF" ]; then
+  DX_BRIEF=$(cat "${STAGE_DIR}"/${STAGE}-dx-brief.md 2>/dev/null)
 fi
 
 # Detect design artifacts (created by design-stage, not plan-stage)
@@ -421,6 +561,19 @@ It provides concrete UX direction for this stage. When planning UI tasks, refere
 interaction patterns, spacing guidelines, component choices, and emotional guardrails.
 The ux_brief is INFORMATIONAL context for the architect -- it does NOT override user
 decisions from intel.md.
+
+{END IF}
+
+{IF DX_BRIEF is non-empty:}
+
+**DX Brief (if exists):**
+{DX_BRIEF}
+
+This dx_brief was produced by inline synthesis of UX.md DX research + DX interview answers.
+It provides concrete DX direction for this stage. When planning implementation tasks,
+reference these developer workflow patterns, error handling guidelines, and interface
+design principles. The dx_brief is INFORMATIONAL context for the architect -- it does
+NOT override user decisions from intel.md.
 
 {END IF}
 
