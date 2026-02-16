@@ -204,6 +204,32 @@ Things that couldn't be fully resolved:
    - Recommendation: [how to handle]
 </open_questions>
 
+<stage_ux_patterns>
+## Stage UX Patterns
+
+> **Conditional section.** Present only when the orchestrator provides UX.md content to the scout. Omit entirely for non-UI stages or when no UX.md exists.
+
+**Source:** Cross-referenced from project UX.md
+
+### Applicable Patterns
+- **[Pattern from UX.md]:** Applies to this stage because [stage-specific reason]
+  - UX.md reference: [Section] > [Pattern Name]
+  - Stage adaptation: [how to apply in this stage]
+
+### Stage-Specific UX Considerations
+- **[Consideration]:** [description unique to this stage]
+  - Evidence: [research or UX.md finding]
+
+### Critical Flows in This Stage
+| Flow | Friction Tolerance | UX Requirements |
+|------|-------------------|-----------------|
+| [stage flow] | [LOW/MEDIUM/HIGH] | [requirements] |
+
+### Emotional Design for This Stage
+- Primary emotion: [from UX.md + stage context]
+- Avoid: [from UX.md anti-emotion + stage context]
+</stage_ux_patterns>
+
 <sources>
 ## Sources
 
@@ -531,8 +557,8 @@ function useVehicleControls(rigidBodyRef) {
 
 **Structure:**
 - Use XML tags for section markers (matches ACE templates)
-- Seven core sections: summary, standard_stack, architecture_patterns, dont_hand_roll, common_pitfalls, code_examples, sources
-- All sections required (drives comprehensive research)
+- Seven core sections: summary, standard_stack, architecture_patterns, dont_hand_roll, common_pitfalls, code_examples, sources. Optional eighth section: stage_ux_patterns / Stage UX Patterns (conditional on UX.md availability)
+- All core sections required (drives comprehensive research)
 
 **Content quality:**
 - Standard stack: Specific versions, not just names
