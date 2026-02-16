@@ -429,6 +429,30 @@ Things that couldn't be fully resolved:
 
 **Research date:** [date]
 **Valid until:** [estimate - 30 days for stable, 7 for fast-moving]
+
+## Stage UX Patterns
+
+> **Conditional section.** Include ONLY when the orchestrator provides UX.md content in the scout prompt. If no UX.md content is provided, omit this entire section.
+
+**Source:** Cross-referenced from project UX.md
+
+### Applicable Patterns
+- **[Pattern from UX.md]:** Applies to this stage because [stage-specific reason]
+  - UX.md reference: [Section] > [Pattern Name]
+  - Stage adaptation: [how this pattern manifests in this specific stage]
+
+### Stage-Specific UX Considerations
+- **[Consideration]:** [description unique to this stage's screens/flows]
+  - Evidence: [from stage research or UX.md findings]
+
+### Critical Flows in This Stage
+| Flow | Friction Tolerance | UX Requirements |
+|------|-------------------|-----------------|
+| [flow from this stage] | [level from UX.md or stage analysis] | [specific requirements] |
+
+### Emotional Design for This Stage
+- Primary emotion for this stage: [derived from UX.md + stage context]
+- What to avoid: [derived from UX.md anti-emotion + stage context]
 ```
 
 </output_format>
@@ -475,6 +499,13 @@ git check-ignore -q .ace 2>/dev/null && COMMIT_ACE_DOCS=false
 
 Parse intel.md content before proceeding to research.
 
+**UX context (if provided by orchestrator):**
+- The orchestrator may inline UX.md content (from `.ace/research/UX.md`) in the scout prompt
+- If UX.md content is present: read it and generate a `## Stage UX Patterns` section in your research.md output
+- If UX.md content is NOT present: skip the Stage UX Patterns section entirely
+- Focus on sections relevant to this stage: Proven UX Patterns, Anti-Patterns, Critical Flows, Emotional Design Goals
+- Cross-reference UX.md findings with stage-specific context (which patterns apply here, which flows are in scope)
+
 ## Step 2: Identify Research Domains
 
 Based on stage description, identify what needs investigating:
@@ -502,6 +533,11 @@ Based on stage description, identify what needs investigating:
 **Don't Hand-Roll:**
 - What existing solutions should be used?
 - What problems look simple but aren't?
+
+**UX Patterns (if UX.md provided):**
+- Which project UX patterns apply to this stage's features?
+- What critical flows does this stage implement?
+- What emotional design implications exist for this stage?
 
 ## Step 3: Execute Research Protocol
 
