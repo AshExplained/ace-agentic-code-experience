@@ -834,6 +834,7 @@ The design workflow runs in two phases with an approval gate between them. Each 
 | `translation_context` | TRANSLATION_CONTEXT (DESIGN.md content, only when DESIGN_MODE="translate") |
 | `translation_strategy` | TRANSLATE_STRATEGY ("absorb" or "extend", only when DESIGN_MODE="translate") |
 | `design_extension_preferences` | DESIGN_EXTENSION_PREFERENCES (only when TRANSLATE_STRATEGY="extend") |
+| `ux_brief` | UX_BRIEF (from ux_synthesis step, if non-empty) |
 
 Note: `stylekit_content` and `component_names` are NOT passed in Phase 1 (they don't exist yet).
 
@@ -850,6 +851,17 @@ First, read ./.claude/agents/ace-designer.md for your role and instructions.
 **Goal:** {stage_goal}
 
 {DESIGN_PREFERENCES}
+
+{IF UX_BRIEF is non-empty:}
+
+**UX Brief (from UX research + interview):**
+{UX_BRIEF}
+
+This ux_brief provides concrete UX direction based on research and user interview answers.
+Use it to inform spacing/density decisions, component selection, and interaction patterns.
+The ux_brief is INFORMATIONAL -- it supplements design preferences but does not override them.
+
+{END IF}
 
 {IF DESIGN_MODE == "translate":}
 
@@ -1103,6 +1115,7 @@ After Phase 1 approval (or accept-as-is):
 | `pexels_key` | Pexels API key check result |
 | `stage_dir` | STAGE_DIR path |
 | `existing_screens` | `ls .ace/design/screens/*.yaml 2>/dev/null` with name + description for each |
+| `ux_brief` | UX_BRIEF (from ux_synthesis step, if non-empty) |
 
 **Assemble existing screen context:**
 
@@ -1135,6 +1148,17 @@ First, read ./.claude/agents/ace-designer.md for your role and instructions.
 
 **Intel (raw -- extract design-relevant decisions yourself):**
 {intel_content}
+
+{IF UX_BRIEF is non-empty:}
+
+**UX Brief (from UX research + interview):**
+{UX_BRIEF}
+
+This ux_brief provides concrete UX direction. Reference it for flow design,
+component density, and interaction patterns when creating screen layouts.
+The ux_brief is INFORMATIONAL -- it supplements intel decisions.
+
+{END IF}
 
 **Approved Stylekit:** (locked -- do not modify)
 {stylekit_content}

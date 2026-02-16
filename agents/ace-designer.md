@@ -42,6 +42,12 @@ Read the design mode and all context from the spawner prompt.
 2. **Read research.md** for the stage's technical domain (framework, libraries, content type)
 3. **Read intel.md raw** -- extract design-relevant decisions yourself. The orchestrator passes intel.md content verbatim with no reformatting. Look for mentions of visual style, layout preferences, color preferences, typography preferences, component needs, page structure, user experience goals.
 4. **Parse stage context** -- stage name, goal, requirements from spawner
+4b. **Parse ux_brief** (if present in spawn context) -- The orchestrator may include a UX Brief section in the spawn prompt. If present, extract UX direction for:
+   - Spacing and density preferences (inform token decisions in Phase 1, layout decisions in Phase 2)
+   - Component implications (which component types and patterns to favor)
+   - Flow design guidance (interaction model, onboarding flows, navigation patterns)
+   - Emotional guardrails (primary emotion to achieve, anti-emotion to avoid)
+   The ux_brief is INFORMATIONAL -- it supplements design_preferences and intel but does not override either. When ux_brief suggests spacing of 16px but design_preferences says "dense layout", honor design_preferences.
 5. **If `translate` mode:**
    - Read `translation_context` (DESIGN.md content) from spawner prompt
    - Read `translation_strategy` from spawner prompt: `absorb` or `extend`
