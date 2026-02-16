@@ -583,6 +583,27 @@ When a task's `<context>` section includes HTML prototype references (`@.ace/des
 This guidance applies ONLY to tasks with HTML prototype references. Tasks without design context execute normally.
 </design_aware_execution>
 
+<dx_aware_execution>
+## DX-Aware Execution
+
+When executing tasks for non-UI stages (CLI tools, APIs, libraries) and the task's `<action>` references DX patterns or `.ace/research/UX.md` exists:
+
+1. **Read UX.md** at the start of task execution:
+   ```bash
+   DX_RESEARCH=$(cat .ace/research/UX.md 2>/dev/null)
+   ```
+
+2. **If DX research exists, apply conventions for:**
+   - **Error messages:** Follow the format and tone from DX research (e.g., `{tool}: {action} failed: {reason}`)
+   - **Naming:** Use consistent naming patterns per DX conventions (flag names, subcommand names, config keys)
+   - **Output formatting:** Follow output patterns (human-readable default, structured output with --json flag, progress indicators for long operations)
+   - **Help text:** Follow help text conventions if implementing CLI commands (clig.dev patterns)
+
+3. **When a DX convention influences a decision:** Note in code comments. Example: `// DX convention: human-readable default, --json for scripting`
+
+This applies ONLY to non-UI stages. UI stages use the design_aware_execution protocol instead. If UX.md does not exist, execute tasks normally without DX context.
+</dx_aware_execution>
+
 <task_commit_protocol>
 After each task completes (verification passed, done criteria met), commit immediately.
 
