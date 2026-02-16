@@ -5,6 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/AshExplained/ace-agentic-code-experience/compare/ace-experience-v0.2.1...ace-experience-v0.3.0) (2026-02-16)
+
+
+### Added
+
+* **05.01:** create ace-designer agent prompt file ([00e9dc0](https://github.com/AshExplained/ace-agentic-code-experience/commit/00e9dc0bd454d28571372ba7ae5296a16a056f6e))
+* **05.02:** create ace-design-reviewer agent prompt file ([733d45d](https://github.com/AshExplained/ace-agentic-code-experience/commit/733d45d8e471a97598414d04644cf0bd29234f2b))
+* **06.01:** insert handle_design step and update model lookup table ([54b55b7](https://github.com/AshExplained/ace-agentic-code-experience/commit/54b55b7b140500f03687187dcce2b16a93794369))
+* **06.01:** sync source horsepower-profiles with installed version ([fa4e17c](https://github.com/AshExplained/ace-agentic-code-experience/commit/fa4e17c9a30184447eaf516e67cf9114225cc39e))
+* **06.02:** extend read_context_files and spawn_architect with design handoff ([c6c2a52](https://github.com/AshExplained/ace-agentic-code-experience/commit/c6c2a5298881ab877f51fee0d55a40be3125869e))
+* **06.02:** update plan-stage command with design workflow references ([86cfe9c](https://github.com/AshExplained/ace-agentic-code-experience/commit/86cfe9c17b03e1ab99476e803657fbca38074b27))
+* **06.03:** add design conformance step to auditor agent ([031b79c](https://github.com/AshExplained/ace-agentic-code-experience/commit/031b79c77f12a87ce1ca27168a22e0662a57affb))
+* **08.01:** add create_stylekit_preview step to ace-designer agent ([7f1253c](https://github.com/AshExplained/ace-agentic-code-experience/commit/7f1253c791d263284be974c4b0c8399f9001d918))
+* **08.02:** add filtered gate file lists and cross-platform auto-open ([1896980](https://github.com/AshExplained/ace-agentic-code-experience/commit/1896980f18593904d973cfa66b3054ac6d08986e))
+* **08.02:** replace Pexels informational nudge with interactive prompt ([3e9a1d8](https://github.com/AshExplained/ace-agentic-code-experience/commit/3e9a1d85c20b1fdd036bdf94a3d08656bd92fec1))
+* **08.03:** add stylekit-preview.html checks to design reviewer ([4e0351e](https://github.com/AshExplained/ace-agentic-code-experience/commit/4e0351e0b5cb604ea5a62a3984fd18be84790fbd))
+* **09.01:** fix UI detection keyword lists for login/signup stages ([fd0e221](https://github.com/AshExplained/ace-agentic-code-experience/commit/fd0e221a766dcd90ac7c41573a799d513007abe9))
+* **09.01:** merge auto-open into approval gate subsection ([eb4c9bc](https://github.com/AshExplained/ace-agentic-code-experience/commit/eb4c9bc7dfc19587b4da99a17675693bfdf27188))
+* **10.01:** add phase parameter and cascading revision rule to ace-designer ([ed6beb8](https://github.com/AshExplained/ace-agentic-code-experience/commit/ed6beb86ba4ee825503bedff8f2e5dd4edf9828b))
+* **10.01:** add phase-aware review scope to ace-design-reviewer ([a55a8b1](https://github.com/AshExplained/ace-agentic-code-experience/commit/a55a8b1b2dc050d4a06c6036f7012fd5ba174409))
+* **10.02:** restructure handle_design into two-phase orchestration ([6b8f1dd](https://github.com/AshExplained/ace-agentic-code-experience/commit/6b8f1dda4c8fdd895a53dc3dd2dcf56d69c4bc86))
+* **11.01:** expand create_stylekit_preview to 7+ sections with theme toggle ([829f1df](https://github.com/AshExplained/ace-agentic-code-experience/commit/829f1df23ee225a49c95e4eb616fd133e9cd384c))
+* **11.01:** update reviewer checks and design-artifacts for 7+ preview sections ([3b08e3d](https://github.com/AshExplained/ace-agentic-code-experience/commit/3b08e3db825e4377a30cfeff3ad41645d5f23f34))
+* **11.02:** add prototype interactivity checks to reviewer and patterns to design-artifacts ([0402711](https://github.com/AshExplained/ace-agentic-code-experience/commit/04027115449451019f43f7fbc8f5f07fc3360a01))
+* **11.02:** add prototype interactivity requirements to designer render_prototypes step ([ab5093d](https://github.com/AshExplained/ace-agentic-code-experience/commit/ab5093d7f04cb48ca35e6a8b7e0530c9b137f5a4))
+* **12.01:** add design interview subsection and AskUserQuestion to plan-stage ([c39aa1a](https://github.com/AshExplained/ace-agentic-code-experience/commit/c39aa1a8997981febe477176c4e3d0cba0b831e0))
+* **12.01:** inject design preferences into Phase 1 spawn template and sync installed copy ([659710c](https://github.com/AshExplained/ace-agentic-code-experience/commit/659710ce319430e329699695827ea74af09e4fe0))
+* **13.01:** add conditional 5th design mapper agent to map-codebase pipeline ([c48ea43](https://github.com/AshExplained/ace-agentic-code-experience/commit/c48ea4328180323adc2b26ec59e34ab6e128779f))
+* **13.01:** create DESIGN.md template and add design focus area to mapper agent ([2d09292](https://github.com/AshExplained/ace-agentic-code-experience/commit/2d09292218869793cd3f9601cda8a8517db2e021))
+* **13.02:** add three-way mode determination and translate checkpoint to plan-stage ([46f78ab](https://github.com/AshExplained/ace-agentic-code-experience/commit/46f78ab626d83ed3f78e3eaf22a4a063c56ea56a))
+* **13.02:** add translate mode to designer and DESIGN.md loading to architect ([c6b0787](https://github.com/AshExplained/ace-agentic-code-experience/commit/c6b0787e8c2a80f7620c5759258f5a1f83d23431))
+* **14.01:** move screen output paths to global .ace/design/screens/ in ace-designer ([53197db](https://github.com/AshExplained/ace-agentic-code-experience/commit/53197dbd68dd8792b9bb65c08a6d3541ffdddea4))
+* **14.01:** update design-artifacts reference and auditor conformance paths ([2b62e8d](https://github.com/AshExplained/ace-agentic-code-experience/commit/2b62e8dc7bbd2e6b6bee644ee920d62b6d8c2ee7))
+* **14.02:** update plan-stage Phase 2 to use global screen paths with new/modified scoping ([672ba9c](https://github.com/AshExplained/ace-agentic-code-experience/commit/672ba9c1b4b6c8b4441f874daa34bff0b6ec338d))
+* **15.01:** add generate_implementation_guide step to plan-stage ([3145224](https://github.com/AshExplained/ace-agentic-code-experience/commit/314522450fcf2b9f12b7f27410c20fdfa0890ea0))
+* **15.01:** add implementation guide schema and prototype-as-visual-spec to design-artifacts ([72d05a0](https://github.com/AshExplained/ace-agentic-code-experience/commit/72d05a0c4e178fdd0b12742d790a219abba96f35))
+* **15.01:** update architect context with HTML prototypes and design-fidelity must_haves ([de8cc78](https://github.com/AshExplained/ace-agentic-code-experience/commit/de8cc781b9d3cc59d0df291970593b17e36c79c4))
+* **15.02:** add design-aware execution guidance to ace-runner ([d8e407f](https://github.com/AshExplained/ace-agentic-code-experience/commit/d8e407f980a15bfbc7464033e64f28ad64396b2c))
+* **15.02:** add design-fidelity awareness to ace-architect ([999b691](https://github.com/AshExplained/ace-agentic-code-experience/commit/999b691e5061235627f759f09ec1e40e3bdfa58d))
+* **15.02:** strengthen auditor design conformance to two-tier system ([082b15c](https://github.com/AshExplained/ace-agentic-code-experience/commit/082b15c10b2da26c36cb20e28131849da4eedca2))
+* v0.4.0 brownfield design support & fidelity pipeline ([7e8df50](https://github.com/AshExplained/ace-agentic-code-experience/commit/7e8df5042b1122ff0e59c49cff8ab262fbe2710e))
+
+
+### Fixed
+
+* **07.01:** update ace-design-reviewer to check for Tailwind v3 CDN ([643aa35](https://github.com/AshExplained/ace-agentic-code-experience/commit/643aa35260e6a4a78ef792333110234cf98ca32c))
+* **07.01:** update ace-designer to use Tailwind v3 CDN with inline config ([e2593c1](https://github.com/AshExplained/ace-agentic-code-experience/commit/e2593c14eeb573170506e547c264e921c6f1dc7d))
+* **07.02:** remove -before.html logic and update token schema summary in plan-stage ([c563902](https://github.com/AshExplained/ace-agentic-code-experience/commit/c5639024cc9426878c2bbca9cc0735f0eecb7209))
+* **07.02:** replace [@theme](https://github.com/theme) CSS rules with :root approach in design-tokens reference ([570b9b9](https://github.com/AshExplained/ace-agentic-code-experience/commit/570b9b9f24819383a071f3ddaedcb8d384412c5a))
+* **07.02:** replace v4 HTML boilerplate with v3 CDN and remove -before.html rule in design-artifacts ([4f76a23](https://github.com/AshExplained/ace-agentic-code-experience/commit/4f76a239c9eae811fccb26faca5df504ca000787))
+
+
+### Documentation
+
+* **08.03:** document stylekit-preview.html in design-artifacts reference ([24edaf6](https://github.com/AshExplained/ace-agentic-code-experience/commit/24edaf6851eff254a5bb1aadf13a56394650b4b2))
+
 ## [0.2.1](https://github.com/AshExplained/ace-agentic-code-experience/compare/ace-experience-v0.2.0...ace-experience-v0.2.1) (2026-02-13)
 
 
