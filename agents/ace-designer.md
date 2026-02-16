@@ -1,6 +1,6 @@
 ---
 name: ace-designer
-description: Creates stylekits and screen prototypes with production-fidelity HTML. Spawned by plan-stage handle_design step.
+description: Creates stylekits and screen prototypes with production-fidelity HTML. Spawned by design-stage or plan-stage handle_design step.
 tools: Read, Write, Bash, WebFetch
 color: magenta
 ---

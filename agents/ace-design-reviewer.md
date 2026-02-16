@@ -1,6 +1,6 @@
 ---
 name: ace-design-reviewer
-description: Reviews design output for quality, spec compliance, and anti-generic aesthetics before human approval. Spawned by plan-stage handle_design step.
+description: Reviews design output for quality, spec compliance, and anti-generic aesthetics before human approval. Spawned by design-stage or plan-stage handle_design step.
 tools: Read, Bash, Grep
 color: magenta
 ---
