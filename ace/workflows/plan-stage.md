@@ -48,6 +48,7 @@ Extract from $ARGUMENTS:
 - `--skip-research` flag to skip research
 - `--gaps` flag for gap closure mode
 - `--skip-verify` flag to bypass verification loop
+- `--skip-ux-interview` flag to skip UX interview
 
 **If no stage number:** Detect next unplanned stage from track.
 
@@ -213,13 +214,12 @@ Task(
 - Wait for user response
 </step>
 
-<step name="handle_design">
+<step name="detect_ui_stage">
+**If `--gaps` flag:** Set `UI_STAGE=false`. Skip to handle_design.
 
-**If `--gaps` flag:** Skip handle_design entirely (gap closure does not re-run design).
+Run UI detection ONCE. Both handle_ux_interview and handle_design use this result.
 
-**If `--skip-research` flag was used AND no research exists:** Design still runs if triggered -- design does not require research.
-
-### UI Detection (PLAN-02)
+### UI Detection (moved from handle_design)
 
 Define the three keyword lists:
 
@@ -269,12 +269,12 @@ function detect_ui_stage(stage_name, goal_text, intel_content, specs_content):
 
 ### Routing by Detection Result
 
-- `NO_DESIGN`: Skip to check_existing_runs. Zero side effects -- no directory creation, no file reads beyond detection, no state changes, no messages emitted.
+- `NO_DESIGN`: Set `UI_STAGE=false`. No side effects.
 
 - `UNCERTAIN`: Present a `checkpoint:decision`:
 
 ```
-This stage may need design. Include design phase?
+This stage may need UX research and design. Include design pipeline?
 
 Context:
   Stage: {stage_name}
@@ -282,13 +282,110 @@ Context:
   Signals found: {list of matched keywords and sources}
 
 Options:
-  Yes - Run design phase (stylekit + screen specs)
-  No  - Skip design, proceed to architect
+  Yes - Run UX interview + design phase
+  No  - Skip UX interview and design, proceed to architect
 ```
 
-User selects No -> skip to check_existing_runs. User selects Yes -> proceed as DESIGN_NEEDED.
+User selects No -> set `UI_STAGE=false`.
+User selects Yes -> set `UI_STAGE=true`.
 
-- `DESIGN_NEEDED`: Continue to existing design detection.
+- `DESIGN_NEEDED`: Set `UI_STAGE=true`.
+
+Store `UI_STAGE` for use by handle_ux_interview and handle_design.
+</step>
+
+<step name="handle_ux_interview">
+**Skip conditions (check in order):**
+1. `--gaps` flag set -> skip (gap closure does not re-run interviews)
+2. `UI_STAGE` is false -> skip
+3. UX.md does not exist -> skip (display: "No UX.md found. Skipping UX interview. Run /ace.start or /ace.new-milestone to generate UX research.")
+4. `--skip-ux-interview` flag set -> skip
+
+**Read UX context:**
+
+```bash
+UX_CONTENT=$(cat .ace/research/UX.md 2>/dev/null)
+if [ -z "$UX_CONTENT" ]; then
+  echo "No UX.md found. Skipping UX interview."
+  UX_INTERVIEW_ANSWERS=""
+  UX_QUESTIONS_ASKED=0
+fi
+
+RESEARCH_UX_SECTION=""
+if [ -f "${STAGE_DIR}"/*-research.md ]; then
+  RESEARCH_UX_SECTION=$(sed -n '/## Stage UX Patterns/,/^## [^S]/p' "${STAGE_DIR}"/*-research.md 2>/dev/null)
+fi
+```
+
+**Display banner:**
+
+```
+ACE > UX INTERVIEW FOR STAGE {X}
+
+Before visual design, let's discuss how users should experience this stage.
+```
+
+**Generate 4-6 questions dynamically from UX.md findings (UXIN-04):**
+
+Read UX.md content and extract questions from these categories:
+
+1. **Critical Flows (1-2 questions):** For each critical flow with LOW or MEDIUM friction tolerance in UX.md, generate a question about how that flow should behave in this stage. Use third-person framing (UXIN-05):
+   - "When a user reaches [flow_name] for the first time, should the experience prioritize [option A] or [option B]?"
+
+2. **Proven Patterns (1-2 questions):** For proven patterns from UX.md that apply to this stage's features, ask whether to adopt the pattern. Direct framing acceptable for preference questions:
+   - "Research shows [pattern] works well in [domain]. Should this stage use [pattern implementation]?"
+
+3. **Anti-Pattern Awareness (0-1 questions):** If UX.md identifies anti-patterns relevant to this stage, generate one awareness question. Third-person framing:
+   - "UX research flagged [anti_pattern] as common in [domain]. When a user encounters [scenario], how should we handle it?"
+
+4. **Emotional Design (1 question):** Generate one emotional calibration question from UX.md emotional design goals. Direct framing:
+   - "UX research targets '[emotion]' as the primary user feeling. For this stage, which approach better achieves that?"
+
+**Question format (UXIN-02, UXIN-03):**
+
+Every question presented via AskUserQuestion:
+- 2-4 concrete options informed by UX.md findings
+- EVERY question includes a "Let Claude decide" option with research-backed default: "(Research suggests: [UX.md recommendation])"
+- Third-person framing for interaction/flow questions (UXIN-05); direct framing for preference/calibration questions
+- Track `UX_QUESTIONS_ASKED` count (target 4-6)
+
+**Compile answers:**
+
+```xml
+<ux_interview_answers>
+### [Question Topic 1]
+Question: {question text}
+Answer: {user's choice or "Let Claude decide"}
+Research default: {what UX.md recommends}
+
+### [Question Topic 2]
+Question: {question text}
+Answer: {user's choice or "Let Claude decide"}
+Research default: {what UX.md recommends}
+
+...
+</ux_interview_answers>
+```
+
+**Store for downstream:**
+- `UX_INTERVIEW_ANSWERS` -- compiled answers
+- `UX_QUESTIONS_ASKED` -- count for visual interview budget
+- `UX_CONTENT` -- original UX.md content for synthesis
+- `RESEARCH_UX_SECTION` -- stage-specific UX section for synthesis
+</step>
+
+<step name="handle_design">
+
+**If `--gaps` flag:** Skip handle_design entirely (gap closure does not re-run design).
+
+**If `--skip-research` flag was used AND no research exists:** Design still runs if triggered -- design does not require research.
+
+### UI Detection (PLAN-02)
+
+UI detection has already run in detect_ui_stage. Check the stored result:
+
+- `UI_STAGE=false`: Skip handle_design entirely. Zero side effects.
+- `UI_STAGE=true`: Continue to Existing Design Detection.
 
 ### Existing Design Detection (PLAN-03 partial)
 
@@ -515,7 +612,7 @@ For each selected area, in order:
 Let's focus on the design direction for [current stage]."
 ```
 
-**Target 8-15 total questions across all areas.** The interview should take 2-3 minutes, not 10.
+**Target up to {VISUAL_BUDGET} questions across all areas, where VISUAL_BUDGET = 15 - UX_QUESTIONS_ASKED.** If UX interview was skipped (UX_QUESTIONS_ASKED=0), target 8-15. The combined interview (UX + visual) should take 2-3 minutes, not 10.
 
 #### Step 4: Core Question Fallback
 
