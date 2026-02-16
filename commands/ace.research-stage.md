@@ -148,8 +148,8 @@ Write to: .ace/stages/${STAGE}-{slug}/${STAGE}-research.md
 
 ```
 Task(
-  prompt="First, read ~/.claude/agents/ace-stage-scout.md for your role and instructions.\n\n" + filled_prompt,
-  subagent_type="general-purpose",
+  prompt=filled_prompt,
+  subagent_type="ace-stage-scout",
   model="{scout_model}",
   description="Research Stage {stage}"
 )
@@ -182,8 +182,8 @@ Research file: @.ace/stages/${STAGE}-{slug}/${STAGE}-research.md
 
 ```
 Task(
-  prompt="First, read ~/.claude/agents/ace-stage-scout.md for your role and instructions.\n\n" + continuation_prompt,
-  subagent_type="general-purpose",
+  prompt=continuation_prompt,
+  subagent_type="ace-stage-scout",
   model="{scout_model}",
   description="Continue research Stage {stage}"
 )
