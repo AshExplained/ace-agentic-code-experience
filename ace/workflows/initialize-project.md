@@ -411,9 +411,7 @@ Display spawning indicator:
 Spawn 5 parallel ace-project-scout agents with rich context:
 
 ```
-Task(prompt="First, read ~/.claude/agents/ace-project-scout.md for your role and instructions.
-
-<research_type>
+Task(prompt="<research_type>
 Project Research — Stack dimension for [domain].
 </research_type>
 
@@ -449,11 +447,9 @@ Your STACK.md feeds into track creation. Be prescriptive:
 Write to: .ace/research/stack.md
 Use template: ~/.claude/ace/templates/research/stack.md
 </output>
-", subagent_type="general-purpose", model="{scout_model}", description="Stack research")
+", subagent_type="ace-project-scout", model="{scout_model}", description="Stack research")
 
-Task(prompt="First, read ~/.claude/agents/ace-project-scout.md for your role and instructions.
-
-<research_type>
+Task(prompt="<research_type>
 Project Research — Features dimension for [domain].
 </research_type>
 
@@ -489,11 +485,9 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 Write to: .ace/research/features.md
 Use template: ~/.claude/ace/templates/research/features.md
 </output>
-", subagent_type="general-purpose", model="{scout_model}", description="Features research")
+", subagent_type="ace-project-scout", model="{scout_model}", description="Features research")
 
-Task(prompt="First, read ~/.claude/agents/ace-project-scout.md for your role and instructions.
-
-<research_type>
+Task(prompt="<research_type>
 Project Research — Architecture dimension for [domain].
 </research_type>
 
@@ -529,11 +523,9 @@ Your ARCHITECTURE.md informs stage structure in track. Include:
 Write to: .ace/research/architecture.md
 Use template: ~/.claude/ace/templates/research/architecture.md
 </output>
-", subagent_type="general-purpose", model="{scout_model}", description="Architecture research")
+", subagent_type="ace-project-scout", model="{scout_model}", description="Architecture research")
 
-Task(prompt="First, read ~/.claude/agents/ace-project-scout.md for your role and instructions.
-
-<research_type>
+Task(prompt="<research_type>
 Project Research — Pitfalls dimension for [domain].
 </research_type>
 
@@ -569,11 +561,9 @@ Your PITFALLS.md prevents mistakes in track/planning. For each pitfall:
 Write to: .ace/research/pitfalls.md
 Use template: ~/.claude/ace/templates/research/pitfalls.md
 </output>
-", subagent_type="general-purpose", model="{scout_model}", description="Pitfalls research")
+", subagent_type="ace-project-scout", model="{scout_model}", description="Pitfalls research")
 
-Task(prompt="First, read ~/.claude/agents/ace-project-scout.md for your role and instructions.
-
-<research_type>
+Task(prompt="<research_type>
 Project Research — UX/DX dimension for [domain].
 
 **Project type detection:**
@@ -626,7 +616,7 @@ Structure matters — use the template headings exactly.
 Write to: .ace/research/UX.md
 Use template: ~/.claude/ace/templates/research/ux.md
 </output>
-", subagent_type="general-purpose", model="{scout_model}", description="UX/DX research")
+", subagent_type="ace-project-scout", model="{scout_model}", description="UX/DX research")
 ```
 
 After all 5 agents complete, spawn synthesizer to create recap.md:
