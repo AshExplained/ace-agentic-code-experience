@@ -345,6 +345,19 @@ git add -A     # FORBIDDEN
 git add src/   # FORBIDDEN
 ```
 
+### PR titles
+- **Never include future version numbers.** Release-please owns versioning.
+- Referencing past versions is fine (e.g., `fix: regression from 0.2.0`).
+- Describe the feature, not the release.
+
+```
+# BAD — predicts a version release-please will calculate
+feat: v0.4.0 brownfield design support
+
+# GOOD — describes the change
+feat: brownfield design support & fidelity pipeline
+```
+
 ---
 
 ## 10. Naming Conventions
