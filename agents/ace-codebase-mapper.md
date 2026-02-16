@@ -165,6 +165,19 @@ find . -name "*.swift" -path "*Style*" -o -name "*.swift" -path "*Theme*" 2>/dev
 
 # General: design system indicators
 grep -rn "font-family\|font-size\|border-radius\|box-shadow" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -30
+
+# UX Pattern detection
+# Navigation patterns
+grep -rn "useRouter\|useNavigate\|Link\|NavLink\|router\|navigation\|breadcrumb" src/ --include="*.tsx" --include="*.ts" 2>/dev/null | head -30
+
+# State handling patterns (loading, empty, error)
+grep -rn "loading\|isLoading\|skeleton\|Spinner\|empty.*state\|no.*data\|error.*message\|retry" src/ --include="*.tsx" --include="*.ts" 2>/dev/null | head -30
+
+# Modal/dialog/notification patterns
+grep -rn "Modal\|Dialog\|confirm\|toast\|notification\|Snackbar\|Alert" src/ --include="*.tsx" --include="*.ts" 2>/dev/null | head -30
+
+# Form patterns
+grep -rn "onSubmit\|handleSubmit\|validation\|useForm\|formik\|react-hook-form\|zod" src/ --include="*.tsx" --include="*.ts" 2>/dev/null | head -30
 ```
 
 Read key files identified during exploration. Use Glob and Grep liberally.
@@ -835,6 +848,31 @@ Ready for orchestrator summary.
 
 **Scale:**
 - [Name]: [value] - [usage]
+
+## UX Patterns
+
+**Navigation:**
+- Pattern: [e.g., "sidebar + top nav", "tab-based", "breadcrumb trail"]
+- Active state: [how active route is indicated]
+- Implementation: `[file path]`
+
+**State Handling:**
+- Loading: [spinners, skeletons, progress bars, shimmer]
+- Empty: [empty state messaging, illustration, CTA]
+- Error: [toast, inline, page-level, retry patterns]
+- Implementation: `[file paths]`
+
+**Interaction Conventions:**
+- Forms: [validation timing, submission pattern, field ordering]
+- Modals/Dialogs: [confirmation flow, dismiss behavior]
+- Notifications: [position, auto-dismiss timing, actions]
+- Data display: [table/card/list patterns, sorting, filtering, pagination]
+- Implementation: `[file paths]`
+
+**Feedback Patterns:**
+- Success: [how success is communicated to users]
+- Failure: [how errors are communicated to users]
+- Progress: [async operation feedback pattern]
 
 ---
 

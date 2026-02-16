@@ -400,14 +400,15 @@ Check if this is greenfield or subsequent milestone:
 
 Display spawning indicator:
 ```
-◆ Spawning 4 scouts in parallel...
+◆ Spawning 5 scouts in parallel...
   → Stack research
   → Features research
   → Architecture research
   → Pitfalls research
+  → UX/DX research
 ```
 
-Spawn 4 parallel ace-project-scout agents with rich context:
+Spawn 5 parallel ace-project-scout agents with rich context:
 
 ```
 Task(prompt="First, read ~/.claude/agents/ace-project-scout.md for your role and instructions.
@@ -569,9 +570,66 @@ Write to: .ace/research/pitfalls.md
 Use template: ~/.claude/ace/templates/research/pitfalls.md
 </output>
 ", subagent_type="general-purpose", model="{scout_model}", description="Pitfalls research")
+
+Task(prompt="First, read ~/.claude/agents/ace-project-scout.md for your role and instructions.
+
+<research_type>
+Project Research — UX/DX dimension for [domain].
+
+**Project type detection:**
+- If the project involves user-facing screens (web app, mobile app, dashboard, website):
+  Research UX patterns — competitor UX analysis, proven UX patterns, anti-patterns, emotional design, critical flows
+- If the project is a CLI tool:
+  Research DX patterns — CLI conventions from clig.dev, help text, error messages, output formatting, flag design
+- If the project is an API:
+  Research DX patterns — API design principles, endpoint naming, error responses, documentation, versioning
+- If the project is a library/package:
+  Research DX patterns — API surface design, naming conventions, error handling, documentation, tree-shaking
+- If unclear, default to DX research unless screens/pages are explicitly mentioned.
+</research_type>
+
+<milestone_context>
+[greenfield OR subsequent]
+
+Greenfield: What UX/DX patterns are standard for [domain]? What do users expect from the experience?
+Subsequent: What UX/DX patterns apply to [target features]? What experience improvements are needed?
+</milestone_context>
+
+<question>
+What UX/DX patterns should [domain] follow? Identify competitors, proven patterns, anti-patterns, emotional design goals, and critical flows with friction tolerance.
+</question>
+
+<project_context>
+[brief.md summary - core value, constraints, project type, what they're building]
+</project_context>
+
+<downstream_consumer>
+Your UX.md feeds into:
+1. Stage-specific UX refinement by the stage scout
+2. UX interview question generation during plan-stage
+3. UX synthesis (ux_brief) for the designer
+4. DX pattern flow to architect and runner (non-UI projects)
+
+Structure matters — use the template headings exactly.
+</downstream_consumer>
+
+<quality_gate>
+- [ ] Project type correctly identified (UI vs CLI vs API vs Library)
+- [ ] Competitor analysis uses REAL products, not placeholders
+- [ ] Patterns cite evidence (source URL or competitor name)
+- [ ] Emotional design goals are specific to this domain, not generic
+- [ ] Critical flows have friction tolerance levels (LOW/MEDIUM/HIGH)
+- [ ] Confidence levels assigned to all findings
+</quality_gate>
+
+<output>
+Write to: .ace/research/UX.md
+Use template: ~/.claude/ace/templates/research/ux.md
+</output>
+", subagent_type="general-purpose", model="{scout_model}", description="UX/DX research")
 ```
 
-After all 4 agents complete, spawn synthesizer to create recap.md:
+After all 5 agents complete, spawn synthesizer to create recap.md:
 
 ```
 Task(prompt="
@@ -585,6 +643,7 @@ Read these files:
 - .ace/research/features.md
 - .ace/research/architecture.md
 - .ace/research/pitfalls.md
+- .ace/research/UX.md
 </research_files>
 
 <output>

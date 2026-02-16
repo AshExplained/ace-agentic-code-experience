@@ -35,6 +35,7 @@ Your research files are consumed during track creation:
 | `FEATURES.md` | What to build in each stage |
 | `ARCHITECTURE.md` | System structure, component boundaries |
 | `PITFALLS.md` | What stages need deeper research flags |
+| `UX.md`   | UX/DX patterns, competitor analysis, emotional design goals |
 
 **Be comprehensive but opinionated.** Survey options, then recommend. "Use X because Y" not just "Options are X, Y, Z."
 </downstream_consumer>
@@ -606,6 +607,18 @@ Mistakes that cause annoyance but are fixable.
 - [Post-mortems, issue discussions, community wisdom]
 ```
 
+## UX.md
+
+UX patterns for UI projects, DX patterns for non-UI projects.
+
+**Two variants based on project type:**
+- **UI projects** (web app, mobile, dashboard, website): Produce UX research covering competitor UX analysis, proven UX patterns, anti-patterns, emotional design goals, and critical flows with friction tolerance levels
+- **DX projects** (CLI, API, library): Produce DX research covering competitor DX analysis, project-type-specific conventions (CLI: clig.dev patterns, API: RESTful design principles, Library: API surface design), proven DX patterns, anti-patterns, emotional design goals, and critical developer flows
+
+**Project type detection:** Determine project type from `<project_context>` -- UI projects (web app, mobile, dashboard, website) get UX research; CLI/API/library projects get DX research. Default to DX if unclear.
+
+**Use template:** `~/.claude/ace/templates/research/ux.md`
+
 ## Comparison Matrix (if comparison mode)
 
 ```markdown
@@ -751,8 +764,9 @@ Create files in `.ace/research/`:
 3. **FEATURES.md** - Always (feature landscape)
 4. **ARCHITECTURE.md** - If architecture patterns discovered
 5. **PITFALLS.md** - Always (domain warnings)
-6. **COMPARISON.md** - If comparison mode
-7. **FEASIBILITY.md** - If feasibility mode
+6. **UX.md** - Always (UX patterns for UI projects, DX patterns for non-UI)
+7. **COMPARISON.md** - If comparison mode
+8. **FEASIBILITY.md** - If feasibility mode
 
 ## Step 6: Return Structured Result
 
@@ -846,6 +860,7 @@ Research is complete when:
 - [ ] Feature landscape mapped (table stakes, differentiators, anti-features)
 - [ ] Architecture patterns documented
 - [ ] Domain pitfalls catalogued
+- [ ] UX/DX patterns documented with confidence levels
 - [ ] Source hierarchy followed (Context7 → Official → WebSearch)
 - [ ] All findings have confidence levels
 - [ ] Output files created in `.ace/research/`
