@@ -123,14 +123,15 @@ mkdir -p .ace/research
 
 Display spawning indicator:
 ```
-◆ Spawning 4 scouts in parallel...
+◆ Spawning 5 scouts in parallel...
   → Stack research (for new features)
   → Features research
   → Architecture research (integration)
   → Pitfalls research
+  → UX/DX research
 ```
 
-Spawn 4 parallel ace-project-scout agents with milestone-aware context:
+Spawn 5 parallel ace-project-scout agents with milestone-aware context:
 
 ```
 Task(prompt="
@@ -294,9 +295,66 @@ Write to: .ace/research/pitfalls.md
 Use template: ~/.claude/ace/templates/research/pitfalls.md
 </output>
 ", subagent_type="ace-project-scout", model="{scout_model}", description="Pitfalls research")
+
+Task(prompt="
+<research_type>
+Project Research — UX/DX dimension for [new features].
+
+**Project type detection:**
+- If the project involves user-facing screens (web app, mobile app, dashboard, website):
+  Research UX patterns — competitor UX analysis, proven UX patterns, anti-patterns, emotional design, critical flows
+- If the project is a CLI tool:
+  Research DX patterns — CLI conventions from clig.dev, help text, error messages, output formatting, flag design
+- If the project is an API:
+  Research DX patterns — API design principles, endpoint naming, error responses, documentation, versioning
+- If the project is a library/package:
+  Research DX patterns — API surface design, naming conventions, error handling, documentation, tree-shaking
+- If unclear, default to DX research unless screens/pages are explicitly mentioned.
+</research_type>
+
+<milestone_context>
+SUBSEQUENT MILESTONE — Adding [target features] to existing app.
+
+Existing validated capabilities (DO NOT re-research):
+[List from brief.md Validated requirements]
+
+Focus ONLY on UX/DX patterns for the NEW features.
+</milestone_context>
+
+<question>
+What UX/DX patterns should [new features] follow? Identify competitor approaches, proven patterns, anti-patterns, emotional design goals, and critical flows with friction tolerance.
+</question>
+
+<project_context>
+[brief.md summary - current state, new milestone goals]
+</project_context>
+
+<downstream_consumer>
+Your UX.md feeds into:
+1. Stage-specific UX refinement by the stage scout
+2. UX interview question generation during plan-stage
+3. UX synthesis (ux_brief) for the designer
+4. DX pattern flow to architect and runner (non-UI projects)
+
+Structure matters — use the template headings exactly.
+</downstream_consumer>
+
+<quality_gate>
+- [ ] Project type correctly identified (UI vs CLI vs API vs Library)
+- [ ] Competitor analysis uses REAL products, not placeholders
+- [ ] Patterns cite evidence (source URL or competitor name)
+- [ ] Focus is on NEW features, not re-researching existing ones
+- [ ] Confidence levels assigned to all findings
+</quality_gate>
+
+<output>
+Write to: .ace/research/UX.md
+Use template: ~/.claude/ace/templates/research/ux.md
+</output>
+", subagent_type="ace-project-scout", model="{scout_model}", description="UX/DX research")
 ```
 
-After all 4 agents complete, spawn synthesizer to create recap.md:
+After all 5 agents complete, spawn synthesizer to create recap.md:
 
 ```
 Task(prompt="
@@ -310,6 +368,7 @@ Read these files:
 - .ace/research/features.md
 - .ace/research/architecture.md
 - .ace/research/pitfalls.md
+- .ace/research/UX.md
 </research_files>
 
 <output>
