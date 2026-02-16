@@ -447,6 +447,13 @@ Display: "UX brief synthesized. Proceeding to design..."
 
 **If `--gaps` flag:** Skip handle_design entirely (gap closure does not re-run design).
 
+**Load commit config for design artifact commits:**
+
+```bash
+COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
+```
+
 **If `--skip-research` flag was used AND no research exists:** Design still runs if triggered -- design does not require research.
 
 ### UI Detection (PLAN-02)
@@ -1078,6 +1085,27 @@ Behavior:
 
 **CRITICAL:** Phase 1 skip aborts BOTH phases. There is no path where Phase 1 is skipped but Phase 2 runs.
 
+#### Phase 1 -- Commit Design Artifacts
+
+**After Phase 1 approval (before Phase 2 transition):**
+
+```bash
+if [ "$COMMIT_PLANNING_DOCS" = "true" ]; then
+  git add .ace/design/stylekit.yaml
+  git add .ace/design/stylekit.css
+  git add .ace/design/stylekit-preview.html
+  git add .ace/design/components/
+  git commit -m "docs(${STAGE}): approve Phase 1 design system
+
+Phase 1 (stylekit) approved for Stage ${STAGE}: ${STAGE_NAME}
+- Design tokens: stylekit.yaml + stylekit.css
+- Component inventory committed
+- Preview: stylekit-preview.html"
+else
+  echo "Skipping Phase 1 design commit (commit_docs: false)"
+fi
+```
+
 #### Phase 1 -> Phase 2 Transition
 
 After Phase 1 approval (or accept-as-is):
@@ -1366,6 +1394,26 @@ Behavior:
 - `skip`: Revert current session's screen changes (same scoped approach as restart). Stylekit remains. Continue to Store Design Output (HAS_DESIGN still true since stylekit exists, but no new/modified screen specs for this stage).
 
 ---
+
+#### Phase 2 -- Commit Design Artifacts
+
+**After Phase 2 approval (before Store Design Output):**
+
+```bash
+if [ "$COMMIT_PLANNING_DOCS" = "true" ]; then
+  git add .ace/design/screens/
+  if [ -f ".ace/design/implementation-guide.md" ]; then
+    git add .ace/design/implementation-guide.md
+  fi
+  git commit -m "docs(${STAGE}): approve Phase 2 screen prototypes
+
+Phase 2 (screens) approved for Stage ${STAGE}: ${STAGE_NAME}
+- Screen specs and prototypes committed
+- Implementation guide included"
+else
+  echo "Skipping Phase 2 design commit (commit_docs: false)"
+fi
+```
 
 ### Store Design Output
 
