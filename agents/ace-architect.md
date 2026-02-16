@@ -1159,6 +1159,18 @@ cat "$STAGE_DIR"/*-research.md 2>/dev/null
 **If intel.md exists:** Honor user's vision, prioritize their essential features, respect stated boundaries. These are locked decisions - do not revisit.
 
 **If research.md exists:** Use standard_stack, architecture_patterns, dont_hand_roll, common_pitfalls. Research has already identified the right tools.
+
+**Load DX patterns (non-UI stages only):**
+
+When the orchestrator's planning_context does NOT include a `**Design:**` section (indicating a non-UI stage), check for DX research:
+
+```bash
+DX_PATTERNS=$(cat .ace/research/UX.md 2>/dev/null)
+```
+
+**If DX patterns exist:** Reference CLI conventions, error message formats, naming patterns, API design principles, and output formatting rules from UX.md when writing task `<action>` elements. Embed relevant DX conventions directly into task actions so the runner has concrete guidance. Example: "Error messages follow the format from UX.md DX research: '{tool}: {action} failed: {reason}' with exit code 1."
+
+These DX patterns ensure consistent developer experience across non-UI stages. DX patterns flow through research (UX.md), NOT through the design pipeline.
 </step>
 
 <step name="break_into_tasks">
