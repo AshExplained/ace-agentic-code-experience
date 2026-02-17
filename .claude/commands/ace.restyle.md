@@ -1,6 +1,6 @@
 ---
 name: ace.restyle
-description: Redesign a stage's visuals without re-planning (keep stylekit or full redo)
+description: Redesign a stage's visuals without re-planning (redo screens with existing stylekit)
 argument-hint: "<stage>"
 allowed-tools:
   - Read
@@ -19,8 +19,8 @@ Context budget: ~15% orchestrator, fresh 200k per subagent.
 </objective>
 
 <execution_context>
-@.claude/ace/workflows/design-stage.md
-@.claude/ace/references/ui-brand.md
+@./.claude/ace/workflows/design-stage.md
+@./.claude/ace/references/ui-brand.md
 </execution_context>
 
 <context>
@@ -30,13 +30,13 @@ Normalize stage input in step 2 before any directory lookups.
 </context>
 
 <process>
-**Follow the design-stage workflow** from `@.claude/ace/workflows/design-stage.md`.
+**Follow the design-stage workflow** from `@./.claude/ace/workflows/design-stage.md`.
 
 This command adds `--restyle --skip-ux-interview` semantics to the arguments before the workflow processes them. The `--restyle` flag causes the workflow to:
 
-- **Validate stylekit.yaml exists** -- If no existing design is found, display an error directing the user to run `/ace.design-system N` first
+- **Validate stylekit.yaml exists** -- If no existing design is found, display an error directing the user to run `/ace.design-system` first
 - **Skip normal mode determination** -- Bypass the standard priority cascade (stylekit exists / DESIGN.md exists / greenfield)
-- **Present restyle choice** -- "Keep stylekit (redo screens only)" or "Full redo (new stylekit + screens)"
+- **Set screens-only mode** -- Automatically uses existing stylekit, creates new screen prototypes
 - **Skip UX interview** -- Restyle is a visual refresh, not a UX rethink; the UX brief from the original design run remains valid
 
 The workflow handles all logic including:
@@ -47,7 +47,7 @@ The workflow handles all logic including:
 4. **Ensure stage directory** -- Create if needed, load intel.md early
 5. **Handle research** (optional) -- Check existing, offer to run scout
 6. **Detect UI stage** -- UI detection, ERROR if non-UI stage
-7. **Handle design (restyle mode)** -- Validate stylekit exists, present restyle choice, execute chosen design pipeline path
+7. **Handle design (restyle mode)** -- Validate stylekit exists, set screens-only mode, execute screen design pipeline
 8. **Generate implementation guide** -- CSS framework detection + guide
 9. **Present final status** -- Restyle-specific banner with next steps
 </process>
@@ -83,7 +83,7 @@ If existing runs are still valid (layout unchanged, only visuals refreshed):
 **Also available:**
 - cat .ace/design/stylekit-preview.html -- review design system
 - cat .ace/design/screens/*.html -- review screen prototypes
-- /ace.design-system {X} -- recreate design system from scratch
+- /ace.design-system -- recreate design system from scratch
 - /ace.design-screens {X} -- create new screen prototypes
 
 ---
@@ -91,8 +91,8 @@ If existing runs are still valid (layout unchanged, only visuals refreshed):
 
 <success_criteria>
 - [ ] Existing stylekit validated
-- [ ] Restyle choice presented and user selected
-- [ ] Design pipeline executed in chosen mode
+- [ ] Screens-only mode set automatically
+- [ ] Design pipeline executed in screens-only mode
 - [ ] Design artifacts updated
 - [ ] User directed to next step
 </success_criteria>

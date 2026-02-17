@@ -796,20 +796,13 @@ Display: "Extension preferences captured. Proceeding to design system creation..
 
 Only when `DESIGN_MODE="screens_only"` (existing stylekit detected):
 
-**If RESTYLE_MODE=true:** Present the restyle-specific checkpoint:
+**If RESTYLE_MODE=true:** Skip the restyle checkpoint entirely. Set `DESIGN_MODE="screens_only"`.
 
+Display:
 ```
-Existing design found. How would you like to restyle?
-
-Options:
-  Keep stylekit - Redo screens only using the current design system
-  Full redo - Create a new design system and new screens
-
-Select: keep-stylekit or full-redo
+Restyling: creating new screen prototypes with existing design system.
+To create an entirely new design system, run /ace.design-system instead.
 ```
-
-If `keep-stylekit`: Continue with `DESIGN_MODE="screens_only"`.
-If `full-redo`: Set `DESIGN_MODE="full"`. Designer receives existing stylekit as reference context.
 
 **If RESTYLE_MODE is NOT set (normal flow):** Present the existing checkpoint:
 
