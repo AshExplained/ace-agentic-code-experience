@@ -13,14 +13,14 @@ allowed-tools:
 ---
 
 <objective>
-Redesign a stage's visuals by invoking the design-stage workflow in restyle mode. Requires an existing design (stylekit.yaml) from a prior `/ace.design-stage` run. Skips UX interview by default since restyle is about visual direction, not UX.
+Redesign a stage's visuals by invoking the design-stage workflow in restyle mode. Requires an existing design (stylekit.yaml) from a prior `/ace.design-system` run. Skips UX interview by default since restyle is about visual direction, not UX.
 
 Context budget: ~15% orchestrator, fresh 200k per subagent.
 </objective>
 
 <execution_context>
-@./.claude/ace/workflows/design-stage.md
-@./.claude/ace/references/ui-brand.md
+@.claude/ace/workflows/design-stage.md
+@.claude/ace/references/ui-brand.md
 </execution_context>
 
 <context>
@@ -30,11 +30,11 @@ Normalize stage input in step 2 before any directory lookups.
 </context>
 
 <process>
-**Follow the design-stage workflow** from `@./.claude/ace/workflows/design-stage.md`.
+**Follow the design-stage workflow** from `@.claude/ace/workflows/design-stage.md`.
 
 This command adds `--restyle --skip-ux-interview` semantics to the arguments before the workflow processes them. The `--restyle` flag causes the workflow to:
 
-- **Validate stylekit.yaml exists** -- If no existing design is found, display an error directing the user to run `/ace.design-stage N` first
+- **Validate stylekit.yaml exists** -- If no existing design is found, display an error directing the user to run `/ace.design-system N` first
 - **Skip normal mode determination** -- Bypass the standard priority cascade (stylekit exists / DESIGN.md exists / greenfield)
 - **Present restyle choice** -- "Keep stylekit (redo screens only)" or "Full redo (new stylekit + screens)"
 - **Skip UX interview** -- Restyle is a visual refresh, not a UX rethink; the UX brief from the original design run remains valid
@@ -83,7 +83,8 @@ If existing runs are still valid (layout unchanged, only visuals refreshed):
 **Also available:**
 - cat .ace/design/stylekit-preview.html -- review design system
 - cat .ace/design/screens/*.html -- review screen prototypes
-- /ace.design-stage {X} -- full design pipeline (includes UX interview)
+- /ace.design-system {X} -- recreate design system from scratch
+- /ace.design-screens {X} -- create new screen prototypes
 
 ---
 </offer_next>

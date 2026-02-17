@@ -539,7 +539,7 @@ If `PHASE_2_ONLY=true`:
 
 If `RESTYLE_MODE=true`:
 - Check `ls .ace/design/stylekit.yaml 2>/dev/null`
-- If stylekit.yaml does NOT exist: **ERROR** -- Display: "No existing design to restyle. Run `/ace.design-stage N` first." STOP.
+- If stylekit.yaml does NOT exist: **ERROR** -- Display: "No existing design to restyle. Run `/ace.design-system N` first." STOP.
 - If stylekit.yaml exists: Set `DESIGN_MODE="screens_only"`. Skip the normal priority order below. Jump directly to the Restyle Trigger (PLAN-07) section.
 
 **Normal mode determination (when --restyle flag is NOT set):**
@@ -1665,7 +1665,7 @@ Implementation guide for Stage ${STAGE}: ${STAGE_NAME}
 fi
 ```
 
-This commit runs for ALL invocation modes (design-stage, design-screens), fixing the bug where the implementation guide was never committed on single-design-stage projects.
+This commit runs for ALL invocation modes (design-system, design-screens), fixing the bug where the implementation guide was never committed on single-design-stage projects.
 </step>
 
 <step name="present_final_status">
