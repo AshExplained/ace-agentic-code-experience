@@ -515,7 +515,7 @@ After incorporating user feedback and updating files:
 
 ### Ready for Planning
 
-Next: `/ace.plan-stage 1`
+Next: `/ace.design-system 1` (if UI stage) or `/ace.plan-stage 1`
 ```
 
 ## Track Blocked

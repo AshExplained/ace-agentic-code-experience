@@ -130,20 +130,10 @@ Create screen prototypes using the existing design system.
 
 Usage: `/ace.design-screens 3`
 
-**`/ace.design-stage [stage] [--skip-ux-interview]`**
-Run the full design pipeline for a UI stage.
-
-- Creates design system (stylekit) and screen prototypes
-- Handles UX interview, design interview, Phase 1 (stylekit), Phase 2 (screens)
-- Produces `.ace/design/` artifacts for downstream planning
-- Use before `/ace.plan-stage` for UI stages
-
-Usage: `/ace.design-stage 3`
-
 **`/ace.restyle <stage>`**
 Redesign a stage's visuals without re-planning.
 
-- Requires existing design artifacts from a prior `/ace.design-stage` run
+- Requires existing design artifacts from a prior `/ace.design-system` run
 - Choose to keep existing stylekit (redo screens only) or full redo (new stylekit + screens)
 - Preserves architecture plans (run.md files) -- only design changes
 

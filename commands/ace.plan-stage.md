@@ -52,7 +52,7 @@ The workflow handles all planning logic including:
 3. **Validate stage** — Confirm stage exists in track.md
 4. **Ensure stage directory** — Create if needed, load intel.md early
 5. **Handle research** — Scout spawning (unless --skip-research/--gaps/exists)
-6. **Handle UI redirect** — Detect UI stages, check for design artifacts, redirect to /ace.design-stage if missing
+6. **Handle UI redirect** — Detect UI stages, check for design artifacts, redirect to /ace.design-system if missing
 7. **Check existing runs** — Offer replan if runs exist
 8. **Read context files** — Inline pulse, track, specs, intel, research, design for architect
 9. **Spawn architect** — Create run.md files with planning context
@@ -111,7 +111,7 @@ Verification: {Passed | Passed with override | Skipped}
 - [ ] Runs created (ARCHITECTING COMPLETE or GATE handled)
 - [ ] ace-plan-reviewer spawned with intel.md (verifies intel compliance)
 - [ ] Verification passed OR user override OR max iterations with user decision
-- [ ] UI stages without design artifacts blocked with redirect to /ace.design-stage
+- [ ] UI stages without design artifacts blocked with redirect to /ace.design-system
 - [ ] Design context loaded from disk when design artifacts exist
 - [ ] User sees status between agent spawns
 - [ ] User knows next steps (execute or review)

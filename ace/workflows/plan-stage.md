@@ -70,7 +70,9 @@ ls .ace/stages/${STAGE}-*/*-run.md 2>/dev/null
 
 <step name="validate_stage">
 ```bash
-grep -A5 "Stage ${STAGE}:" .ace/track.md 2>/dev/null
+# Strip leading zeros for track.md lookup (track uses "Stage 1:", not "Stage 01:")
+STAGE_UNPADDED=$(echo "$STAGE" | sed 's/^0\+\([0-9]\)/\1/')
+grep -A5 "^### Stage ${STAGE_UNPADDED}:" .ace/track.md 2>/dev/null
 ```
 
 **If not found:** Error with available stages. **If found:** Extract stage number, name, description.
@@ -82,7 +84,9 @@ grep -A5 "Stage ${STAGE}:" .ace/track.md 2>/dev/null
 STAGE_DIR=$(ls -d .ace/stages/${STAGE}-* 2>/dev/null | head -1)
 if [ -z "$STAGE_DIR" ]; then
   # Create stage directory from track name
-  STAGE_NAME=$(grep "Stage ${STAGE}:" .ace/track.md | sed 's/.*Stage [0-9]*: //' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+  # Anchor to ### headings to avoid matching list items (which contain markdown ** and descriptions)
+  STAGE_UNPADDED=$(echo "$STAGE" | sed 's/^0\+\([0-9]\)/\1/')
+  STAGE_NAME=$(grep "^### Stage ${STAGE_UNPADDED}:" .ace/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
   mkdir -p ".ace/stages/${STAGE}-${STAGE_NAME}"
   STAGE_DIR=".ace/stages/${STAGE}-${STAGE_NAME}"
 fi
@@ -146,8 +150,8 @@ Proceed to spawn scout.
 Gather additional context for research prompt:
 
 ```bash
-# Get stage description from track
-STAGE_DESC=$(grep -A3 "Stage ${STAGE}:" .ace/track.md)
+# Get stage description from track (use STAGE_UNPADDED from validate_stage)
+STAGE_DESC=$(grep -A5 "^### Stage ${STAGE_UNPADDED}:" .ace/track.md)
 
 # Get specs if they exist
 SPECS=$(cat .ace/specs.md 2>/dev/null | grep -A100 "## Requirements" | head -50)
@@ -228,7 +232,7 @@ Task(
 <step name="handle_ui_stage_redirect">
 **If `--gaps` flag:** Set `UI_STAGE=false`. Skip to check_existing_runs.
 
-Run UI detection using the SAME keyword algorithm as design-stage:
+Run UI detection using the SAME keyword algorithm as design-system:
 
 ```
 STRONG_POSITIVE = [ui, frontend, dashboard, interface, page, screen, layout, form,
@@ -289,7 +293,7 @@ Context:
   Signals found: {list of matched keywords and sources}
 
 Options:
-  Yes - This is a UI stage (requires /ace.design-stage first)
+  Yes - This is a UI stage (requires /ace.design-system first)
   No  - Not a UI stage, proceed to architecture planning
 ```
 
@@ -308,7 +312,8 @@ if [ -f "$UX_BRIEF_FILE" ]; then
 else
   echo ""
   echo "Stage ${STAGE} is a UI stage but has no design artifacts."
-  echo "Run /ace.design-stage ${STAGE} first to create the design system."
+  echo "Run /ace.design-system ${STAGE} first to create the design system."
+  echo "Then run /ace.design-screens ${STAGE} to create screen prototypes."
   echo "Then re-run /ace.plan-stage ${STAGE}."
   echo ""
   exit 1
@@ -321,7 +326,7 @@ Store `UI_STAGE` and `UX_BRIEF` for downstream use.
 <step name="handle_dx_interview">
 **Skip conditions (check in order):**
 1. `--gaps` flag set -> skip (gap closure does not re-run interviews)
-2. `UI_STAGE` is true -> skip (UX handled by design-stage)
+2. `UI_STAGE` is true -> skip (UX handled by design-system/design-screens)
 3. UX.md does not exist -> skip (display: "No UX.md found. Skipping DX interview.")
 4. UX.md has no DX content -> skip
 

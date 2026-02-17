@@ -708,6 +708,7 @@ Present completion with next steps:
 ---
 
 **Also available:**
+- `/ace.design-system [N]` — create design system (if UI stage)
 - `/ace.plan-stage [N]` — skip discussion, plan directly
 
 ───────────────────────────────────────────────────────────────

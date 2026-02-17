@@ -208,6 +208,7 @@ Check if `{stage}-intel.md` exists in stage directory.
 ---
 
 **Also available:**
+- `/ace.design-system {stage}` — create design system (if UI stage)
 - `/ace.plan-stage {stage}` — skip discussion, plan directly
 - `/ace.list-stage-assumptions {stage}` — see Claude's assumptions
 
@@ -281,6 +282,7 @@ Read track.md to get the next stage's name and goal.
 ---
 
 **Also available:**
+- `/ace.design-system {Z+1}` — create design system (if UI stage)
 - `/ace.plan-stage {Z+1}` — skip discussion, plan directly
 - `/ace.audit {Z}` — user acceptance test before continuing
 
