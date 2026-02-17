@@ -1603,7 +1603,7 @@ Task(
     "**Stylekit YAML:** Read @.ace/design/stylekit.yaml\n" +
     "**Stylekit CSS:** Read @.ace/design/stylekit.css\n" +
     "**HTML Prototypes:** Read each file in .ace/design/screens/*.html\n\n" +
-    "Generate .ace/design/implementation-guide.md with these 5 sections:\n\n" +
+    "Generate .ace/design/implementation-guide.md with these sections (5 required + 1 conditional):\n\n" +
     "## Framework Detection\n" +
     "- CSS framework: {detected}\n" +
     "- Version: {detected}\n" +
@@ -1631,7 +1631,17 @@ Task(
     "- For each section: the Tailwind v3 CDN classes used and their project-framework equivalent\n" +
     "- Focus on classes that DIFFER between v3 CDN and the project framework\n" +
     "- Skip structural classes (flex, grid, items-center) that are identical across frameworks\n\n" +
-    "**Target:** 100-200 lines. Summary document, not full prototype inline.\n" +
+    "## Viewport Translation (ONLY if stylekit.yaml has a viewport section)\n" +
+    "- If NO viewport section exists in stylekit.yaml: OMIT this section entirely\n" +
+    "- If viewport section exists:\n" +
+    "  - Target viewport type and dimensions from stylekit.yaml\n" +
+    "  - How to constrain the app's root layout to viewport dimensions in the project's framework\n" +
+    "  - For React Native/Flutter: map viewport dimensions to root container constraints\n" +
+    "  - For web targeting mobile: meta viewport tag, CSS max-width on app container, media queries\n" +
+    "  - For wearable: circular clip-path or border-radius constraints, safe area considerations\n" +
+    "  - Device-specific safe areas (notch, home indicator, status bar) and how to handle them\n" +
+    "  - RTL handling if direction is rtl (CSS logical properties, framework RTL support)\n\n" +
+    "**Target:** 100-250 lines (longer if viewport section included). Summary document, not full prototype inline.\n" +
     "**Output:** Write to .ace/design/implementation-guide.md\n" +
     "</guide_context>",
   subagent_type="general-purpose",

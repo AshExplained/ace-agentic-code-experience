@@ -145,6 +145,7 @@ Evaluate design coherence and completeness.
 - Phase `stylekit`: Component consistency check, preview completeness check. Skip layout coherence (no screens yet), responsive overrides, and image integration checks.
 - Phase `screens`: Layout coherence, component usage consistency, responsive overrides, image integration, artifact completeness. Also includes: prototype interactivity, state coverage, modal context checks. Skip component-internal consistency (already approved).
 - No phase: All quality checks.
+- Viewport checks (container, dimensions, frame, override, preview): Run ONLY in phase `screens` or no phase. Skip in phase `stylekit` (no prototypes exist yet). Additionally, ALL viewport checks are gated on `viewport` section existence in `stylekit.yaml` -- skip entirely when no viewport section exists.
 
 | Check | What to Verify | Method |
 |-------|---------------|--------|
@@ -156,6 +157,11 @@ Evaluate design coherence and completeness.
 | Prototype interactivity | Multi-state screens (states beyond `default`) have a fixed bottom-right control panel with toggle buttons and `function toggle` definitions in the script block. Single-state screens (only `default`) have NO control panel and NO toggle functions — their presence on a single-state screen is a defect | Grep HTML prototypes for `function toggle` and `fixed bottom` patterns; cross-reference against screen spec `states` field to classify each screen as single-state or multi-state |
 | State coverage | Each state defined in the screen spec's `states` field has a corresponding toggle button and hidden DOM section in the prototype. Count toggle functions vs spec states | Cross-reference screen spec YAML states against prototype toggle functions |
 | Modal context | For screens described as modal/dialog/overlay, verify the prototype contains a dimmed parent background (`opacity-40` or similar reduced opacity element with `aria-hidden`) and an overlay backdrop | Read modal screen prototypes for opacity and backdrop patterns |
+| Viewport container applied | When `stylekit.yaml` has a `viewport` section with `type` != `desktop`: verify each screen prototype's body element uses `bg-neutral-200 min-h-screen flex items-center justify-center` (the constrained viewport background), NOT the standard `bg-neutral-50`. When no viewport section exists: SKIP this check entirely. | Read each screen prototype's body element classes; compare against viewport wrapper pattern from design-artifacts.md |
+| Viewport dimensions correct | When viewport section exists: verify the content container `style` attribute contains the expected `width` and `height` values from the effective viewport (stylekit viewport or screen spec viewport override). | Read the `style="width: ...px; height: ...px"` from the viewport container div; compare against stylekit.yaml viewport width/height or screen spec viewport override |
+| Device frame present | When viewport section has a `frame` value other than `none`: verify the prototype contains a device frame wrapper element (rounded borders, notch for mobile, circular clip for wearables). When `frame: none` or no frame: SKIP. | Grep for frame indicators: `rounded-\[2.5rem\]` (mobile frame), `clip-path: circle` (wearable frame), `border-neutral-800` (frame border) |
+| Viewport override respected | When a screen spec YAML has its own `viewport` field: verify that screen's prototype uses the override dimensions, NOT the stylekit viewport dimensions. | Cross-reference screen spec YAML `viewport` field against prototype container dimensions |
+| Stylekit preview unaffected | Verify `stylekit-preview.html` body element uses the standard `bg-neutral-50` class (NOT `bg-neutral-200`), even when viewport section exists. The preview is always full-width. | Read stylekit-preview.html body element class list |
 
 </review_dimensions>
 
@@ -207,6 +213,7 @@ Read the designer's structured return and all referenced artifacts.
 3. **Read all HTML prototype files** listed in the artifact list (if in scope for this phase)
 3.5. **Read stylekit-preview.html** (if full mode) to verify structural checks
 4. **Read `stylekit.css`** (if full mode) to verify CSS generation
+5b. **Read viewport section** from `stylekit.yaml` (if exists). If a `viewport` section is present, store `HAS_VIEWPORT=true` and the viewport values (type, width, height, frame, shape). If absent, set `HAS_VIEWPORT=false` -- all viewport quality checks will be skipped.
 5. **Read reference schemas** for validation:
    - Token schema format rules from `01-design-tokens.md` Section 8 (Format Rules)
    - Artifact format rules from `02-artifact-formats.md` Section 8 (Artifact Format Rules)
