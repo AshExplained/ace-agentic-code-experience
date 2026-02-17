@@ -98,6 +98,34 @@ Consult `questioning.md` for techniques:
 - Find edges
 - Reveal motivation
 
+**Platform and viewport capture:**
+
+During the conversation, if the user mentions building for a non-web surface (mobile app, wearable, TV, fixed-dimension display, print, desktop app, etc.), capture the target platform and viewport dimensions. This information flows into brief.md's Context section as Platform and Viewport fields.
+
+Detection triggers (in the user's responses):
+- Mobile: "mobile app", "iOS app", "Android app", "iPhone", "React Native", "Flutter", "Swift", "Kotlin"
+- Tablet: "iPad", "tablet app"
+- Wearable: "watch app", "watchOS", "Wear OS", "wearable"
+- TV: "TV app", "tvOS", "Android TV", "smart TV"
+- Desktop: "desktop app", "Electron", "Tauri"
+- Fixed: "kiosk", "POS", "point of sale", "embedded display", "digital signage"
+- Print: "print layout", "PDF", "A4", "letter"
+
+When a trigger is detected, ask ONE follow-up question using AskUserQuestion:
+
+- header: "Target Device"
+- question: "What device/screen size should the design target?"
+- options: [device-specific options based on platform detected]
+  - For mobile: "iPhone 15 Pro (393x852)", "iPhone SE (375x667)", "Pixel 8 (412x892)", "Galaxy S24 (360x780)", "Let Claude pick based on platform"
+  - For tablet: "iPad Pro 11\" (834x1194)", "iPad mini (768x1024)", "iPad Pro 13\" (1024x1366)", "Let Claude pick"
+  - For wearable: "Apple Watch 41mm (176x215)", "Apple Watch Ultra (205x251)", "Galaxy Watch (170x170)", "Let Claude pick"
+  - For TV: "1080p (1920x1080)"
+  - For fixed: Ask inline (freeform) "What are the display dimensions in pixels?"
+
+If no non-web trigger is detected during the entire conversation, the Platform defaults to "web" and the Viewport field is omitted from brief.md.
+
+This is a single question added to the natural flow -- not a separate questionnaire. It only fires when the user's responses indicate a non-web target.
+
 **Check context (background, not out loud):**
 
 As you go, mentally check the context checklist from `questioning.md`. If gaps remain, weave questions naturally. Don't suddenly switch to checklist mode.
@@ -119,6 +147,10 @@ Loop until "Create brief.md" selected.
 
 <step name="write_brief">
 Synthesize all context into `.ace/brief.md` using the template from `templates/brief.md`.
+
+When populating the Context section, include:
+- **Platform:** [detected platform from questioning, defaults to "web"]
+- **Viewport:** [target dimensions if non-web, e.g., "iPhone 15 Pro (393x852)". Omit for web.]
 
 **For greenfield projects:**
 
