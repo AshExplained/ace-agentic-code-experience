@@ -305,14 +305,17 @@ User selects Yes -> set `UI_STAGE=true`.
 ### Design Artifact Check (only when UI_STAGE=true)
 
 ```bash
-UX_BRIEF_FILE="${STAGE_DIR}/${STAGE}-ux-brief.md"
+UX_BRIEF_FILE=".ace/design/ux-brief.md"
+if [ ! -f "$UX_BRIEF_FILE" ]; then
+  UX_BRIEF_FILE="${STAGE_DIR}/${STAGE}-ux-brief.md"
+fi
 if [ -f "$UX_BRIEF_FILE" ]; then
   echo "Design artifacts found. Loading UX brief..."
   UX_BRIEF=$(cat "$UX_BRIEF_FILE")
 else
   echo ""
   echo "Stage ${STAGE} is a UI stage but has no design artifacts."
-  echo "Run /ace.design-system ${STAGE} first to create the design system."
+  echo "Run /ace.design-system first to create the design system."
   echo "Then run /ace.design-screens ${STAGE} to create screen prototypes."
   echo "Then re-run /ace.plan-stage ${STAGE}."
   echo ""
@@ -481,6 +484,9 @@ RESEARCH_CONTENT=$(cat "${STAGE_DIR}"/*-research.md 2>/dev/null)
 
 # Load UX brief from design-stage output (if UI stage with completed design)
 # UX_BRIEF may already be loaded from handle_ui_stage_redirect
+if [ -z "$UX_BRIEF" ]; then
+  UX_BRIEF=$(cat .ace/design/ux-brief.md 2>/dev/null)
+fi
 if [ -z "$UX_BRIEF" ]; then
   UX_BRIEF=$(cat "${STAGE_DIR}"/${STAGE}-ux-brief.md 2>/dev/null)
 fi
