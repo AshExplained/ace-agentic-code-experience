@@ -50,6 +50,15 @@ Read the design mode and all context from the spawner prompt.
    - Flow design guidance (interaction model, onboarding flows, navigation patterns)
    - Emotional guardrails (primary emotion to achieve, anti-emotion to avoid)
    The ux_brief is INFORMATIONAL -- it supplements design_preferences and intel but does not override either. When ux_brief suggests spacing of 16px but design_preferences says "dense layout", honor design_preferences.
+4c. **Parse viewport context** (if present in spawn context or brief.md) -- The orchestrator may include viewport metadata from brief.md. If present, extract:
+   - `VIEWPORT_TYPE`: The viewport type (desktop, mobile, tablet, fixed, wearable, tv, print)
+   - `VIEWPORT_WIDTH`: Target width in CSS pixels
+   - `VIEWPORT_HEIGHT`: Target height in CSS pixels
+   - `VIEWPORT_FRAME`: Device frame identifier (e.g., iphone-15, none)
+   - `VIEWPORT_ORIENTATION`: portrait or landscape
+   - `VIEWPORT_SHAPE`: rectangular or circular
+   - `VIEWPORT_DIRECTION`: ltr or rtl
+   If no viewport metadata is present, set `VIEWPORT_TYPE="desktop"` (default -- all viewport logic is skipped for desktop).
 5. **If `translate` mode:**
    - Read `translation_context` (DESIGN.md content) from spawner prompt
    - Read `translation_strategy` from spawner prompt: `absorb` or `extend`
@@ -101,6 +110,25 @@ Create the project's visual identity:
    - **Theme overrides:** Dark mode overrides for semantic and component tokens that change between themes
 
 3. **Write `stylekit.yaml`** at `.ace/design/stylekit.yaml` using W3C DTCG `$type`/`$value` structure. All primitive tokens contain concrete values. Semantic tokens use `{primitive.path}` aliases. Component tokens use `{semantic.path}` or `{primitive.path}` aliases. Maximum alias chain depth: 2 levels.
+
+3b. **Write viewport section to stylekit.yaml** (ONLY if `VIEWPORT_TYPE` is NOT "desktop"):
+
+   Append a `viewport` section to `stylekit.yaml` using the values parsed in load_context:
+
+   ```yaml
+   viewport:
+     type: {VIEWPORT_TYPE}
+     width: {VIEWPORT_WIDTH}
+     height: {VIEWPORT_HEIGHT}
+     frame: {VIEWPORT_FRAME}
+     orientation: {VIEWPORT_ORIENTATION}
+     shape: {VIEWPORT_SHAPE}
+     direction: {VIEWPORT_DIRECTION}
+   ```
+
+   Omit fields that have default values (orientation: portrait, shape: rectangular, direction: ltr) unless explicitly set. The viewport section sits at the same level as `metadata`, `primitive`, `semantic`, `component`, and `themes` in the YAML structure.
+
+   If `VIEWPORT_TYPE` is "desktop": do NOT add a viewport section. Standard web projects have no viewport section in stylekit.yaml.
 
 4. **Generate `stylekit.css`** at `.ace/design/stylekit.css`:
    - Write a `:root {}` block containing all resolved token values as CSS custom properties
@@ -159,6 +187,8 @@ For each component the stage needs (minimum: the 7 base components -- button, ca
 
 <step name="create_stylekit_preview">
 **Skip this step if mode is `screens_only` OR phase is `screens`.**
+
+**Viewport handling:** The stylekit preview is ALWAYS rendered full-width regardless of any viewport settings in stylekit.yaml. The preview is a documentation artifact showing the design system, not a screen prototype. Do NOT apply viewport wrapping to the stylekit preview.
 
 Generate `.ace/design/stylekit-preview.html` -- a single-page composed view of the entire design system. The user reviews this one file instead of opening individual component HTMLs.
 
@@ -290,6 +320,7 @@ Create screen layout specs for every screen the stage needs:
    - `responsive`: mobile overrides (desktop-first strategy)
    - `interactions`: trigger/action pairs describing user interactions
    - `developer-notes`: implementation hints
+   - `viewport`: (optional) viewport override for this screen, same schema as the stylekit viewport section. When absent, the screen inherits the stylekit viewport. When present, the screen spec viewport completely overrides the stylekit viewport (no merging). Use this when a screen needs different dimensions than the project default (e.g., a landscape screen in a portrait-default mobile app).
 
 4. **Component references** use `component:` fields pointing to inventory component names. Props include variant selection and content-zone hints (descriptive strings guiding content generation).
 
@@ -397,6 +428,29 @@ For each screen spec YAML, generate an HTML prototype:
    - Generate representative content matching content-zone hint descriptions
    - Apply responsive classes from both component specs and screen spec overrides
 
+2b. **Viewport wrapping** (ONLY when a viewport section exists in stylekit.yaml or in this screen's spec YAML):
+
+   Determine the effective viewport for this screen:
+   - If screen spec YAML has a `viewport` field: use screen spec viewport (complete override)
+   - Else if `stylekit.yaml` has a `viewport` section: use stylekit viewport
+   - Else: no viewport wrapping (standard full-width behavior, skip this step)
+
+   When the effective viewport type is NOT "desktop":
+
+   a. Change the body element's class from `font-body bg-neutral-50 text-neutral-900 antialiased` to `font-body bg-neutral-200 text-neutral-900 antialiased min-h-screen flex items-center justify-center` -- the gray background provides contrast for the viewport container.
+
+   b. Wrap all page content in the appropriate viewport container pattern (see design-artifacts.md Viewport Wrapper Pattern section for the exact HTML). Select the pattern based on the effective viewport:
+      - `frame` matches a device ID (e.g., iphone-15): use the iPhone/mobile frame pattern with rounded corners and notch
+      - `shape: circular`: use the circular frame pattern with clip-path
+      - `frame: none` or no frame specified: use the fixed dimension pattern with simple border
+      - `direction: rtl`: add `dir="rtl"` to the `<html>` tag
+
+   c. Set the content area dimensions from the effective viewport width and height.
+
+   d. The page content inside the viewport container uses the same Tailwind classes and layout as it would full-width -- only the outer container constrains the canvas.
+
+   When the effective viewport type IS "desktop": skip viewport wrapping entirely. Render the prototype with the standard full-width body as currently done.
+
 3. **Image handling:**
    - If Pexels API key is available: use `WebFetch` to fetch images per the screen spec's `images` array. Use `photos[0].src.large` for images wider than 600px, `photos[0].src.medium` for 200-600px, `photos[0].src.small` for under 200px.
    - If no API key: use descriptive placeholder divs per the fallback format.
@@ -441,7 +495,7 @@ Before returning, run the 6-item anti-generic checklist against your output:
 Produce ALL artifacts before returning. Do not return after creating the stylekit but before creating screen specs. Do not return after creating some screens but not others.
 
 **Full mode produces:**
-1. `.ace/design/stylekit.yaml` -- token definitions
+1. `.ace/design/stylekit.yaml` -- token definitions (includes viewport section if non-desktop project)
 2. `.ace/design/stylekit.css` -- generated CSS
 3. `.ace/design/stylekit-preview.html` -- composed design system preview
 4. `.ace/design/components/{name}/{name}.yaml` -- component specs (one per component)
