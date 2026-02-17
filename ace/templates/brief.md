@@ -44,6 +44,9 @@ One sentence that drives prioritization when tradeoffs arise.]
 
 ## Context
 
+**Platform:** [web | mobile-ios | mobile-android | cross-platform | desktop | wearable | tv | cli | api | other]
+**Viewport:** [If non-web: target dimensions, e.g., "iPhone 15 Pro (393x852)" or "Apple Watch Ultra (205x251)". If web: omit or "responsive"]
+
 [Background information that informs implementation:
 - Technical environment or ecosystem
 - Relevant prior work or experience
@@ -104,6 +107,7 @@ Common types: Tech stack, Timeline, Budget, Dependencies, Compatibility, Perform
 - Background that informs implementation decisions
 - Technical environment, prior work, user feedback
 - Known issues or technical debt to address
+- Platform and Viewport captured during initialization (informs design pipeline viewport handling)
 - Update as new context emerges
 
 **Constraints:**
