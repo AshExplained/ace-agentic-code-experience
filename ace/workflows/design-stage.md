@@ -1,7 +1,7 @@
 <purpose>
-Run the full design pipeline for a UI stage independently of plan-stage.
+Run the full design pipeline for a UI stage or an entire project independently of plan-stage.
 
-Use this workflow when a stage involves visual UI work and needs design artifacts (stylekit, screen prototypes, implementation guide) before architecture planning. Handles UI detection, UX interview, UX synthesis, design interview, Phase 1 (stylekit), Phase 2 (screens), implementation guide generation, and design artifact commits.
+Dual-mode: operates in stage-level mode (single stage, invoked by design-screens or restyle) or project-level mode (all UI stages, invoked by design-system without a stage number). Use this workflow when a stage involves visual UI work and needs design artifacts (stylekit, screen prototypes, implementation guide) before architecture planning. Handles UI detection, UX interview, UX synthesis, design interview, Phase 1 (stylekit), Phase 2 (screens), implementation guide generation, and design artifact commits.
 </purpose>
 
 <core_principle>
@@ -150,6 +150,7 @@ INTEL_CONTENT=""  # No per-stage intel exists for project-level
 STAGE_NAME="design-system"  # For display purposes
 STAGE="project"  # For commit messages
 COMMIT_PREFIX="design"  # For commit messages (used by handle_design)
+COMMIT_MSG_SCOPE="project design system"  # For commit message body text
 
 # Project-level variables are still extracted from brief.md (they are project-scoped already)
 PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
@@ -175,6 +176,7 @@ fi
 
 # Set COMMIT_PREFIX for stage-level mode (symmetry with project-level)
 COMMIT_PREFIX="${STAGE}"
+COMMIT_MSG_SCOPE="Stage ${STAGE}: ${STAGE_NAME}"
 
 # Load intel.md immediately - this informs ALL downstream agents
 INTEL_CONTENT=$(cat "${STAGE_DIR}"/*-intel.md 2>/dev/null)
@@ -836,6 +838,16 @@ If `restyle`: Set `DESIGN_MODE="full"`. Designer receives existing stylekit as r
 
 Display banner:
 
+**If PROJECT_LEVEL=true:**
+
+```
+ACE > PROJECT DESIGN -- DESIGN INTERVIEW
+
+Before creating your project design system, let me understand your vision.
+```
+
+**If PROJECT_LEVEL=false:**
+
 ```
 ACE > DESIGNING STAGE {X} -- DESIGN INTERVIEW
 
@@ -1085,8 +1097,17 @@ Phase 1 designer spawn template:
 **Project Name:** {PROJECT_NAME}
 **Mode:** {DESIGN_MODE}
 **Phase:** stylekit
+
+{IF PROJECT_LEVEL=true:}
+**Scope:** All UI stages
+**UI Stages:**
+{for each stage in UI_STAGES: "- Stage {N}: {name} -- {goal}"}
+{END IF}
+
+{IF PROJECT_LEVEL=false:}
 **Stage:** {stage_name}
 **Goal:** {stage_goal}
+{END IF}
 
 {DESIGN_PREFERENCES}
 
@@ -1175,6 +1196,19 @@ Return ## DESIGN REVISION (not ## DESIGN COMPLETE) to signal this is a revision.
 
 Display banner before spawning:
 
+**If PROJECT_LEVEL=true:**
+
+```
+ACE > PROJECT DESIGN -- PHASE 1: DESIGN SYSTEM
+{IF DESIGN_MODE == "translate":}
+Spawning designer (mode: translate, strategy: {TRANSLATE_STRATEGY}, phase: stylekit)...
+{ELSE:}
+Spawning designer (mode: full, phase: stylekit)...
+{END IF}
+```
+
+**If PROJECT_LEVEL=false:**
+
 ```
 ACE > DESIGNING STAGE {X} -- PHASE 1: DESIGN SYSTEM
 {IF DESIGN_MODE == "translate":}
@@ -1185,6 +1219,19 @@ Spawning designer (mode: full, phase: stylekit)...
 ```
 
 Spawn:
+
+**If PROJECT_LEVEL=true:**
+
+```
+Task(
+  prompt=designer_prompt,
+  subagent_type="ace-designer",
+  model="{designer_model}",
+  description="Design Project - Phase 1 (stylekit)"
+)
+```
+
+**If PROJECT_LEVEL=false:**
 
 ```
 Task(
@@ -1218,6 +1265,19 @@ Return REVIEW PASSED or ISSUES FOUND with actionable feedback.
 
 </review_context>
 ```
+
+**If PROJECT_LEVEL=true:**
+
+```
+Task(
+  prompt=reviewer_prompt,
+  subagent_type="ace-design-reviewer",
+  model="{reviewer_model}",
+  description="Review design Phase 1 (stylekit) for project"
+)
+```
+
+**If PROJECT_LEVEL=false:**
 
 ```
 Task(
@@ -1274,6 +1334,22 @@ done
 
 **Step 2 -- Present checkpoint:human-verify:**
 
+**If PROJECT_LEVEL=true:**
+
+```
+what-built: "Design system for project"
+how-to-verify:
+  1. Review design system preview in browser (auto-opened):
+     - .ace/design/stylekit-preview.html (colors, typography, spacing, components)
+  2. Check that color palette matches your brand vision
+  3. Verify typography feels right for your project
+  4. Review component styling (buttons, cards, inputs, etc.)
+  Note: This project-level design system will be used across all UI stages.
+resume-signal: Type "approved" or describe what to change (e.g., "make primary color darker", "switch to a serif font")
+```
+
+**If PROJECT_LEVEL=false:**
+
 ```
 what-built: "Design system for Stage {N}: {stage_name}"
 how-to-verify:
@@ -1302,6 +1378,24 @@ If user provides feedback:
 #### Phase 1 -- Escalation
 
 Present `checkpoint:decision`:
+
+**If PROJECT_LEVEL=true:**
+
+```
+Design system has reached the revision limit.
+
+Current state: {summary of latest designer output}
+{IF reviewer issues exist:} Reviewer concerns: {summary of latest issues}
+
+Options:
+  Accept - Use current design system as-is
+  Restart - Start over with a completely new design direction
+  Skip - Skip design for this project (no design system will be created)
+
+Select: accept, restart, or skip
+```
+
+**If PROJECT_LEVEL=false:**
 
 ```
 Design system has reached the revision limit.
@@ -1334,9 +1428,9 @@ if [ "$COMMIT_PLANNING_DOCS" = "true" ]; then
   git add .ace/design/stylekit.css
   git add .ace/design/stylekit-preview.html
   git add .ace/design/components/
-  git commit -m "docs(${STAGE}): approve Phase 1 design system
+  git commit -m "docs(${COMMIT_PREFIX}): approve Phase 1 design system
 
-Phase 1 (stylekit) approved for Stage ${STAGE}: ${STAGE_NAME}
+Phase 1 (stylekit) approved for ${COMMIT_MSG_SCOPE}
 - Design tokens: stylekit.yaml + stylekit.css
 - Component inventory committed
 - Preview: stylekit-preview.html"
@@ -1417,8 +1511,17 @@ Phase 2 designer spawn template:
 **Project Name:** {PROJECT_NAME}
 **Mode:** {design_mode}
 **Phase:** screens
+
+{IF PROJECT_LEVEL=true:}
+**Scope:** All UI stages
+**UI Stages:**
+{for each stage in UI_STAGES: "- Stage {N}: {name} -- {goal}"}
+{END IF}
+
+{IF PROJECT_LEVEL=false:}
 **Stage:** {stage_name}
 **Goal:** {stage_goal}
+{END IF}
 
 **Research:**
 {research_content}
@@ -1476,6 +1579,16 @@ Return ## DESIGN REVISION (not ## DESIGN COMPLETE) to signal this is a revision.
 
 Display banner:
 
+**If PROJECT_LEVEL=true:**
+
+```
+ACE > PROJECT DESIGN -- PHASE 2: SCREEN PROTOTYPES
+
+Spawning designer (mode: {design_mode}, phase: screens)...
+```
+
+**If PROJECT_LEVEL=false:**
+
 ```
 ACE > DESIGNING STAGE {X} -- PHASE 2: SCREEN PROTOTYPES
 
@@ -1483,6 +1596,19 @@ Spawning designer (mode: {design_mode}, phase: screens)...
 ```
 
 Spawn:
+
+**If PROJECT_LEVEL=true:**
+
+```
+Task(
+  prompt=designer_prompt,
+  subagent_type="ace-designer",
+  model="{designer_model}",
+  description="Design Project - Phase 2 (screens)"
+)
+```
+
+**If PROJECT_LEVEL=false:**
 
 ```
 Task(
@@ -1514,6 +1640,19 @@ Return REVIEW PASSED or ISSUES FOUND with actionable feedback.
 
 </review_context>
 ```
+
+**If PROJECT_LEVEL=true:**
+
+```
+Task(
+  prompt=reviewer_prompt,
+  subagent_type="ace-design-reviewer",
+  model="{reviewer_model}",
+  description="Review design Phase 2 (screens) for project"
+)
+```
+
+**If PROJECT_LEVEL=false:**
 
 ```
 Task(
@@ -1583,6 +1722,25 @@ done
 
 **Step 2 -- Present checkpoint:human-verify:**
 
+**If PROJECT_LEVEL=true:**
+
+```
+what-built: "Screen prototypes for project"
+how-to-verify:
+  1. Review screen prototypes in browser (auto-opened):
+     {For each [NEW] screen from designer return:}
+     - .ace/design/screens/{screen-name}.html [NEW] -- {description}
+     {For each [MODIFIED] screen from designer return:}
+     - .ace/design/screens/{screen-name}.html [MODIFIED] -- {modification summary}
+  2. Check that layouts match your vision for each screen
+  3. Verify components are used consistently across screens
+  4. Review responsive behavior if applicable
+  Note: The design system (colors, fonts, spacing) was approved in the previous phase. Screen feedback should be about layout and content, not colors/fonts.
+resume-signal: Type "approved" or describe what to change
+```
+
+**If PROJECT_LEVEL=false:**
+
 ```
 what-built: "Screen prototypes for Stage {N}: {stage_name}"
 how-to-verify:
@@ -1617,6 +1775,24 @@ If user provides feedback:
 
 Present `checkpoint:decision`:
 
+**If PROJECT_LEVEL=true:**
+
+```
+Screen prototypes have reached the revision limit.
+
+Current state: {summary of latest designer output}
+{IF reviewer issues exist:} Reviewer concerns: {summary of latest issues}
+
+Options:
+  Accept - Use current screen prototypes as-is (proceed to implementation guide)
+  Restart - Start over with new screen layouts (design system stays locked)
+  Skip - Skip screen design (stylekit exists but no screen specs for this project)
+
+Select: accept, restart, or skip
+```
+
+**If PROJECT_LEVEL=false:**
+
 ```
 Screen prototypes have reached the revision limit.
 
@@ -1649,9 +1825,9 @@ Behavior:
 ```bash
 if [ "$COMMIT_PLANNING_DOCS" = "true" ]; then
   git add .ace/design/screens/
-  git commit -m "docs(${STAGE}): approve Phase 2 screen prototypes
+  git commit -m "docs(${COMMIT_PREFIX}): approve Phase 2 screen prototypes
 
-Phase 2 (screens) approved for Stage ${STAGE}: ${STAGE_NAME}
+Phase 2 (screens) approved for ${COMMIT_MSG_SCOPE}
 - Screen specs and prototypes committed"
 else
   echo "Skipping Phase 2 design commit (commit_docs: false)"
@@ -1830,9 +2006,9 @@ Display: `Implementation guide generated at .ace/design/implementation-guide.md`
 ```bash
 if [ "$COMMIT_PLANNING_DOCS" = "true" ] && [ -f ".ace/design/implementation-guide.md" ]; then
   git add .ace/design/implementation-guide.md
-  git commit -m "docs(${STAGE}): generate implementation guide
+  git commit -m "docs(${COMMIT_PREFIX}): generate implementation guide
 
-Implementation guide for Stage ${STAGE}: ${STAGE_NAME}
+Implementation guide for ${COMMIT_MSG_SCOPE}
 - CSS framework translation mappings
 - Token system bridging: prototype -> project"
 fi
@@ -1846,7 +2022,24 @@ Route to the command's `<offer_next>` section.
 
 Display the design-specific completion banner with actual artifact paths:
 
-**If `HAS_DESIGN=true`:**
+**If `HAS_DESIGN=true` AND `PROJECT_LEVEL=true`:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ACE ► PROJECT DESIGN COMPLETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Design artifacts:
+  Stylekit:     .ace/design/stylekit.yaml
+  CSS:          .ace/design/stylekit.css
+  Preview:      .ace/design/stylekit-preview.html
+  Components:   .ace/design/components/
+  Guide:        .ace/design/implementation-guide.md
+
+Design system ready. Run /ace.design-screens {N} for each UI stage, then /ace.plan-stage {N}.
+```
+
+**If `HAS_DESIGN=true` AND `PROJECT_LEVEL=false`:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1864,7 +2057,19 @@ Design artifacts:
 Ready for /ace.plan-stage {X} to create executable runs.
 ```
 
-**If `HAS_DESIGN=false`:**
+**If `HAS_DESIGN=false` AND `PROJECT_LEVEL=true`:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ACE ► PROJECT DESIGN SKIPPED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Design was skipped for this project.
+
+You can still run /ace.plan-stage {N} for each stage -- they will proceed without design artifacts.
+```
+
+**If `HAS_DESIGN=false` AND `PROJECT_LEVEL=false`:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
