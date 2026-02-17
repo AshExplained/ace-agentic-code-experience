@@ -46,6 +46,7 @@ Extract from $ARGUMENTS:
 - Stage number (integer or decimal like `2.1`)
 - `--skip-ux-interview` flag to skip UX interview
 - `--restyle` flag to enter restyle mode (invoked by ace.restyle command)
+- `--phase-1-only` flag to stop after Phase 1 (invoked by ace.design-system command)
 
 **If no stage number:** Detect next unplanned stage from track.
 
@@ -69,7 +70,9 @@ ls .ace/stages/${STAGE}-*/*-research.md 2>/dev/null
 
 <step name="validate_stage">
 ```bash
-grep -A5 "Stage ${STAGE}:" .ace/track.md 2>/dev/null
+# Strip leading zeros for track.md lookup (track uses "Stage 1:", not "Stage 01:")
+STAGE_UNPADDED=$(echo "$STAGE" | sed 's/^0\+\([0-9]\)/\1/')
+grep -A5 "^### Stage ${STAGE_UNPADDED}:" .ace/track.md 2>/dev/null
 ```
 
 **If not found:** Error with available stages. **If found:** Extract stage number, name, description.
@@ -81,7 +84,9 @@ grep -A5 "Stage ${STAGE}:" .ace/track.md 2>/dev/null
 STAGE_DIR=$(ls -d .ace/stages/${STAGE}-* 2>/dev/null | head -1)
 if [ -z "$STAGE_DIR" ]; then
   # Create stage directory from track name
-  STAGE_NAME=$(grep "Stage ${STAGE}:" .ace/track.md | sed 's/.*Stage [0-9]*: //' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+  # Anchor to ### headings to avoid matching list items (which contain markdown ** and descriptions)
+  STAGE_UNPADDED=$(echo "$STAGE" | sed 's/^0\+\([0-9]\)/\1/')
+  STAGE_NAME=$(grep "^### Stage ${STAGE_UNPADDED}:" .ace/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
   mkdir -p ".ace/stages/${STAGE}-${STAGE_NAME}"
   STAGE_DIR=".ace/stages/${STAGE}-${STAGE_NAME}"
 fi
@@ -147,8 +152,8 @@ Spawning scout...
 Gather additional context for research prompt:
 
 ```bash
-# Get stage description from track
-STAGE_DESC=$(grep -A3 "Stage ${STAGE}:" .ace/track.md)
+# Get stage description from track (use STAGE_UNPADDED from validate_stage)
+STAGE_DESC=$(grep -A5 "^### Stage ${STAGE_UNPADDED}:" .ace/track.md)
 
 # Get specs if they exist
 SPECS=$(cat .ace/specs.md 2>/dev/null | grep -A100 "## Requirements" | head -50)
@@ -1162,6 +1167,16 @@ else
   echo "Skipping Phase 1 design commit (commit_docs: false)"
 fi
 ```
+
+#### Phase 1 -- Stop for design-system command
+
+**If `--phase-1-only` flag is set:**
+- Skip Phase 2 entirely
+- Skip implementation guide generation
+- Route to the command's `<offer_next>` section
+- STOP
+
+**Otherwise:** Continue to Phase 1 -> Phase 2 transition as normal.
 
 #### Phase 1 -> Phase 2 Transition
 
