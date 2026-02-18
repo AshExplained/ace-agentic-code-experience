@@ -1,6 +1,6 @@
 {
   "name": "ace-experience",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A stage-driven, context-engineered agentic code execution system for Claude Code, OpenCode, and Gemini.",
   "bin": {
     "ace-experience": "bin/install.js"
