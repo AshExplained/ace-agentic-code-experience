@@ -44,9 +44,9 @@ Eight fixed states. Components document only the states that apply to them.
 - **Layout components** (navigation): default; may need active for current page indication
 - **Feedback components** (toast, alert): default; may need loading, error, empty
 
-## Common Components
+## Base Component Set
 
-Seven common components. Only create components the stage screens will actually use. Projects may add custom components using the same schema.
+Seven base components. Projects may add custom components using the same schema.
 
 | Component | Category | Key States | Purpose |
 |-----------|----------|------------|---------|

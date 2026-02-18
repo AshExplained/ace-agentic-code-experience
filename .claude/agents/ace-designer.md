@@ -105,7 +105,7 @@ Create the project's visual identity:
 
 2. **Design token values** following the three-layer architecture:
    - **Primitive layer:** Raw palette values (brand colors, neutrals, feedback colors), typography (font families from Google Fonts, weights, sizes, line heights, letter spacing), spacing base unit, breakpoints, shadows, borders, border radius, z-index, opacity, transitions
-   - **Semantic layer:** Intent-based aliases referencing primitives (primary, secondary, background, text, border, feedback colors; page padding, section gap, component gap; heading/body typography (add code typography only if the stage displays code or terminal content))
+   - **Semantic layer:** Intent-based aliases referencing primitives (primary, secondary, background, text, border, feedback colors; page padding, section gap, component gap; heading/body/code typography)
    - **Component layer:** Scoped to specific UI components, referencing semantic or primitive tokens (button variants, card, input, badge, navigation)
    - **Theme overrides:** Dark mode overrides for semantic and component tokens that change between themes
 
@@ -162,7 +162,7 @@ Example: User says "make primary color darker"
 
 Create the component inventory at `.ace/design/components/`:
 
-For each component the stage needs (common components include button, card, input, navigation, heading, badge, avatar — only create components the stage screens will actually use):
+For each component the stage needs (minimum: the 7 base components -- button, card, input, navigation, heading, badge, avatar):
 
 1. **Create directory:** `.ace/design/components/{component-name}/`
 
@@ -258,13 +258,13 @@ Generate `.ace/design/stylekit-preview.html` -- a single-page composed view of t
 
    **1. Color Palette:** Visual grid of all `primitive.color` tokens. Each swatch shows the color as a visual rectangle, the token name, and the hex/oklch value. Semantic color mappings should be indicated alongside their primitive source. The designer chooses the grid layout based on the project's spacing and sizing tokens.
 
-   **2. Typography (contextual):** Each specimen uses real project text derived from the stage context (project name, feature descriptions, UI labels) -- NOT generic "quick brown fox" or "lorem ipsum" placeholder. Each specimen is labeled with its typographic role (Page Title / h1, Section Heading / h2, Body Text, Small / Caption). Include Code / Mono only if the stage involves code display, terminal output, or technical content. Show each font family at each defined size with its weight and line-height values displayed alongside. The specimens should demonstrate what the typography actually looks like in context.
+   **2. Typography (contextual):** Each specimen uses real project text derived from the stage context (project name, feature descriptions, UI labels) -- NOT generic "quick brown fox" or "lorem ipsum" placeholder. Each specimen is labeled with its typographic role (Page Title / h1, Section Heading / h2, Body Text, Small / Caption, Code / Mono). Show each font family at each defined size with its weight and line-height values displayed alongside. The specimens should demonstrate what the typography actually looks like in context.
 
    **3. Spacing Scale (semantic):** Each spacing token shows the semantic name derived from common usage (e.g., `card-padding`, `section-gap`, `input-padding`, `page-margin`) alongside the raw value. A visual bar representation still communicates relative scale, but the semantic name label gives each value meaning beyond a number.
 
    **4. Components Gallery (all states):** For each component in `.ace/design/components/`, render ALL relevant states -- not just the default. Show default, hover (simulated with a variant), focus (with focus ring), disabled (greyed), and loading (with spinner if applicable). Use the component's `states` field from its YAML to determine which states to render. Lay out states in a horizontal row per component so the user sees the full state spectrum at a glance.
 
-   **5. Patterns / Compositions:** Show components composed into real UI patterns that the project will use. Select 3-5 compositions relevant to the project's screens. Examples: a navigation header with logo + nav links + action button, a modal dialog (card + heading + input + buttons), a toast notification (badge + text + close button), an empty state (heading + descriptive text + button CTA). Each pattern gets a title and a brief description of when it is used.
+   **5. Patterns / Compositions:** Show components composed into real UI patterns that the project will use. Select 3-5 compositions relevant to the project's screens. Examples: a navigation header with logo + nav links + avatar, a modal dialog (card + heading + input + buttons), a toast notification (badge + text + close button), an empty state (heading + descriptive text + button CTA). Each pattern gets a title and a brief description of when it is used.
 
    **Conditional sections (included when applicable):**
 

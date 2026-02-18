@@ -26,8 +26,8 @@ Create executable stage prompts (run.md files) for a track stage with integrated
 </objective>
 
 <execution_context>
-@~/.claude/ace/references/ui-brand.md
-@~/.claude/ace/workflows/plan-stage.md
+@.claude/ace/references/ui-brand.md
+@.claude/ace/workflows/plan-stage.md
 </execution_context>
 
 <context>
@@ -43,7 +43,7 @@ Normalize stage input in step 2 before any directory lookups.
 </context>
 
 <process>
-**Follow the plan-stage workflow** from `@~/.claude/ace/workflows/plan-stage.md`.
+**Follow the plan-stage workflow** from `@.claude/ace/workflows/plan-stage.md`.
 
 The workflow handles all planning logic including:
 
