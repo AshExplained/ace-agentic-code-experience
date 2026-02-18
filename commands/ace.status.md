@@ -177,16 +177,13 @@ Check if `{stage}-intel.md` exists in stage directory.
 
 **If intel.md exists:**
 
-Before routing, check if this is a UI stage that needs design:
+Before routing, check if this is a UI stage:
 
-```
-UI_KEYWORDS = [ui, frontend, dashboard, interface, page, screen, layout, form,
-               component, widget, view, display, navigation, sidebar, header,
-               footer, modal, dialog, login, signup, register, onboarding,
-               checkout, wizard, portal, gallery, carousel, menu, toolbar]
-```
+Check the ### Stage N: heading line from track.md for this stage.
+If the heading contains [UI] (e.g., `### Stage 5: Dashboard [UI]`) -> IS_UI_STAGE=true.
+Otherwise -> IS_UI_STAGE=false.
 
-If ANY UI keyword in stage goal/name → check design artifacts:
+If IS_UI_STAGE=true, check design artifacts:
 
 ```bash
 HAS_STYLEKIT=$(ls .ace/design/stylekit.yaml 2>/dev/null && echo "yes")
@@ -256,7 +253,7 @@ HAS_SCREENS=$(ls .ace/design/screens/*.yaml 2>/dev/null && echo "yes")
 
 **If intel.md does NOT exist:**
 
-Run the same UI keyword check on stage goal/name (see above).
+Run the same [UI] tag check on the stage heading (see above).
 
 **If UI stage + no stylekit:**
 
@@ -354,7 +351,7 @@ State: "Current stage is {X}. Milestone has {N} stages (highest: {Y})."
 **Route C: Stage complete, more stages remain**
 
 Read track.md to get the next stage's name and goal.
-Run the same UI keyword check on the NEXT stage's goal/name.
+Run the same [UI] tag check on the NEXT stage's heading from track.md.
 
 **If next stage is UI + no stylekit:**
 

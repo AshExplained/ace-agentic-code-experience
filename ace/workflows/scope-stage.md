@@ -290,7 +290,7 @@ STAGE_DIR=$(ls -d .ace/stages/${PADDED_STAGE}-* .ace/stages/${STAGE}-* 2>/dev/nu
 if [ -z "$STAGE_DIR" ]; then
   # Create from track name (lowercase, hyphens)
   # Anchor to ### headings to avoid matching list items (which contain markdown ** and descriptions)
-  STAGE_NAME=$(grep "^### Stage ${STAGE}:" .ace/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+  STAGE_NAME=$(grep "^### Stage ${STAGE}:" .ace/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | sed 's/ \[UI\]$//' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
   mkdir -p ".ace/stages/${PADDED_STAGE}-${STAGE_NAME}"
   STAGE_DIR=".ace/stages/${PADDED_STAGE}-${STAGE_NAME}"
 fi
@@ -378,16 +378,12 @@ Created: .ace/stages/${PADDED_STAGE}-${SLUG}/${PADDED_STAGE}-intel.md
 
 **Then, detect if design is needed before routing:**
 
-Check if the stage goal (from track.md) contains UI keywords:
+Check if the stage heading from track.md has a [UI] tag:
 
-```
-UI_KEYWORDS = [ui, frontend, dashboard, interface, page, screen, layout, form,
-               component, widget, view, display, navigation, sidebar, header,
-               footer, modal, dialog, login, signup, register, onboarding,
-               checkout, wizard, portal, gallery, carousel, menu, toolbar]
-```
-
-If ANY UI keyword appears in the stage goal or stage name → `IS_UI_STAGE=true`.
+Check the ### Stage N: heading line from track.md for this stage.
+If the heading contains [UI] (e.g., `### Stage 5: Dashboard [UI]`) -> IS_UI_STAGE=true.
+Otherwise -> IS_UI_STAGE=false.
+No keyword matching. The [UI] tag is authoritative.
 
 If `IS_UI_STAGE=true`, check design artifacts:
 
