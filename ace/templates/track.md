@@ -22,7 +22,7 @@ Template for `.ace/track.md`.
 Decimal stages appear between their surrounding integers in numeric order.
 
 - [ ] **Stage 1: [Name]** - [One-line description]
-- [ ] **Stage 2: [Name]** - [One-line description]
+- [ ] **Stage 2: [Name] [UI]** - [One-line description] (if UI stage)
 - [ ] **Stage 3: [Name]** - [One-line description]
 - [ ] **Stage 4: [Name]** - [One-line description]
 
@@ -43,7 +43,7 @@ Runs:
 - [ ] 01-02: [Brief description of second run]
 - [ ] 01-03: [Brief description of third run]
 
-### Stage 2: [Name]
+### Stage 2: [Name] [UI]
 **Goal**: [What this stage delivers]
 **Depends on**: Stage 1
 **Requirements**: [REQ-04, REQ-05]
@@ -121,6 +121,13 @@ Stages execute in numeric order: 2 → 2.1 → 2.2 → 3 → 3.1 → 4
 - Flow downstream to `must_haves` in ace.plan
 - Verified by audit-stage after execution
 - Format: "User can [action]" or "[Thing] works/exists"
+
+**UI stage tagging:**
+- Stages involving visual user interface get `[UI]` appended to their heading
+- Format: `### Stage 5: Dashboard Layout [UI]`
+- Non-UI stages have no tag
+- The navigator determines this at creation time based on stage content
+- Downstream commands (design-system, design-screens, plan-stage, status) read this tag for routing
 
 **After milestones ship:**
 - Collapse completed milestones in `<details>` tags
