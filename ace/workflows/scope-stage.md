@@ -79,6 +79,14 @@ Gray areas are **implementation decisions the user cares about** — things that
    - Something users READ → structure, tone, depth, flow matter
    - Something being ORGANIZED → criteria, grouping, handling exceptions matter
 3. **Generate stage-specific gray areas** — Not generic categories, but concrete decisions for THIS stage
+4. **[UI] stage filter** — If the stage heading in track.md contains `[UI]`, this stage has a design pipeline that handles visual/interaction decisions separately. Generate gray areas about DATA, CONTENT, BUSINESS RULES, and BEHAVIOR only. Defer these to the design pipeline:
+   - Visual layout and presentation (how things look)
+   - Information density and spacing
+   - Loading and transition patterns
+   - Interaction patterns (hover, click, drag)
+   - Visual states (what empty/error/loading states look like)
+   - Navigation structure (sidebar vs tabs vs breadcrumbs)
+   - Color, typography, animation
 
 **Don't use generic category labels** (UI, UX, Behavior). Generate specific gray areas:
 
@@ -156,15 +164,29 @@ Analyze the stage to identify gray areas worth discussing.
 
 **Read the stage description from track.md and determine:**
 
+0. **[UI] check** — Check the ### Stage N: heading line from track.md for this stage. If the heading contains [UI] (e.g., `### Stage 5: Dashboard Layout [UI]`), suppress visual/interaction gray areas. Focus only on data, content, business rules, and behavior. The design pipeline handles visual decisions for [UI] stages.
+
 1. **Domain boundary** — What capability is this stage delivering? State it clearly.
 
-2. **Gray areas by category** — For each relevant category (UI, UX, Behavior, Empty States, Content), identify 1-2 specific ambiguities that would change implementation.
+2. **Gray areas by category** — For each relevant category, identify 1-2 specific ambiguities that would change implementation.
+   - **If [UI] stage:** Only data, content, business rules, and behavioral categories. Do NOT generate layout, density, loading, interaction, or visual state gray areas -- these are deferred to the design pipeline.
+   - **If non-[UI] stage:** All categories apply (UI, UX, Behavior, Empty States, Content).
 
 3. **Skip assessment** — If no meaningful gray areas exist (pure infrastructure, clear-cut implementation), the stage may not need discussion.
 
 **Output your analysis internally, then present to user.**
 
-Example analysis for "Post Feed" stage:
+Example analysis for "Post Feed [UI]" stage:
+```
+Domain: Displaying posts from followed users
+Gray areas (visual/interaction deferred to design pipeline):
+- Content: What data shows on each post (author, time, reactions, preview text)
+- Behavior: What order posts appear (newest, relevance, user preference)
+- Data: What defines "followed users" (direct follows only, or include recommended)
+- Empty state behavior: What happens with no posts (redirect to explore, suggest follows)
+```
+
+Example analysis for "Post Feed" stage (no [UI] tag):
 ```
 Domain: Displaying posts from followed users
 Gray areas:
@@ -188,6 +210,12 @@ We'll clarify HOW to implement this.
 (New capabilities belong in other stages.)
 ```
 
+**[UI] stage handling:** If this is a [UI] stage (heading contains `[UI]`), state:
+```
+This is a [UI] stage -- visual presentation and interaction patterns are handled by the design pipeline.
+Let's focus on the data and behavior decisions.
+```
+
 **Then use AskUserQuestion (multiSelect: true):**
 - header: "Discuss"
 - question: "Which areas do you want to discuss for [stage name]?"
@@ -201,7 +229,17 @@ We'll clarify HOW to implement this.
 
 **Examples by domain:**
 
-For "Post Feed" (visual feature):
+For "Post Feed [UI]" (visual feature with design pipeline):
+```
+This is a [UI] stage -- visual presentation and interaction patterns are handled by the design pipeline.
+Let's focus on the data and behavior decisions.
+
+☐ What shows on each post -- Author name, time posted, like count? Full text or just a preview? Which details matter most?
+☐ How posts are sorted -- Newest first, a smart algorithm, or let the user pick? What about posts from close friends?
+☐ What counts as "my feed" -- Only people I follow, or also suggested content? How much of each?
+```
+
+For "Post Feed" (visual feature, no [UI] tag):
 ```
 ☐ How posts look — Show each post as a card, a scrolling list, or a grid? How much detail per post?
 ☐ How more posts load — Keep loading as you scroll down (like Instagram), or page-by-page with Next/Previous (like Google)?
