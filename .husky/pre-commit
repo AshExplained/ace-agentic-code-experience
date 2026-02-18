@@ -6,5 +6,12 @@ if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
   exit 1
 fi
 
+# ─── Reject .claude/ files staged via explicit paths ───
+if git diff --cached --name-only | grep -q '^\.claude/'; then
+  echo "✗ .claude/ files are staged — these should not be committed."
+  echo "  Run: git rm --cached .claude/"
+  exit 1
+fi
+
 npx lint-staged
 gitleaks protect --staged --verbose
