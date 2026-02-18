@@ -5,6 +5,92 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0](https://github.com/AshExplained/ace-agentic-code-experience/compare/ace-experience-v0.3.0...ace-experience-v0.4.0) (2026-02-18)
+
+
+### Added
+
+* **16.01:** create UX/DX research template ([420036d](https://github.com/AshExplained/ace-agentic-code-experience/commit/420036d90c3ea957e131e5137999660f08ee28df))
+* **16.02:** add 5th UX/DX scout to new-milestone workflow ([2ed7f7b](https://github.com/AshExplained/ace-agentic-code-experience/commit/2ed7f7bf0ad8b4a557cca5f0b71d4c33f63e5a99))
+* **16.03:** add UX pattern detection to codebase mapper ([b9a8f1f](https://github.com/AshExplained/ace-agentic-code-experience/commit/b9a8f1fb69c3f0804c52fb5e3c9892f1bcec9064))
+* **16.03:** add UX/DX section to research recap template ([4f474f0](https://github.com/AshExplained/ace-agentic-code-experience/commit/4f474f0e7d1f60c3b2d8b55cc915c91c04152788))
+* **17.01:** add UX section generation to stage scout agent ([2a5a1c8](https://github.com/AshExplained/ace-agentic-code-experience/commit/2a5a1c8419cfbf156106be9f27cbf667836b2862))
+* **17.01:** add UX section to research template ([51ccc06](https://github.com/AshExplained/ace-agentic-code-experience/commit/51ccc06d9011fa69cc4e0684041cd8b4985ce5bd))
+* **17.02:** add UX synthesis step + scout UX inlining + architect context ([36016a5](https://github.com/AshExplained/ace-agentic-code-experience/commit/36016a5dbbd1787679f7446f09a576c994d4f08a))
+* **17.02:** extract UI detection to shared step + add UX interview step ([b588909](https://github.com/AshExplained/ace-agentic-code-experience/commit/b5889094144fc925faed21a880c599857c0c8608))
+* **18.01:** add design artifact commit steps after approval gates ([bce159f](https://github.com/AshExplained/ace-agentic-code-experience/commit/bce159fbd15a1682c971a030457b563d854ed7b9))
+* **18.01:** thread UX_BRIEF into Phase 1 and Phase 2 designer spawn templates ([1493ab2](https://github.com/AshExplained/ace-agentic-code-experience/commit/1493ab246b12664b5014e9fd02cb15731376f6dd))
+* **18.02:** add DX pattern awareness to ace-architect gather_stage_context ([6f45660](https://github.com/AshExplained/ace-agentic-code-experience/commit/6f45660f0d91b353aeaeca133f6d70ab2f3e2f4c))
+* **18.02:** add DX-aware execution section to ace-runner ([709202e](https://github.com/AshExplained/ace-agentic-code-experience/commit/709202edc2772f0fb2fead5623edf461a6449aa7))
+* **19.01:** replace 2 general-purpose spawns with dedicated scout type in research-stage ([1c29717](https://github.com/AshExplained/ace-agentic-code-experience/commit/1c297170b8654c8be0f3e6eff055bee5c75f5747))
+* **19.01:** replace 7 general-purpose spawns with dedicated agent types in plan-stage ([6f44e39](https://github.com/AshExplained/ace-agentic-code-experience/commit/6f44e39d37125f64575d33b012348615a3db812f))
+* **20.01:** create ace.design-stage command file ([58bc3bb](https://github.com/AshExplained/ace-agentic-code-experience/commit/58bc3bbd8f31e2460003f056b076697563fd7415))
+* **20.01:** create design-stage workflow steps 1-8 ([936735c](https://github.com/AshExplained/ace-agentic-code-experience/commit/936735c897d2678e5a390ed2a0186ab32b9efab2))
+* **20.02:** add handle_design, generate_implementation_guide, present_final_status steps ([eb6b5e3](https://github.com/AshExplained/ace-agentic-code-experience/commit/eb6b5e3152b400ab706fd908d3b28449f595706a))
+* **21.01:** remove design pipeline and add UI stage redirect in plan-stage source ([1a60ff2](https://github.com/AshExplained/ace-agentic-code-experience/commit/1a60ff2b2d61bd3548314388d5c8dad3d4114c77))
+* **21.01:** synchronize installed copies and update command files ([bd7ae7d](https://github.com/AshExplained/ace-agentic-code-experience/commit/bd7ae7d0ff9e98886719929725ccaf5fdd8c5297))
+* **21.02:** add DX interview and synthesis steps to plan-stage source ([db60d7a](https://github.com/AshExplained/ace-agentic-code-experience/commit/db60d7a54acc102a71b5f7f9251ea4e6ea2fd1d8))
+* **22.01:** create ace.restyle command file ([0a20c8d](https://github.com/AshExplained/ace-agentic-code-experience/commit/0a20c8dde634e3bdac6fae5260e05a6d6549b9b4))
+* **22.01:** extend design-stage workflow with --restyle flag support ([94bcf2b](https://github.com/AshExplained/ace-agentic-code-experience/commit/94bcf2bc53a5da450ac7b6a4a2be5f3ad1bbce52))
+* **22.01:** synchronize installed copies with path transformation ([149406a](https://github.com/AshExplained/ace-agentic-code-experience/commit/149406a2035efe99d37fc9be8604998003106d52))
+* **22.02:** add Design section and update workflows in ace.help ([45f4520](https://github.com/AshExplained/ace-agentic-code-experience/commit/45f45206e3d388252845f59e68640529cc5eec19))
+* **22.02:** synchronize installed help copy with design commands ([56e2a48](https://github.com/AshExplained/ace-agentic-code-experience/commit/56e2a480d911fa8bb59d81e8b37104428ef04d2d))
+* **23.01:** add --phase-1-only flag to design-stage workflow ([6cae128](https://github.com/AshExplained/ace-agentic-code-experience/commit/6cae128f1910d1221127ca245f780db0c5eb634a))
+* **23.01:** create ace.design-system command file ([8b1ea2c](https://github.com/AshExplained/ace-agentic-code-experience/commit/8b1ea2c11eea8c33ddb2e2b9bf2adf84bcd5ce23))
+* **23.02:** synchronize installed copies with source files ([295103f](https://github.com/AshExplained/ace-agentic-code-experience/commit/295103f13ad67ba4b9456b2a90b0f003c79d8a5c))
+* **23.02:** update ace.help.md with ace.design-system command ([6fa75bb](https://github.com/AshExplained/ace-agentic-code-experience/commit/6fa75bbb55a65cd7780a3fcb42d979145e682daf))
+* **24.01:** add --phase-2-only flag and impl guide commit to design-stage workflow ([f7b18a3](https://github.com/AshExplained/ace-agentic-code-experience/commit/f7b18a383f42096bf97145313c9c40e8eaa4ba53))
+* **24.01:** create ace.design-screens command ([bfac601](https://github.com/AshExplained/ace-agentic-code-experience/commit/bfac601b68415ee3942a23ed4a5b12df193a38c7))
+* **24.02:** add ace.design-screens to help reference ([667ace5](https://github.com/AshExplained/ace-agentic-code-experience/commit/667ace501209544418c4f112c21313321825936d))
+* **24.02:** synchronize installed copies with source files ([9e92d88](https://github.com/AshExplained/ace-agentic-code-experience/commit/9e92d885cbd1d6d64bf42d88c10d45b2e46afa53))
+* **25.01:** replace ace.design-stage routing with design-system/design-screens ([9e7a151](https://github.com/AshExplained/ace-agentic-code-experience/commit/9e7a151bad1df2197bbdf27c2004694bc57d8594))
+* **25.02:** synchronize installed copies with source files ([f5f0fa3](https://github.com/AshExplained/ace-agentic-code-experience/commit/f5f0fa332e1e03e66887409649eca330292b1231))
+* **26.01:** add Platform and Viewport fields to brief.md template ([7cdbea9](https://github.com/AshExplained/ace-agentic-code-experience/commit/7cdbea98e849de2eae6ee508453250604c48ad92))
+* **26.01:** add viewport schema, wrapper patterns, device table, and screen spec override to design-artifacts ([780e51b](https://github.com/AshExplained/ace-agentic-code-experience/commit/780e51b3ac5123af9d25959e5b3e2d708c9636a3))
+* **26.02:** add target surface capture to initialize-project deep questioning ([206994a](https://github.com/AshExplained/ace-agentic-code-experience/commit/206994a0fddd92064ee98e00819c4e2d31cb9546))
+* **26.02:** add viewport-aware behavior to ace-designer agent ([d48955c](https://github.com/AshExplained/ace-agentic-code-experience/commit/d48955c3556e18f3743d879a00a2c1162eb60d4e))
+* **26.02:** add viewport-aware behavior to ace-designer agent ([d367cec](https://github.com/AshExplained/ace-agentic-code-experience/commit/d367cece50bfbe417ac117b6b90293b8f30edc3f))
+* **26.03:** add Viewport Translation section to implementation guide prompt ([3ae63d2](https://github.com/AshExplained/ace-agentic-code-experience/commit/3ae63d2cd971ed4fc6c51fc39bf4a1ca94e5ec14))
+* **26.04:** synchronize installed copies with source files ([d03633c](https://github.com/AshExplained/ace-agentic-code-experience/commit/d03633ca0c941e28506740eb8c716a2eff0b78b8))
+* **27.01:** add viewport extraction and spawn context to design-stage workflow ([6e07786](https://github.com/AshExplained/ace-agentic-code-experience/commit/6e07786265416ddb45c4c49ce6d7a2a6398cc48d))
+* **28.01:** add PROJECT_LEVEL branches to ensure_stage_directory and handle_research ([b81b3c1](https://github.com/AshExplained/ace-agentic-code-experience/commit/b81b3c13dde4cbef0f147224909becaa39871c6b))
+* **28.01:** add PROJECT_LEVEL mode detection to parse_arguments and validate_stage ([a1006c3](https://github.com/AshExplained/ace-agentic-code-experience/commit/a1006c38ea0344b008e4ea0aa0fc065782288f75))
+* **28.02:** add PROJECT_LEVEL branch to detect_ui_stage ([eac219a](https://github.com/AshExplained/ace-agentic-code-experience/commit/eac219a57f58f049771769a563d98f4599e0e5ca))
+* **28.02:** add PROJECT_LEVEL branches to UX interview, synthesis, and brief read paths ([60d9950](https://github.com/AshExplained/ace-agentic-code-experience/commit/60d9950d3141947998a99944252a9b0432477a99))
+* **28.03:** add PROJECT_LEVEL branches to handle_design banners, spawns, commits, and present_final_status ([547ebc7](https://github.com/AshExplained/ace-agentic-code-experience/commit/547ebc7b726bdef73af33d8944f5f45914f3da5c))
+* **29.01:** remove full-redo from restyle mode, update restyle command ([dbdcf59](https://github.com/AshExplained/ace-agentic-code-experience/commit/dbdcf598a440b0b34ffc1e331532af0357134aea))
+* **29.01:** rewrite ace.design-system for project-level scope ([f23e467](https://github.com/AshExplained/ace-agentic-code-experience/commit/f23e4673e3cfdbbc1b94232404feba5d18a1e961))
+* **29.02:** add project-level UX brief path to plan-stage ([fbd987e](https://github.com/AshExplained/ace-agentic-code-experience/commit/fbd987e031ce80b3182926b4a8b9bf4bf64da8f7))
+* **31.01:** plain-language interview wording ([3cad49b](https://github.com/AshExplained/ace-agentic-code-experience/commit/3cad49b6c0febab0e43bb584af793e8d8432c46d))
+* **32.01:** design-aware next-step routing ([091c152](https://github.com/AshExplained/ace-agentic-code-experience/commit/091c1527dce3b5284fa17882800f84012920249e))
+* **33.01:** add UI stage tagging instruction to navigator ([f8b22f1](https://github.com/AshExplained/ace-agentic-code-experience/commit/f8b22f104d24f16ef0016503ecb182d55d87b059))
+* **33.01:** update track template with [UI] convention ([5912e75](https://github.com/AshExplained/ace-agentic-code-experience/commit/5912e75a21d67909003ea34f3f42ec6c39c50544))
+* **33.02:** replace keyword detection in design-stage ([5e1cfcf](https://github.com/AshExplained/ace-agentic-code-experience/commit/5e1cfcf25573b344547583666782c70532aedeb0))
+* **33.02:** replace keyword detection in plan-stage ([31a8390](https://github.com/AshExplained/ace-agentic-code-experience/commit/31a8390fd638a20ab12716afdef85c9c58fd6fea))
+* **33.02:** replace keyword detection in scope-stage and ace.status ([9934403](https://github.com/AshExplained/ace-agentic-code-experience/commit/993440368f202c313f17a4ee261ea41bbabadc57))
+* **34.01:** add [UI] gray area filter to scope-stage workflow ([b41b2ae](https://github.com/AshExplained/ace-agentic-code-experience/commit/b41b2ae0ba520c45ccac04a860a6bf770cfd01de))
+* dedicated agent types for all spawn sites ([e365386](https://github.com/AshExplained/ace-agentic-code-experience/commit/e365386e7c141a9244b85875e89383c68459838c))
+* design-aware workflows, UI routing, and keyword detection ([a0ad4e6](https://github.com/AshExplained/ace-agentic-code-experience/commit/a0ad4e6577e5ab5347e3696c1b2e6defbb8b3e7d))
+
+
+### Fixed
+
+* **18:** pass explicit PROJECT_NAME to designer to prevent brand hallucination ([4236dbd](https://github.com/AshExplained/ace-agentic-code-experience/commit/4236dbdcee21f4bbcaec92f522e01ac763762ddc))
+* **19:** replace 5 general-purpose scout spawns with ace-project-scout in initialize-project ([aa119ee](https://github.com/AshExplained/ace-agentic-code-experience/commit/aa119eeabaff9de940ea6f425620f5cfee678049))
+* **19:** replace general-purpose spawn with ace-detective in diagnose-issues ([a30e7ac](https://github.com/AshExplained/ace-agentic-code-experience/commit/a30e7ac7e977b02495c8fe76e08d2b73aab284f1))
+* **29:** sync installed copies for design-stage and restyle ([0874320](https://github.com/AshExplained/ace-agentic-code-experience/commit/08743203a96bf5b05429cdc1764249e1379ab668))
+* **30.01:** drop stage number from design-system references ([2cbb259](https://github.com/AshExplained/ace-agentic-code-experience/commit/2cbb259fb4fc36cbc9161aabdcf9f63076a1cded))
+* **32:** add missing Route B no-intel middle sub-case for UI routing ([9226e5f](https://github.com/AshExplained/ace-agentic-code-experience/commit/9226e5f326642fd91df61a4c46fce9711066fcd6))
+* **33:** sync installed copies for design-stage and plan-stage ([c1f9ce3](https://github.com/AshExplained/ace-agentic-code-experience/commit/c1f9ce3bdbd8faf85985a977edff438bbe088a64))
+* anchor stage name grep to ### headings in scope-stage ([d6dde35](https://github.com/AshExplained/ace-agentic-code-experience/commit/d6dde354bbcd62354e451185d9715744f8b3fc3b))
+* make designer components and typography project-aware ([feb3dc9](https://github.com/AshExplained/ace-agentic-code-experience/commit/feb3dc955611f3070c2c759e82cdd15f0a84b29b))
+
+
+### Documentation
+
+* **20.02:** update designer and reviewer descriptions to reference design-stage ([a578fb2](https://github.com/AshExplained/ace-agentic-code-experience/commit/a578fb238cbcceec29f769d9b6dcbe34c7c98613))
+* add PR title convention to AGENTS.md ([2b49a1f](https://github.com/AshExplained/ace-agentic-code-experience/commit/2b49a1f9590e994f3f784cc53797fa503dc94463))
+
 ## [0.3.0](https://github.com/AshExplained/ace-agentic-code-experience/compare/ace-experience-v0.2.1...ace-experience-v0.3.0) (2026-02-16)
 
 
