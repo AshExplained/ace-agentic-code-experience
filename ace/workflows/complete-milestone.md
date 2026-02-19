@@ -762,13 +762,17 @@ Tag: v[X.Y]
 
 ---
 
-## ▶ Next Up
+## Next Up
 
-**Start Next Milestone** — questioning → research → specs → track
+**Ship Your Project** -- deploy to a platform
+
+`/ace.ship`
+
+**Start Next Milestone** -- questioning -> research -> specs -> track
 
 `/ace.new-milestone`
 
-<sub>`/clear` first → fresh context window</sub>
+<sub>`/clear` first -> fresh context window</sub>
 
 ---
 ```

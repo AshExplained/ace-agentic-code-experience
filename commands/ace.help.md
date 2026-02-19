@@ -222,6 +222,17 @@ Archive completed milestone and prepare for next version.
 
 Usage: `/ace.complete-milestone 1.0.0`
 
+### Shipping
+
+**`/ace.ship`**
+Ship your project to a deployment target.
+
+- Detects your stack and suggests relevant platforms
+- Researches deployment requirements for chosen target
+- Generates and walks a deployment checklist (auto + human-gated steps)
+
+Usage: `/ace.ship`
+
 ### Progress Tracking
 
 **`/ace.status`**
@@ -487,7 +498,9 @@ For projects with UI stages, add design commands before `/ace.plan-stage`:
 ```
 /ace.complete-milestone 1.0.0
 /clear
-/ace.new-milestone  # Start next milestone (questioning → research → requirements → track)
+/ace.ship               # Ship to production (optional)
+/clear
+/ace.new-milestone      # Start next milestone
 ```
 
 **Capturing ideas during work:**
