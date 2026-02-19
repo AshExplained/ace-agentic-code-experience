@@ -1,9 +1,9 @@
 <purpose>
 Ship the project to a deployment target in 3 phases:
 
-1. **ASK** -- Present project summary, detect stack, suggest platforms, user declares target (this phase)
-2. **RESEARCH & PLAN** -- Investigate target requirements, generate deployment checklist (Stage 39)
-3. **WALK CHECKLIST** -- Execute auto items, gate on human items, track progress (Stage 40)
+1. **ASK** -- Present project summary, detect stack, suggest platforms, user declares target
+2. **RESEARCH & PLAN** -- Investigate target requirements, generate deployment checklist
+3. **WALK CHECKLIST** -- Execute auto items, gate on human items, track progress
 
 All three phases are fully implemented.
 </purpose>
@@ -835,4 +835,12 @@ After all items in ship-plan.md are processed (no unchecked items remain):
 - [ ] Failed auto items offer retry/skip/abort recovery
 - [ ] Checkbox updates use sed with HH:MM timestamps
 - [ ] Skipped items use `- [x]` with "(skipped)" annotation
+- [ ] Async gates save position for resume via "Come back later"
+- [ ] Error recovery offers retry/skip/abort for failed auto items
+- [ ] Auth errors create dynamic authentication gates
+- [ ] Completion summary displayed with skipped items highlighted
+- [ ] ship-plan.md Status transitions: ready -> in-progress -> complete/paused/aborted
+- [ ] ship-target.md updated to shipped on completion
+- [ ] pulse.md reflects shipping progress
+- [ ] Phase 3 walks checklist with auto/gate execution, progress tracking, and error recovery
 </success_criteria>
