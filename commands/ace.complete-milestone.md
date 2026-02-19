@@ -19,7 +19,7 @@ Output: Milestone archived (track + specs), brief.md evolved, git tagged.
 <execution_context>
 **Load these files NOW (before proceeding):**
 
-- @~/.claude/ace/workflows/ship-milestone.md (main workflow)
+- @~/.claude/ace/workflows/complete-milestone.md (main workflow)
 - @~/.claude/ace/templates/milestone-archive.md (archive template)
   </execution_context>
 
@@ -35,7 +35,7 @@ $ARGUMENTS
 
 <process>
 
-**Follow ship-milestone.md workflow:**
+**Follow complete-milestone.md workflow:**
 
 0. **Check for audit:**
 
@@ -124,7 +124,7 @@ $ARGUMENTS
 
 <critical_rules>
 
-- **Load workflow first:** Read ship-milestone.md before executing
+- **Load workflow first:** Read complete-milestone.md before executing
 - **Verify completion:** All stages must have recap.md files
 - **User confirmation:** Wait for approval at verification gates
 - **Archive before deleting:** Always create archive files before updating/deleting originals
