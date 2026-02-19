@@ -692,6 +692,124 @@ Route based on response:
 
 **Error output:** Show verbose error output on failure (unlike success which shows concise output). The user needs full context to decide between retry, skip, and abort.
 
+---
+
+**Sub-step 3e: Come back later (async gate)**
+
+When user selects "Come back later" on a gate item (for long-running operations like DNS propagation, app store review, CI pipeline):
+
+1. Update ship-plan.md Status from `in-progress` to `paused-at-{N}` where N is the current item number:
+   ```bash
+   sed -i "s/^\*\*Status:\*\* in-progress/\*\*Status:\*\* paused-at-${ITEM_NUM}/" .ace/ship-plan.md
+   ```
+
+2. Update pulse.md Session Continuity:
+   ```
+   Last activity: {date} -- Shipping paused at step {N} of {TOTAL}
+   Resume file: .ace/ship-plan.md
+   Next action: Run /ace.ship to resume shipping
+   ```
+
+3. Display exit message:
+   ```
+   Progress saved at step {N} of {TOTAL}.
+   {COMPLETED} steps complete, {REMAINING} remaining.
+
+   Run /ace.ship to resume from step {N}.
+   ```
+
+4. Stop execution (return from the workflow -- do NOT continue to the next item)
+
+**Resume mechanism:** No new code needed. The existing `detect_existing_ship` step already handles resume: ship-plan.md exists -> user picks "Resume" -> Phase 3 starts -> sub-step 3a reads ship-plan.md -> finds first unchecked item -> continues from there.
+
+---
+
+**Sub-step 3f: Abort**
+
+When user selects "Abort" from a gate item or error recovery:
+
+1. Update ship-plan.md Status to `aborted`:
+   ```bash
+   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* aborted/' .ace/ship-plan.md
+   ```
+
+2. Update pulse.md with abort status:
+   ```
+   Last activity: {date} -- Ship workflow aborted at step {N}
+   ```
+
+3. Display abort message:
+   ```
+   Ship workflow aborted at step {N}.
+   {COMPLETED}/{TOTAL} steps were completed.
+
+   Run /ace.ship to resume or restart.
+   ```
+
+4. Stop execution
+
+---
+
+**Sub-step 3g: Completion summary**
+
+After all items in ship-plan.md are processed (no unchecked items remain):
+
+1. Count results:
+   ```bash
+   COMPLETED=$(grep -c '^\- \[x\] [0-9]' .ace/ship-plan.md)
+   SKIPPED=$(grep -c '(skipped)' .ace/ship-plan.md)
+   TOTAL=$(grep -c '^\- \[.\] [0-9]' .ace/ship-plan.md)
+   ```
+
+2. Verify no unchecked items remain before declaring complete:
+   ```bash
+   UNCHECKED=$(grep -c '^\- \[ \] [0-9]' .ace/ship-plan.md)
+   if [ "$UNCHECKED" -gt 0 ]; then
+     echo "ERROR: ${UNCHECKED} unchecked items remain -- do not declare complete"
+     # Return to sub-step 3b to continue processing
+   fi
+   ```
+
+3. Update ship-plan.md Status to `complete`:
+   ```bash
+   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* complete/' .ace/ship-plan.md
+   ```
+
+4. Update ship-target.md Status to `shipped`:
+   ```bash
+   sed -i 's/^\*\*Status:\*\* plan-ready/\*\*Status:\*\* shipped/' .ace/ship-target.md
+   ```
+
+5. Update pulse.md to reflect shipping completion -- revert to standard format and note shipping completed:
+   ```
+   Last activity: {date} -- Shipped {project_name} to {target}
+   ```
+
+6. Display completion summary:
+   ```
+   ## Ship Complete!
+
+   **Project:** {project_name}
+   **Target:** {target}
+   **Steps:** {COMPLETED} completed, {SKIPPED} skipped
+   ```
+
+   If skipped items exist, list them:
+   ```
+   ### Skipped Steps
+
+   {For each item with "(skipped)" annotation, list the item number and description}
+
+   These steps were skipped and may need manual attention.
+   ```
+
+**Critical details:**
+- Status field transitions: `ready` -> `in-progress` -> `paused-at-N` / `complete` / `aborted`
+- "Come back later" and "Abort" both STOP execution -- they do not continue the loop
+- The completion summary ONLY runs when no unchecked items remain (verified with grep before declaring complete)
+- ship-target.md Status update to `shipped` only happens on completion, not on pause or abort
+- pulse.md format during shipping: `Status: Shipping to {target} ({N}/{total} steps)`, reverted on completion/abort
+
 </step>
 
 </process>
