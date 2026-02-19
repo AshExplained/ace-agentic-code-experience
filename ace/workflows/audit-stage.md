@@ -443,6 +443,94 @@ Categorize findings:
 - Info: Notable but not problematic
 </step>
 
+<step name="security_conformance">
+**Run security conformance checks against changed files.**
+
+This step fires on every audit run. Relevance filtering happens internally per checklist group via stack detection commands -- there is no trigger condition at the step level.
+
+Load the security checklist:
+
+@~/.claude/ace/references/security-checklist.md
+
+### Identify Changed Files
+
+Extract files modified in this stage from recap.md (same technique as scan_antipatterns):
+
+```bash
+# Extract files from recap.md
+CHANGED_FILES=$(grep -E "^\- \`" "$STAGE_DIR"/*-recap.md | sed 's/.*`\([^`]*\)`.*/\1/' | sort -u)
+```
+
+Store the result as `CHANGED_FILES` for use in the review steps below.
+
+### Auto-Scope Checklist Groups
+
+For each of the 10 checklist groups, read the group's `<stack_detection>` block and run its detection command against the project:
+
+```bash
+# Example: Group 1 (Access Control) -- run detection command
+[ -f package.json ] || grep -rql "from flask\|from django\|from fastapi" . --include="*.py" 2>/dev/null
+
+# Example: Group 8 (LLM/AI) -- run detection command
+grep -qE '"(openai|anthropic|@anthropic-ai|langchain|llamaindex)"' package.json 2>/dev/null || \
+grep -qE "openai|anthropic|langchain" requirements.txt 2>/dev/null || \
+grep -rqlE "ChatCompletion|generateText|streamText|messages\.create" src/ 2>/dev/null
+```
+
+Skip the entire group if its detection command returns false. Record which groups are relevant -- typically 3-5 of 10 for any given project. Log skipped groups for the proof.md body (e.g., "Group 8 skipped: no LLM dependencies detected").
+
+### LLM-Based Security Review
+
+For each relevant group, review its items against `CHANGED_FILES`. This is **reasoning-based review**: read the actual code and analyze data flows, auth logic, input handling, cryptographic usage, and configuration patterns.
+
+**Review protocol per relevant group:**
+
+1. Read each item's description, vulnerable pattern, and secure pattern from the checklist
+2. For each changed file that falls within the item's scope, read the file and reason about whether the vulnerability pattern is present
+3. Optionally run the item's detection grep patterns as **supporting evidence** -- grep patterns are NOT the primary verification method, LLM reasoning is
+4. Only report **findings** (items where a vulnerability or weakness is detected). Do NOT list every item as PASS -- silence means no issue found
+
+**Severity classification (use the item's severity from the checklist):**
+
+- **Blocker**: Exploitable vulnerability, must fix before deploy (e.g., SQL injection, missing auth, hardcoded secrets)
+- **Warning**: Security weakness, should fix (e.g., missing rate limiting, weak crypto, verbose errors)
+- **Info**: Best practice recommendation (e.g., consider Argon2 over bcrypt, add CSP headers)
+
+### Security Findings Output
+
+Security findings integrate into proof.md in two ways:
+
+**1. Frontmatter gaps (Blocker and Warning severity):**
+
+Blocker and Warning findings append to the proof.md `gaps:` section using the existing gap format. Each finding becomes a gap entry:
+
+```yaml
+gaps:
+  - truth: "Security: [Item X.Y] - [Item title]"
+    status: failed
+    reason: "[Description of the vulnerability found in the changed files]"
+    artifacts:
+      - path: "src/app/api/users/route.ts"
+        issue: "[What is wrong with this file]"
+    missing:
+      - "[Specific remediation step]"
+```
+
+**2. Proof body table (all severities):**
+
+All findings (Blocker, Warning, and Info) appear in the proof.md body under a `### Security Conformance` section with this table format:
+
+| Severity | Item | File | Finding |
+|----------|------|------|---------|
+| Blocker | 1.1 Missing Access Control | src/api/users.ts | No auth check on GET |
+| Warning | 5.1 Debug Mode | next.config.js | Verbose errors enabled |
+| Info | 4.2 Weak Hashing | src/auth.ts | Consider Argon2 over bcrypt |
+
+Blocker and Warning findings from this table are ALSO added as gaps in the frontmatter (duplicated for pipeline consumption). Info-severity findings are body-only (advisory, do not enter the gap closure pipeline).
+
+**If no findings:** Add `### Security Conformance` section with "No security findings. {N} groups checked, {M} groups skipped (not relevant to project stack)."
+</step>
+
 <step name="identify_human_verification">
 **Flag items that need human verification.**
 
@@ -487,6 +575,7 @@ Some things can't be verified programmatically:
 - OR one or more artifacts MISSING/STUB
 - OR one or more key links NOT_WIRED
 - OR blocker anti-patterns found
+- OR security Blocker findings from security_conformance step
 
 **Status: human_needed**
 - All automated checks pass
