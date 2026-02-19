@@ -16,24 +16,21 @@ Smart defaults, user decides. Detect the stack automatically, suggest the best-f
 
 <step name="detect_existing_ship" priority="first">
 
-Check for an existing ship plan from a previous run:
+Check for existing ship artifacts from a previous run:
 
 ```bash
 [ -f .ace/ship-plan.md ] && echo "EXISTING_PLAN" || echo "NO_PLAN"
+[ -f .ace/ship-target.md ] && echo "EXISTING_TARGET" || echo "NO_TARGET"
 ```
 
-**If `.ace/ship-plan.md` exists:**
+**Case 1: `.ace/ship-plan.md` exists (plan already generated)**
 
-Read the file to extract the previous target:
+Read the file to extract the previous target and status:
 
 ```bash
 head -20 .ace/ship-plan.md
-```
-
-Also check for the target file:
-
-```bash
 cat .ace/ship-target.md 2>/dev/null
+STATUS=$(grep -m1 '^\*\*Status:\*\*' .ace/ship-target.md 2>/dev/null | sed 's/\*\*Status:\*\* //')
 ```
 
 Present options using AskUserQuestion:
@@ -44,26 +41,34 @@ Present options using AskUserQuestion:
   - "Restart" (description: "Start fresh for the same target")
   - "Different target" (description: "Ship somewhere else")
 
-**If "Resume":** Skip to Phase 2 or Phase 3 depending on plan status. If Phase 2 is not yet implemented, inform the user:
-
-```
-Phase 2 (Research & Plan) will be implemented in Stage 39.
-Run /ace.ship again after Stage 39 is complete to continue.
-```
+**If "Resume":** Skip to `phase_3_walk_checklist`. The plan already exists, so Phase 1 and Phase 2 are complete. Phase 3 walks the checklist.
 
 **If "Restart":** Delete both files and continue to phase_1_ask:
 
 ```bash
-rm -f .ace/ship-plan.md .ace/ship-target.md
+rm -f .ace/ship-plan.md .ace/ship-target.md .ace/ship-research.md
 ```
 
 **If "Different target":** Delete both files and continue to phase_1_ask:
 
 ```bash
-rm -f .ace/ship-plan.md .ace/ship-target.md
+rm -f .ace/ship-plan.md .ace/ship-target.md .ace/ship-research.md
 ```
 
-**If `.ace/ship-plan.md` does NOT exist:** Continue to phase_1_ask.
+**Case 2: `.ace/ship-target.md` exists but `.ace/ship-plan.md` does NOT (Phase 1 done, Phase 2 pending)**
+
+```bash
+# Target declared but plan not yet generated
+if [ ! -f .ace/ship-plan.md ] && [ -f .ace/ship-target.md ]; then
+  echo "TARGET_ONLY"
+fi
+```
+
+If TARGET_ONLY: Display "Found existing target declaration. Continuing to research and plan generation..." and skip directly to `phase_2_research_plan`.
+
+**Case 3: Neither file exists**
+
+Continue to `phase_1_ask`.
 
 </step>
 
@@ -529,17 +534,24 @@ Then proceed to `phase_3_walk_checklist`.
 
 **EXPANSION POINT -- Implemented in Stage 40**
 
+Phase 2 creates `.ace/ship-plan.md` with the deployment checklist. When Phase 3 is implemented (Stage 40), the workflow will continue here to walk through each checklist item.
+
 This phase will:
 - Read `.ace/ship-plan.md` for the deployment checklist
 - Walk through each checklist item in order
-- Execute `auto` items (CLI commands, file creation, config changes, commits)
-- Present `gate` items for user verification (DNS propagation, environment variables, app store review)
+- Execute `[auto]` items (CLI commands, file creation, config changes, commits)
+- Present `[gate]` items for user action (authentication, secret retrieval, DNS, visual verification)
 - Handle async gates for long-running operations (wait and re-check)
 - Track progress with checkboxes and timestamps
 - Handle failures with retry/skip/abort options
 - Provide error recovery guidance
 
-For now, this phase is not yet implemented. Phase 2 creates `.ace/ship-plan.md`, so this step is reachable after Phase 2 completes.
+If this step is reached before Stage 40 implementation, display:
+
+```
+Phase 3 (Checklist Execution) will be implemented in Stage 40.
+Your plan is saved at .ace/ship-plan.md -- run /ace.ship again after Stage 40 is complete.
+```
 
 </step>
 
@@ -547,12 +559,17 @@ For now, this phase is not yet implemented. Phase 2 creates `.ace/ship-plan.md`,
 
 <success_criteria>
 - [ ] Re-ship detection works when .ace/ship-plan.md exists (resume/restart/different-target)
+- [ ] Re-ship detection handles target-only state (Phase 1 done, Phase 2 pending)
 - [ ] Project summary extracted from brief.md and displayed
 - [ ] Stack detected via 5 layers (brief.md, STACK.md, research, manifests, frameworks)
 - [ ] Detected stack mapped to platform suggestions
 - [ ] User selected target via AskUserQuestion
 - [ ] Target persisted to .ace/ship-target.md with status awaiting-plan
 - [ ] .ace/ship-plan.md is NOT created by Phase 1
-- [ ] Phase 2 spawns scout, handles research return, and generates checklist
+- [ ] ace-stage-scout spawned with shipping-specific research prompt
+- [ ] Scout research converted to numbered checklist with auto/gate classification
+- [ ] .ace/ship-plan.md created with project metadata, target, and checklist items
+- [ ] ship-target.md status updated from awaiting-plan to plan-ready
+- [ ] Auto items prefer CLI commands over dashboard instructions
 - [ ] Phase 3 is clearly marked as expansion point for Stage 40
 </success_criteria>
