@@ -7,6 +7,7 @@ allowed-tools:
   - Glob
   - Grep
   - Write
+  - Task
   - AskUserQuestion
 ---
 
@@ -15,9 +16,9 @@ Prepare and ship your project to a deployment target (Vercel, npm, Railway, etc.
 
 Reads brief.md for project context, detects stack for smart platform suggestions, and delegates to ship-project workflow.
 
-**Three phases (Phase 1 active, Phases 2-3 coming in Stages 39-40):**
+**Three phases (Phases 1-2 active, Phase 3 coming in Stage 40):**
 1. ASK -- Present project summary, suggest platforms, user declares target
-2. RESEARCH & PLAN -- Investigate target requirements, generate checklist (Stage 39)
+2. RESEARCH & PLAN -- Investigate target requirements, generate checklist
 3. WALK CHECKLIST -- Execute/verify each deployment step (Stage 40)
 
 When `.ace/ship-plan.md` exists from a prior run, offers resume/restart/different-target.
@@ -43,4 +44,6 @@ $ARGUMENTS
 - [ ] Smart platform suggestions based on detected stack
 - [ ] User declared shipping target (or resumed existing plan)
 - [ ] Target persisted to .ace/ship-target.md for Phase 2
+- [ ] Scout research spawned for target platform
+- [ ] Deployment checklist saved to .ace/ship-plan.md with auto/gate classification
 </success_criteria>
