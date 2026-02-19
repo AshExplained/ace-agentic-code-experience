@@ -5,7 +5,7 @@ Ship the project to a deployment target in 3 phases:
 2. **RESEARCH & PLAN** -- Investigate target requirements, generate deployment checklist (Stage 39)
 3. **WALK CHECKLIST** -- Execute auto items, gate on human items, track progress (Stage 40)
 
-Phases 1 and 2 are fully implemented. Phase 3 is an expansion point for Stage 40.
+All three phases are fully implemented.
 </purpose>
 
 <core_principle>
@@ -504,27 +504,7 @@ Plan generated: .ace/ship-plan.md
 {TOTAL} total steps ({AUTO_COUNT} auto, {GATE_COUNT} gate)
 ```
 
-Then check if Phase 3 is implemented or still a stub:
-
-```bash
-# Check for Phase 3 stub marker
-grep -q 'PHASE_3_STUB=true' ship-project.md 2>/dev/null
-```
-
-<!-- PHASE_3_STUB=true — removed by Stage 40 when Phase 3 is implemented -->
-
-**If Phase 3 is still a stub** (marker present or Phase 3 step contains "EXPANSION POINT"):
-
-```
-Phase 3 (Checklist Execution) will be implemented in Stage 40.
-Your plan is saved at .ace/ship-plan.md -- run /ace.ship again after Stage 40 is complete.
-```
-
-**If Phase 3 is implemented** (marker removed by Stage 40):
-
-```
-Continuing to Phase 3...
-```
+Display: "Continuing to Phase 3..."
 
 Then proceed to `phase_3_walk_checklist`.
 
@@ -532,25 +512,120 @@ Then proceed to `phase_3_walk_checklist`.
 
 <step name="phase_3_walk_checklist">
 
-**EXPANSION POINT -- Implemented in Stage 40**
+Phase 3 walks the deployment checklist item by item -- executing auto items, presenting gate items for user action, and tracking progress with checkboxes and timestamps.
 
-Phase 2 creates `.ace/ship-plan.md` with the deployment checklist. When Phase 3 is implemented (Stage 40), the workflow will continue here to walk through each checklist item.
+This phase MUST execute in the main context (NOT a Task() subagent) because it uses AskUserQuestion for gate presentation.
 
-This phase will:
-- Read `.ace/ship-plan.md` for the deployment checklist
-- Walk through each checklist item in order
-- Execute `[auto]` items (CLI commands, file creation, config changes, commits)
-- Present `[gate]` items for user action (authentication, secret retrieval, DNS, visual verification)
-- Handle async gates for long-running operations (wait and re-check)
-- Track progress with checkboxes and timestamps
-- Handle failures with retry/skip/abort options
-- Provide error recovery guidance
+---
 
-If this step is reached before Stage 40 implementation, display:
+**Sub-step 3a: Initialize execution**
+
+Read ship-plan.md and prepare for execution:
+
+```bash
+# Verify plan exists and read metadata
+TARGET=$(grep -m1 '^\*\*Target:\*\*' .ace/ship-plan.md | sed 's/\*\*Target:\*\* //')
+STATUS=$(grep -m1 '^\*\*Status:\*\*' .ace/ship-plan.md | sed 's/\*\*Status:\*\* //')
+
+# Read project name for display
+PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
+
+# Count items
+TOTAL=$(grep -c '^\- \[.\] [0-9]' .ace/ship-plan.md)
+COMPLETED=$(grep -c '^\- \[x\] [0-9]' .ace/ship-plan.md)
+REMAINING=$((TOTAL - COMPLETED))
+```
+
+**If STATUS contains `paused-at`:**
+Display: "Resuming from where you left off ({COMPLETED}/{TOTAL} complete)..."
+
+**If REMAINING is 0:**
+Display: "All items already complete!" and skip to sub-step 3g (completion summary).
+
+Update status to in-progress:
+
+```bash
+sed -i 's/^\*\*Status:\*\* .*/\*\*Status:\*\* in-progress/' .ace/ship-plan.md
+```
+
+Display execution header:
 
 ```
-Phase 3 (Checklist Execution) will be implemented in Stage 40.
-Your plan is saved at .ace/ship-plan.md -- run /ace.ship again after Stage 40 is complete.
+## Shipping to {TARGET}
+
+{COMPLETED}/{TOTAL} steps complete, {REMAINING} remaining.
+Starting execution...
+```
+
+---
+
+**Sub-step 3b: Walk checklist items**
+
+For each unchecked item in ship-plan.md (in order):
+
+```bash
+# Extract unchecked items from ship-plan.md
+grep -n '^\- \[ \] [0-9]' .ace/ship-plan.md
+```
+
+Read each item line to extract:
+- Item number (N)
+- Type tag (`[auto]` or `[gate]`)
+- Description (text after the tag)
+- For gate items: Instructions sub-bullet (next line starting with `  - Instructions:`)
+
+**If `[auto]`:**
+
+1. Display: "Step {N}: {description}"
+2. Interpret the description and execute the appropriate CLI commands or file operations
+   - Do NOT hardcode platform-specific execution logic -- Claude interprets auto item descriptions at runtime
+   - Show concise output for successful execution
+3. If execution succeeds:
+   - Display: "Step {N} complete"
+   - Update checkbox and timestamp in ship-plan.md using sed:
+     ```bash
+     TIMESTAMP=$(date +%H:%M)
+     sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/ship-plan.md
+     sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .ace/ship-plan.md
+     ```
+4. If execution fails:
+   - Check if the error is an authentication error -> go to sub-step 3c (dynamic auth gate)
+   - Otherwise -> go to sub-step 3d (error recovery)
+
+**If `[gate]`:**
+
+Present to user via AskUserQuestion:
+
+- header: "Step {N}: {description}"
+- question: "{Instructions text}\n\nComplete this step and confirm."
+- options:
+  - "Done" (description: "I've completed this step")
+  - "Skip" (description: "Skip this step and continue")
+  - "Come back later" (description: "Save progress and exit -- for long waits like DNS propagation")
+  - "Abort" (description: "Stop the ship workflow entirely")
+
+Route based on response:
+
+- **"Done":** Update checkbox and timestamp in ship-plan.md, continue to next item:
+  ```bash
+  TIMESTAMP=$(date +%H:%M)
+  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/ship-plan.md
+  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .ace/ship-plan.md
+  ```
+
+- **"Skip":** Mark as checked with "(skipped)" annotation, continue to next item:
+  ```bash
+  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/ship-plan.md
+  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (skipped)/" .ace/ship-plan.md
+  ```
+
+- **"Come back later":** Go to sub-step 3e (pause and save position)
+
+- **"Abort":** Go to sub-step 3f (abort handling)
+
+**After processing each item:** Update pulse.md at section boundaries (when crossing from Prerequisites to Configuration, to Deploy, to Verify) with:
+```
+Status: Shipping to {target} ({completed}/{total} steps)
 ```
 
 </step>
@@ -571,5 +646,11 @@ Your plan is saved at .ace/ship-plan.md -- run /ace.ship again after Stage 40 is
 - [ ] .ace/ship-plan.md created with project metadata, target, and checklist items
 - [ ] ship-target.md status updated from awaiting-plan to plan-ready
 - [ ] Auto items prefer CLI commands over dashboard instructions
-- [ ] Phase 3 is clearly marked as expansion point for Stage 40
+- [ ] Phase 3 walks checklist items with auto-execution and gate presentation
+- [ ] Auto items interpreted and executed by Claude at runtime
+- [ ] Gate items presented via AskUserQuestion with Done/Skip/Come back later/Abort
+- [ ] Auth errors in auto items create dynamic gates before retry
+- [ ] Failed auto items offer retry/skip/abort recovery
+- [ ] Checkbox updates use sed with HH:MM timestamps
+- [ ] Skipped items use `- [x]` with "(skipped)" annotation
 </success_criteria>
