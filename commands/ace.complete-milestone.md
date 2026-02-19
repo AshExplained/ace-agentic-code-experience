@@ -106,6 +106,7 @@ $ARGUMENTS
    - Ask about pushing tag
 
 8. **Offer next steps:**
+   - `/ace.ship` — ship the completed milestone to a deployment target
    - `/ace.new-milestone` — start next milestone (questioning → research → specs → track)
 
 </process>
