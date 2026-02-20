@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0](https://github.com/AshExplained/ace-agentic-code-experience/compare/ace-experience-v0.4.1...ace-experience-v0.5.0) (2026-02-20)
+
+
+### Added
+
+* **35.01:** create security-checklist.md with skeleton and Groups 1-5 ([b5b0d61](https://github.com/AshExplained/ace-agentic-code-experience/commit/b5b0d6156ea77d03537a1ca2b2610c5c44c6813f))
+* **35.02:** populate Groups 6-10 with 18 security checklist items ([7b70e99](https://github.com/AshExplained/ace-agentic-code-experience/commit/7b70e99f4e9e1948d7ae1662b50380254767d449))
+* **35.03:** add CSRF and Security Logging items to close code-reviewer coverage gap ([5e1e969](https://github.com/AshExplained/ace-agentic-code-experience/commit/5e1e969dd69fe770f99a22a05c937d909f8a8cdb))
+* **36.01:** add Step 7.6 Security Conformance to ace-auditor ([50e6f18](https://github.com/AshExplained/ace-agentic-code-experience/commit/50e6f18b345631d8d715b9281b7d288081adf6eb))
+* **36.02:** add security_conformance step to audit-stage workflow ([a3a6751](https://github.com/AshExplained/ace-agentic-code-experience/commit/a3a675111977109156dfc665036433d4a11ab244))
+* **37.01:** add Step 4.5 with auth route completeness and secrets detection ([1c3bdbd](https://github.com/AshExplained/ace-agentic-code-experience/commit/1c3bdbd16b66f8411184a4a01a2e7387a77ea644))
+* **37.02:** add dependency audit, security headers, CORS, and supply chain sub-checks ([f5764a7](https://github.com/AshExplained/ace-agentic-code-experience/commit/f5764a769b938e1457434745bbaace826ebaf55c))
+* **37.03:** add gaps.security parsing to plan-milestone-gaps and update mirror copies ([fb2669a](https://github.com/AshExplained/ace-agentic-code-experience/commit/fb2669aee04fab7b11262c78013cd64029e0258c))
+* **37.03:** wire security findings into report format and MILESTONE-AUDIT.md template ([406924b](https://github.com/AshExplained/ace-agentic-code-experience/commit/406924bf4c7a09bbdecb021daa5eda8025d57e54))
+* **38.01:** rename ship-milestone.md to complete-milestone.md ([dedaa24](https://github.com/AshExplained/ace-agentic-code-experience/commit/dedaa249e6da506e2020d3cadf6406dc793fb9a0))
+* **38.02:** create ace.ship command entry point ([2c64bda](https://github.com/AshExplained/ace-agentic-code-experience/commit/2c64bda79773296c97a8d841a2016e10040f817a))
+* **38.02:** create ship-project workflow with Phase 1 target detection ([27b6df5](https://github.com/AshExplained/ace-agentic-code-experience/commit/27b6df57d8c04673ad8564a2c6b5fb3e8fc794ae))
+* **39.01:** add Task tool to ace.ship.md and update for Phase 2 ([95a0225](https://github.com/AshExplained/ace-agentic-code-experience/commit/95a0225b7d83411354f6bf427ca4f94464224e00))
+* **39.01:** implement Phase 2 scout spawning in ship-project.md ([4592516](https://github.com/AshExplained/ace-agentic-code-experience/commit/45925162feffff1ad48e29606bc80a2718539a11))
+* **39.02:** implement Phase 2 checklist conversion and status update ([875c459](https://github.com/AshExplained/ace-agentic-code-experience/commit/875c459b8baad1a92ac0ba292ccee6f01d6243fd))
+* **39.02:** update Phase 3 stub, detect_existing_ship routing, and success criteria ([48519c9](https://github.com/AshExplained/ace-agentic-code-experience/commit/48519c93610926f8e5a26005483906a0975d2269))
+* **40.01:** implement dynamic auth gates and error recovery ([2b289e9](https://github.com/AshExplained/ace-agentic-code-experience/commit/2b289e9ccb4e51c04e30bbbf34391833e5861f3e))
+* **40.01:** replace Phase 3 stub with initialization and walking loop ([364ef9e](https://github.com/AshExplained/ace-agentic-code-experience/commit/364ef9eee77a66e3318a5f6f5e198313b6b53d8c))
+* **40.02:** implement pause, abort, and completion summary sub-steps ([42192f0](https://github.com/AshExplained/ace-agentic-code-experience/commit/42192f018a69680f114a9a2c904159150ad76690))
+* **40.02:** update ship workflow and command metadata for Phase 3 ([1f3809f](https://github.com/AshExplained/ace-agentic-code-experience/commit/1f3809fbac0fbf9d860fd14b10f54fc86c5c53c2))
+* **41.01:** add /ace.ship to complete-milestone and credential patterns to .gitignore ([59cb81e](https://github.com/AshExplained/ace-agentic-code-experience/commit/59cb81e79c7964b059c97d36968316c633eec0f7))
+* **42.01:** create ace.watch command wrapper ([160378f](https://github.com/AshExplained/ace-agentic-code-experience/commit/160378f5197b84f01d76cb18526ad85c7b0cdc98))
+* **42.02:** create watch-project workflow with Phase 1 ([4ad209e](https://github.com/AshExplained/ace-agentic-code-experience/commit/4ad209e2c42b2a0cb9b9e8419835073fdb44cd79))
+* **43.01:** capture existing tools before deletion in add-more mode ([49cf252](https://github.com/AshExplained/ace-agentic-code-experience/commit/49cf252756994733f38729f0c53e3488b323a493))
+* **43.01:** implement Phase 2 research and plan generation in watch-project.md ([fad7775](https://github.com/AshExplained/ace-agentic-code-experience/commit/fad7775634cb918c19aed2720fcfa921bed968ae))
+* **43.02:** implement Phase 3 checklist walking engine in watch-project.md ([66c417f](https://github.com/AshExplained/ace-agentic-code-experience/commit/66c417f5ecfa3ac6d5aa7bf5f22e89abdae3d06e))
+* **43.02:** update success_criteria to cover all three phases ([45f2e43](https://github.com/AshExplained/ace-agentic-code-experience/commit/45f2e43b7ed180a63c08a5b7ee33fe30c69c21b8))
+* **44.01:** add /ace.new-milestone suggestion to watch-project.md completion ([e13b1c0](https://github.com/AshExplained/ace-agentic-code-experience/commit/e13b1c0376b11db0130b9482022253cd0d314105))
+* **44.01:** add /ace.watch suggestion to ship-project.md completion ([3a7e9f1](https://github.com/AshExplained/ace-agentic-code-experience/commit/3a7e9f109b3435bf68f7c4b54f8b7c7e7d715efd))
+* proactive security, ship command, and watch command (M09-M11) ([3460f9a](https://github.com/AshExplained/ace-agentic-code-experience/commit/3460f9a2e1eaf0934d7f68acdab0e2011adf275a))
+
+
+### Fixed
+
+* **41.01:** fix ship-project.md sed pattern and stale stub text ([487dbd9](https://github.com/AshExplained/ace-agentic-code-experience/commit/487dbd94a4e280da71c4d773a395e5e6a8615046))
+* **ci:** remove npm audit from security job ([577438b](https://github.com/AshExplained/ace-agentic-code-experience/commit/577438b1cbda78bb14a8af0b1c27a315515bf25c))
+* prevent design-redundant foundation stages for UI projects ([eae23fd](https://github.com/AshExplained/ace-agentic-code-experience/commit/eae23fd5138926ac59d2ad0bf0e48bc8204d7846))
+
+
+### Documentation
+
+* **36.02:** add security step rationale to horsepower-profiles ([783bfbd](https://github.com/AshExplained/ace-agentic-code-experience/commit/783bfbd653f3ab8eae6a3b3990b01c9187f3a121))
+* **42.01:** add /ace.watch to help system ([18dfff6](https://github.com/AshExplained/ace-agentic-code-experience/commit/18dfff61243d3507944dde43dc724ba2e0890ce8))
+
 ## [0.4.1](https://github.com/AshExplained/ace-agentic-code-experience/compare/ace-experience-v0.4.0...ace-experience-v0.4.1) (2026-02-18)
 
 
