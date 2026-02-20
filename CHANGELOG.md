@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1](https://github.com/AshExplained/ace-agentic-code-experience/compare/ace-experience-v0.5.0...ace-experience-v0.5.1) (2026-02-20)
+
+
+### Changed
+
+* universal M-format milestone tags ([a94d729](https://github.com/AshExplained/ace-agentic-code-experience/commit/a94d7299bab9297e278d415aadf7d4c14b046e89))
+* use M-format milestone tags instead of semver ([efa9149](https://github.com/AshExplained/ace-agentic-code-experience/commit/efa91490a95a148504978804527235e27b3d10db))
+
 ## [0.5.0](https://github.com/AshExplained/ace-agentic-code-experience/compare/ace-experience-v0.4.1...ace-experience-v0.5.0) (2026-02-20)
 
 
