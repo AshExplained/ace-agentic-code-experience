@@ -1,5 +1,5 @@
 <purpose>
-Validate built features through conversational testing with persistent state. Creates uat.md that tracks test progress, survives /clear, and feeds gaps into /ace.plan-stage --gaps.
+Validate built features through conversational testing with persistent state. Creates uat.md that tracks test progress, survives /clear, and feeds gaps into /renn.plan-stage --gaps.
 
 User tests, Claude records. One test at a time. Plain text responses.
 </purpose>
@@ -15,7 +15,7 @@ No Pass/Fail buttons. No severity questions. Just: "Here's what should happen. D
 </philosophy>
 
 <template>
-@~/.claude/ace/templates/uat.md
+@~/.claude/renn/templates/uat.md
 </template>
 
 <process>
@@ -24,7 +24,7 @@ No Pass/Fail buttons. No severity questions. Just: "Here's what should happen. D
 Read horsepower profile for agent spawning:
 
 ```bash
-HORSEPOWER=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+HORSEPOWER=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -33,8 +33,8 @@ Default to "balanced" if not set.
 
 | Agent | max | balanced | eco |
 |-------|-----|----------|-----|
-| ace-architect | opus | opus | sonnet |
-| ace-plan-reviewer | sonnet | sonnet | haiku |
+| renn-architect | opus | opus | sonnet |
+| renn-plan-reviewer | sonnet | sonnet | haiku |
 
 Store resolved models for use in Task calls below.
 </step>
@@ -43,7 +43,7 @@ Store resolved models for use in Task calls below.
 **First: Check for active UAT sessions**
 
 ```bash
-find .ace/stages -name "*-uat.md" -type f 2>/dev/null | head -5
+find .renn/stages -name "*-uat.md" -type f 2>/dev/null | head -5
 ```
 
 **If active sessions exist AND no $ARGUMENTS provided:**
@@ -78,7 +78,7 @@ If no, continue to `create_uat_file`.
 ```
 No active UAT sessions.
 
-Provide a stage number to start testing (e.g., /ace.audit 4)
+Provide a stage number to start testing (e.g., /renn.audit 4)
 ```
 
 **If no active sessions AND $ARGUMENTS provided:**
@@ -94,7 +94,7 @@ Parse $ARGUMENTS as stage number (e.g., "4") or run number (e.g., "04-02").
 ```bash
 # Find stage directory (match both zero-padded and unpadded)
 PADDED_STAGE=$(printf "%02d" ${STAGE_ARG} 2>/dev/null || echo "${STAGE_ARG}")
-STAGE_DIR=$(ls -d .ace/stages/${PADDED_STAGE}-* .ace/stages/${STAGE_ARG}-* 2>/dev/null | head -1)
+STAGE_DIR=$(ls -d .renn/stages/${PADDED_STAGE}-* .renn/stages/${STAGE_ARG}-* 2>/dev/null | head -1)
 
 # Find RECAP files
 ls "$STAGE_DIR"/*-recap.md 2>/dev/null
@@ -178,7 +178,7 @@ skipped: 0
 [none yet]
 ```
 
-Write to `.ace/stages/XX-name/{stage}-uat.md`
+Write to `.renn/stages/XX-name/{stage}-uat.md`
 
 Proceed to `present_test`.
 </step>
@@ -307,7 +307,7 @@ Clear Current Test section:
 **Check config:**
 
 ```bash
-COMMIT_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+COMMIT_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 git check-ignore -q .ace 2>/dev/null && COMMIT_DOCS=false
 ```
 
@@ -317,7 +317,7 @@ git check-ignore -q .ace 2>/dev/null && COMMIT_DOCS=false
 
 Commit the UAT file:
 ```bash
-git add ".ace/stages/XX-name/{stage}-uat.md"
+git add ".renn/stages/XX-name/{stage}-uat.md"
 git commit -m "test({stage}): complete UAT - {passed} passed, {issues} issues"
 ```
 
@@ -343,8 +343,8 @@ Present summary:
 ```
 All tests passed. Ready to continue.
 
-- `/ace.plan-stage {next}` — Plan next stage
-- `/ace.run-stage {next}` — Execute next stage
+- `/renn.plan-stage {next}` — Plan next stage
+- `/renn.run-stage {next}` — Execute next stage
 ```
 </step>
 
@@ -360,7 +360,7 @@ Spawning parallel debug agents to investigate each issue.
 ```
 
 - Load diagnose-issues workflow
-- Follow @~/.claude/ace/workflows/diagnose-issues.md
+- Follow @~/.claude/renn/workflows/diagnose-issues.md
 - Spawn parallel debug agents for each issue
 - Collect root causes
 - Update uat.md with root causes
@@ -375,13 +375,13 @@ Diagnosis runs automatically - no user prompt. Parallel agents investigate simul
 Display:
 ```
 =====================================================
- ACE > PLANNING FIXES
+ RENN > PLANNING FIXES
 =====================================================
 
 * Spawning architect for gap closure...
 ```
 
-Spawn ace-architect in --gaps mode:
+Spawn renn-architect in --gaps mode:
 
 ```
 Task(
@@ -392,22 +392,22 @@ Task(
 **Mode:** gap_closure
 
 **UAT with diagnoses:**
-@.ace/stages/{stage_dir}/{stage}-uat.md
+@.renn/stages/{stage_dir}/{stage}-uat.md
 
 **Project State:**
-@.ace/pulse.md
+@.renn/pulse.md
 
 **Track:**
-@.ace/track.md
+@.renn/track.md
 
 </planning_context>
 
 <downstream_consumer>
-Output consumed by /ace.run-stage
+Output consumed by /renn.run-stage
 Runs must be executable prompts.
 </downstream_consumer>
 """,
-  subagent_type="ace-architect",
+  subagent_type="renn-architect",
   model="{architect_model}",
   description="Plan gap fixes for Stage {stage}"
 )
@@ -424,7 +424,7 @@ On return:
 Display:
 ```
 =====================================================
- ACE > VERIFYING FIX RUNS
+ RENN > VERIFYING FIX RUNS
 =====================================================
 
 * Spawning plan reviewer...
@@ -432,7 +432,7 @@ Display:
 
 Initialize: `iteration_count = 1`
 
-Spawn ace-plan-reviewer:
+Spawn renn-plan-reviewer:
 
 ```
 Task(
@@ -443,7 +443,7 @@ Task(
 **Stage Goal:** Close diagnosed gaps from UAT
 
 **Runs to verify:**
-@.ace/stages/{stage_dir}/*-run.md
+@.renn/stages/{stage_dir}/*-run.md
 
 </verification_context>
 
@@ -453,7 +453,7 @@ Return one of:
 - ## ISSUES FOUND — structured issue list
 </expected_output>
 """,
-  subagent_type="ace-plan-reviewer",
+  subagent_type="renn-plan-reviewer",
   model="{reviewer_model}",
   description="Verify Stage {stage} fix runs"
 )
@@ -471,7 +471,7 @@ On return:
 
 Display: `Sending back to architect for revision... (iteration {N}/3)`
 
-Spawn ace-architect with revision context:
+Spawn renn-architect with revision context:
 
 ```
 Task(
@@ -482,7 +482,7 @@ Task(
 **Mode:** revision
 
 **Existing runs:**
-@.ace/stages/{stage_dir}/*-run.md
+@.renn/stages/{stage_dir}/*-run.md
 
 **Reviewer issues:**
 {structured_issues_from_reviewer}
@@ -494,7 +494,7 @@ Read existing run.md files. Make targeted updates to address reviewer issues.
 Do NOT replan from scratch unless issues are fundamental.
 </instructions>
 """,
-  subagent_type="ace-architect",
+  subagent_type="renn-architect",
   model="{architect_model}",
   description="Revise Stage {stage} runs"
 )
@@ -510,7 +510,7 @@ Display: `Max iterations reached. {N} issues remain.`
 Offer options:
 1. Force proceed (execute despite issues)
 2. Provide guidance (user gives direction, retry)
-3. Abandon (exit, user runs /ace.plan-stage manually)
+3. Abandon (exit, user runs /renn.plan-stage manually)
 
 Wait for user response.
 </step>
@@ -520,7 +520,7 @@ Wait for user response.
 
 ```
 =====================================================
- ACE > FIXES READY
+ RENN > FIXES READY
 =====================================================
 
 **Stage {X}: {Name}** — {N} gap(s) diagnosed, {M} fix run(s) created
@@ -538,7 +538,7 @@ Runs verified and ready for execution.
 
 **Execute fixes** — run fix runs
 
-`/clear` then `/ace.run-stage {stage} --gaps-only`
+`/clear` then `/renn.run-stage {stage} --gaps-only`
 
 ---------------------------------------------------------------
 ```
@@ -589,8 +589,8 @@ Default to **major** if unclear. User can correct if needed.
 - [ ] Batched writes: on issue, every 5 passes, or completion
 - [ ] Committed on completion
 - [ ] If issues: parallel debug agents diagnose root causes
-- [ ] If issues: ace-architect creates fix runs (gap_closure mode)
-- [ ] If issues: ace-plan-reviewer verifies fix runs
+- [ ] If issues: renn-architect creates fix runs (gap_closure mode)
+- [ ] If issues: renn-plan-reviewer verifies fix runs
 - [ ] If issues: revision loop until runs pass (max 3 iterations)
-- [ ] Ready for `/ace.run-stage --gaps-only` when complete
+- [ ] Ready for `/renn.run-stage --gaps-only` when complete
 </success_criteria>

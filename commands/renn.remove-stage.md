@@ -1,5 +1,5 @@
 ---
-name: ace.remove-stage
+name: renn.remove-stage
 description: Remove a future stage from track and renumber subsequent stages
 argument-hint: <stage-number>
 allowed-tools:
@@ -17,8 +17,8 @@ Output: Stage deleted, all subsequent stages renumbered, git commit as historica
 </objective>
 
 <execution_context>
-@.ace/track.md
-@.ace/pulse.md
+@.renn/track.md
+@.renn/pulse.md
 </execution_context>
 
 <context>
@@ -30,15 +30,15 @@ $ARGUMENTS
 <step name="parse_arguments">
 Parse the command arguments:
 - Argument is the stage number to remove (integer or decimal)
-- Example: `/ace.remove-stage 17` → stage = 17
-- Example: `/ace.remove-stage 16.1` → stage = 16.1
+- Example: `/renn.remove-stage 17` → stage = 17
+- Example: `/renn.remove-stage 16.1` → stage = 16.1
 
 If no argument provided:
 
 ```
 ERROR: Stage number required
-Usage: /ace.remove-stage <stage-number>
-Example: /ace.remove-stage 17
+Usage: /renn.remove-stage <stage-number>
+Example: /renn.remove-stage 17
 ```
 
 Exit.
@@ -48,8 +48,8 @@ Exit.
 Load project state:
 
 ```bash
-cat .ace/pulse.md 2>/dev/null
-cat .ace/track.md 2>/dev/null
+cat .renn/pulse.md 2>/dev/null
+cat .renn/track.md 2>/dev/null
 ```
 
 Parse current stage number from pulse.md "Current Position" section.
@@ -84,7 +84,7 @@ Only future stages can be removed:
 - Current stage: {current}
 - Stage {target} is current or completed
 
-To abandon current work, use /ace.pause instead.
+To abandon current work, use /renn.pause instead.
 ```
 
 Exit.
@@ -92,7 +92,7 @@ Exit.
 3. Check for recap.md files in stage directory:
 
 ```bash
-ls .ace/stages/{target}-*/*-recap.md 2>/dev/null
+ls .renn/stages/{target}-*/*-recap.md 2>/dev/null
 ```
 
 If any recap.md files exist:
@@ -113,7 +113,7 @@ Exit.
 Collect information about the stage being removed:
 
 1. Extract stage name from track.md heading: `### Stage {target}: {Name}`
-2. Find stage directory: `.ace/stages/{target}-{slug}/`
+2. Find stage directory: `.renn/stages/{target}-{slug}/`
 3. Find all subsequent stages (integer and decimal) that need renumbering
 
 **Subsequent stage detection:**
@@ -137,7 +137,7 @@ Present removal summary and confirm:
 Removing Stage {target}: {Name}
 
 This will:
-- Delete: .ace/stages/{target}-{slug}/
+- Delete: .renn/stages/{target}-{slug}/
 - Renumber {N} subsequent stages:
   - Stage 18 → Stage 17
   - Stage 18.1 → Stage 17.1
@@ -154,9 +154,9 @@ Wait for confirmation.
 Delete the target stage directory if it exists:
 
 ```bash
-if [ -d ".ace/stages/{target}-{slug}" ]; then
-  rm -rf ".ace/stages/{target}-{slug}"
-  echo "Deleted: .ace/stages/{target}-{slug}/"
+if [ -d ".renn/stages/{target}-{slug}" ]; then
+  rm -rf ".renn/stages/{target}-{slug}"
+  echo "Deleted: .renn/stages/{target}-{slug}/"
 fi
 ```
 
@@ -170,7 +170,7 @@ For each stage directory that needs renumbering (in reverse order to avoid confl
 
 ```bash
 # Example: renaming 18-dashboard to 17-dashboard
-mv ".ace/stages/18-dashboard" ".ace/stages/17-dashboard"
+mv ".renn/stages/18-dashboard" ".renn/stages/17-dashboard"
 ```
 
 Process in descending order (20→19, then 19→18, then 18→17) to avoid overwriting.
@@ -245,8 +245,8 @@ Search for and update stage references inside run files:
 
 ```bash
 # Find files that reference the old stage numbers
-grep -r "Stage 18" .ace/stages/17-*/ 2>/dev/null
-grep -r "Stage 19" .ace/stages/18-*/ 2>/dev/null
+grep -r "Stage 18" .renn/stages/17-*/ 2>/dev/null
+grep -r "Stage 19" .renn/stages/18-*/ 2>/dev/null
 # etc.
 ```
 
@@ -259,8 +259,8 @@ Stage and commit the removal:
 **Check config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .renn 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 **If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
@@ -268,7 +268,7 @@ git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 **If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
-git add .ace/
+git add .renn/
 git commit -m "chore: remove stage {target} ({original-stage-name})"
 ```
 
@@ -282,7 +282,7 @@ Present completion summary:
 Stage {target} ({original-name}) removed.
 
 Changes:
-- Deleted: .ace/stages/{target}-{slug}/
+- Deleted: .renn/stages/{target}-{slug}/
 - Renumbered: Stages {first-renumbered}-{last-old} → {first-renumbered-1}-{last-new}
 - Updated: track.md, pulse.md
 - Committed: chore: remove stage {target} ({original-name})
@@ -295,7 +295,7 @@ Current position: Stage {current} of {new-total}
 ## What's Next
 
 Would you like to:
-- `/ace.status` — see updated track status
+- `/renn.status` — see updated track status
 - Continue with current stage
 - Review track
 

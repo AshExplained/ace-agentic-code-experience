@@ -7,11 +7,11 @@ You are a thinking partner, not an interviewer. The user is the visionary — yo
 <downstream_awareness>
 **intel.md feeds into:**
 
-1. **ace-stage-scout** — Reads intel.md to know WHAT to research
+1. **renn-stage-scout** — Reads intel.md to know WHAT to research
    - "User wants card-based layout" → scout investigates card component patterns
    - "Infinite scroll decided" → scout looks into virtualization libraries
 
-2. **ace-architect** — Reads intel.md to know WHAT decisions are locked
+2. **renn-architect** — Reads intel.md to know WHAT decisions are locked
    - "Pull-to-refresh on mobile" → architect includes that in task specs
    - "Claude's Discretion: loading skeleton" → architect can decide approach
 
@@ -119,7 +119,7 @@ Stage: "API documentation"
 Stage number from argument (required).
 
 Load and validate:
-- Read `.ace/track.md`
+- Read `.renn/track.md`
 - Find stage entry
 - Extract: number, name, description, status
 
@@ -127,7 +127,7 @@ Load and validate:
 ```
 Stage [X] not found in track.
 
-Use /ace.status to see available stages.
+Use /renn.status to see available stages.
 ```
 Exit workflow.
 
@@ -140,7 +140,7 @@ Check if intel.md already exists:
 ```bash
 # Match both zero-padded (05-*) and unpadded (5-*) folders
 PADDED_STAGE=$(printf "%02d" ${STAGE})
-ls .ace/stages/${PADDED_STAGE}-*/*-intel.md .ace/stages/${STAGE}-*/*-intel.md 2>/dev/null
+ls .renn/stages/${PADDED_STAGE}-*/*-intel.md .renn/stages/${STAGE}-*/*-intel.md 2>/dev/null
 ```
 
 **If exists:**
@@ -324,13 +324,13 @@ Create intel.md capturing decisions made.
 ```bash
 # Match existing directory (padded or unpadded)
 PADDED_STAGE=$(printf "%02d" ${STAGE})
-STAGE_DIR=$(ls -d .ace/stages/${PADDED_STAGE}-* .ace/stages/${STAGE}-* 2>/dev/null | head -1)
+STAGE_DIR=$(ls -d .renn/stages/${PADDED_STAGE}-* .renn/stages/${STAGE}-* 2>/dev/null | head -1)
 if [ -z "$STAGE_DIR" ]; then
   # Create from track name (lowercase, hyphens)
   # Anchor to ### headings to avoid matching list items (which contain markdown ** and descriptions)
-  STAGE_NAME=$(grep "^### Stage ${STAGE}:" .ace/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | sed 's/ \[UI\]$//' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-  mkdir -p ".ace/stages/${PADDED_STAGE}-${STAGE_NAME}"
-  STAGE_DIR=".ace/stages/${PADDED_STAGE}-${STAGE_NAME}"
+  STAGE_NAME=$(grep "^### Stage ${STAGE}:" .renn/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | sed 's/ \[UI\]$//' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+  mkdir -p ".renn/stages/${PADDED_STAGE}-${STAGE_NAME}"
+  STAGE_DIR=".renn/stages/${PADDED_STAGE}-${STAGE_NAME}"
 fi
 ```
 
@@ -399,7 +399,7 @@ Present summary and next steps.
 **First, show what was captured:**
 
 ```
-Created: .ace/stages/${PADDED_STAGE}-${SLUG}/${PADDED_STAGE}-intel.md
+Created: .renn/stages/${PADDED_STAGE}-${SLUG}/${PADDED_STAGE}-intel.md
 
 ## Decisions Captured
 
@@ -426,8 +426,8 @@ No keyword matching. The [UI] tag is authoritative.
 If `IS_UI_STAGE=true`, check design artifacts:
 
 ```bash
-HAS_STYLEKIT=$(ls .ace/design/stylekit.yaml 2>/dev/null && echo "yes")
-HAS_SCREENS=$(ls .ace/design/screens/*.yaml 2>/dev/null && echo "yes")
+HAS_STYLEKIT=$(ls .renn/design/stylekit.yaml 2>/dev/null && echo "yes")
+HAS_SCREENS=$(ls .renn/design/screens/*.yaml 2>/dev/null && echo "yes")
 ```
 
 **Route based on detection:**
@@ -443,14 +443,14 @@ HAS_SCREENS=$(ls .ace/design/screens/*.yaml 2>/dev/null && echo "yes")
 
 This is a UI stage — create the design system first:
 
-`/ace.design-system`
+`/renn.design-system`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.plan-stage ${STAGE}` — skip design, Claude designs inline during execution
+- `/renn.plan-stage ${STAGE}` — skip design, Claude designs inline during execution
 - Review/edit intel.md before continuing
 
 ---
@@ -467,14 +467,14 @@ This is a UI stage — create the design system first:
 
 Design system exists. Create screen prototypes for this stage:
 
-`/ace.design-screens ${STAGE}`
+`/renn.design-screens ${STAGE}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.plan-stage ${STAGE}` — skip screen design, Claude designs inline during execution
+- `/renn.plan-stage ${STAGE}` — skip screen design, Claude designs inline during execution
 - Review/edit intel.md before continuing
 
 ---
@@ -489,14 +489,14 @@ Design system exists. Create screen prototypes for this stage:
 
 **Stage ${STAGE}: [Name]** — [Goal from track.md]
 
-`/ace.plan-stage ${STAGE}`
+`/renn.plan-stage ${STAGE}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.plan-stage ${STAGE} --skip-research` — plan without research
+- `/renn.plan-stage ${STAGE} --skip-research` — plan without research
 - Review/edit intel.md before continuing
 
 ---
@@ -509,7 +509,7 @@ Commit stage context:
 **Check planning config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 

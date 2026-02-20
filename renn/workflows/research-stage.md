@@ -4,7 +4,7 @@ Produces research.md (for Level 2-3) that informs run.md creation.
 
 Called from plan-stage.md's mandatory_research step with a depth parameter.
 
-NOTE: For comprehensive ecosystem research ("how do experts build this"), use /ace.research-stage instead, which produces RESEARCH.md.
+NOTE: For comprehensive ecosystem research ("how do experts build this"), use /renn.research-stage instead, which produces RESEARCH.md.
 </purpose>
 
 <depth_levels>
@@ -28,7 +28,7 @@ Claude's training data is 6-18 months stale. Always verify.
 2. **Official docs** - When Context7 lacks coverage
 3. **WebSearch LAST** - For comparisons and trends only
 
-See ~/.claude/ace/templates/research.md `<research_protocol>` for full protocol.
+See ~/.claude/renn/templates/research.md `<research_protocol>` for full protocol.
 </source_hierarchy>
 
 <process>
@@ -107,7 +107,7 @@ For: Choosing between options, new external integration.
 
 5. **Cross-verify:** Any WebSearch finding → confirm with Context7/official docs.
 
-6. **Create research.md** using ~/.claude/ace/templates/research.md structure:
+6. **Create research.md** using ~/.claude/renn/templates/research.md structure:
 
    - Summary with recommendation
    - Key findings per option
@@ -116,7 +116,7 @@ For: Choosing between options, new external integration.
 
 7. Return to plan-stage.md.
 
-**Output:** `.ace/stages/XX-name/research.md`
+**Output:** `.renn/stages/XX-name/research.md`
 </step>
 
 <step name="level_3_deep_dive">
@@ -126,7 +126,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 **Process:**
 
-1. **Scope the research** using ~/.claude/ace/templates/research.md:
+1. **Scope the research** using ~/.claude/renn/templates/research.md:
 
    - Define clear scope
    - Define include/exclude boundaries
@@ -160,7 +160,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 6. **Create comprehensive research.md:**
 
-   - Full structure from ~/.claude/ace/templates/research.md
+   - Full structure from ~/.claude/renn/templates/research.md
    - Quality report with source attribution
    - Confidence by finding
    - If LOW confidence on any critical finding → add validation checkpoints
@@ -169,7 +169,7 @@ For: Architectural decisions, novel problems, high-risk choices.
 
 8. Return to plan-stage.md.
 
-**Output:** `.ace/stages/XX-name/research.md` (comprehensive)
+**Output:** `.renn/stages/XX-name/research.md` (comprehensive)
 </step>
 
 <step name="identify_unknowns">
@@ -184,7 +184,7 @@ Ask: What do we need to learn before we can plan this stage?
   </step>
 
 <step name="create_research_scope">
-Use ~/.claude/ace/templates/research.md.
+Use ~/.claude/renn/templates/research.md.
 
 Include:
 
@@ -203,7 +203,7 @@ Run the research:
 </step>
 
 <step name="create_research_output">
-Write `.ace/stages/XX-name/research.md`:
+Write `.renn/stages/XX-name/research.md`:
 - Summary with recommendation
 - Key findings with sources
 - Code examples if applicable
@@ -246,14 +246,14 @@ If "address first": Gather user input on questions, update research.
 
 <step name="offer_next">
 ```
-Research complete: .ace/stages/XX-name/research.md
+Research complete: .renn/stages/XX-name/research.md
 Recommendation: [one-liner]
 Confidence: [level]
 
 What's next?
 
-1. Discuss stage context (/ace.discuss-stage [current-stage])
-2. Create stage plan (/ace.plan-stage [current-stage])
+1. Discuss stage context (/renn.discuss-stage [current-stage])
+2. Create stage plan (/renn.plan-stage [current-stage])
 3. Refine research (dig deeper)
 4. Review research
 

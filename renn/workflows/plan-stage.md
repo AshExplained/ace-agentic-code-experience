@@ -11,18 +11,18 @@ Fresh context per agent. Orchestrator stays lean (~15%), each subagent gets 100%
 <process>
 
 <step name="validate_environment" priority="first">
-Validate .ace/ exists and resolve model profile:
+Validate .renn/ exists and resolve model profile:
 
 ```bash
-ls .ace/ 2>/dev/null
+ls .renn/ 2>/dev/null
 ```
 
-**If not found:** Error - user should run `/ace.start` first.
+**If not found:** Error - user should run `/renn.start` first.
 
 **Resolve model profile for agent spawning:**
 
 ```bash
-MODEL_PROFILE=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+MODEL_PROFILE=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -31,9 +31,9 @@ Default to "balanced" if not set.
 
 | Agent | max | balanced | eco |
 |-------|---------|----------|--------|
-| ace-stage-scout | opus | sonnet | haiku |
-| ace-architect | opus | opus | sonnet |
-| ace-plan-reviewer | sonnet | sonnet | haiku |
+| renn-stage-scout | opus | sonnet | haiku |
+| renn-architect | opus | opus | sonnet |
+| renn-plan-reviewer | sonnet | sonnet | haiku |
 
 Store resolved models for use in Task calls below.
 </step>
@@ -63,8 +63,8 @@ fi
 **Check for existing research and runs:**
 
 ```bash
-ls .ace/stages/${STAGE}-*/*-research.md 2>/dev/null
-ls .ace/stages/${STAGE}-*/*-run.md 2>/dev/null
+ls .renn/stages/${STAGE}-*/*-research.md 2>/dev/null
+ls .renn/stages/${STAGE}-*/*-run.md 2>/dev/null
 ```
 </step>
 
@@ -72,7 +72,7 @@ ls .ace/stages/${STAGE}-*/*-run.md 2>/dev/null
 ```bash
 # Strip leading zeros for track.md lookup (track uses "Stage 1:", not "Stage 01:")
 STAGE_UNPADDED=$(echo "$STAGE" | sed 's/^0\+\([0-9]\)/\1/')
-grep -A5 "^### Stage ${STAGE_UNPADDED}:" .ace/track.md 2>/dev/null
+grep -A5 "^### Stage ${STAGE_UNPADDED}:" .renn/track.md 2>/dev/null
 ```
 
 **If not found:** Error with available stages. **If found:** Extract stage number, name, description.
@@ -81,21 +81,21 @@ grep -A5 "^### Stage ${STAGE_UNPADDED}:" .ace/track.md 2>/dev/null
 <step name="ensure_stage_directory">
 ```bash
 # STAGE is already normalized (08, 02.1, etc.) from parse_arguments
-STAGE_DIR=$(ls -d .ace/stages/${STAGE}-* 2>/dev/null | head -1)
+STAGE_DIR=$(ls -d .renn/stages/${STAGE}-* 2>/dev/null | head -1)
 if [ -z "$STAGE_DIR" ]; then
   # Create stage directory from track name
   # Anchor to ### headings to avoid matching list items (which contain markdown ** and descriptions)
   STAGE_UNPADDED=$(echo "$STAGE" | sed 's/^0\+\([0-9]\)/\1/')
-  STAGE_NAME=$(grep "^### Stage ${STAGE_UNPADDED}:" .ace/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | sed 's/ \[UI\]$//' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-  mkdir -p ".ace/stages/${STAGE}-${STAGE_NAME}"
-  STAGE_DIR=".ace/stages/${STAGE}-${STAGE_NAME}"
+  STAGE_NAME=$(grep "^### Stage ${STAGE_UNPADDED}:" .renn/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | sed 's/ \[UI\]$//' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+  mkdir -p ".renn/stages/${STAGE}-${STAGE_NAME}"
+  STAGE_DIR=".renn/stages/${STAGE}-${STAGE_NAME}"
 fi
 
 # Load intel.md immediately - this informs ALL downstream agents
 INTEL_CONTENT=$(cat "${STAGE_DIR}"/*-intel.md 2>/dev/null)
 
 # Extract project name from brief.md heading (used in designer spawn)
-PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
+PROJECT_NAME=$(head -1 .renn/brief.md 2>/dev/null | sed 's/^# //')
 ```
 
 **CRITICAL:** Store `INTEL_CONTENT` now. It must be passed to:
@@ -115,7 +115,7 @@ If intel.md exists, display: `Using stage context from: ${STAGE_DIR}/*-intel.md`
 **Check config for research setting:**
 
 ```bash
-WORKFLOW_RESEARCH=$(cat .ace/config.json 2>/dev/null | grep -o '"research"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+WORKFLOW_RESEARCH=$(cat .renn/config.json 2>/dev/null | grep -o '"research"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 ```
 
 **If `checks.research` is `false` AND `--research` flag NOT set:** Skip to check_existing_runs.
@@ -137,7 +137,7 @@ ls "${STAGE_DIR}"/*-research.md 2>/dev/null
 Display stage banner:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► SCOUTING STAGE {X}
+ RENN ► SCOUTING STAGE {X}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ◆ Spawning scout...
@@ -145,24 +145,24 @@ Display stage banner:
 
 Proceed to spawn scout.
 
-### Spawn ace-stage-scout
+### Spawn renn-stage-scout
 
 Gather additional context for research prompt:
 
 ```bash
 # Get stage description from track (use STAGE_UNPADDED from validate_stage)
-STAGE_DESC=$(grep -A5 "^### Stage ${STAGE_UNPADDED}:" .ace/track.md)
+STAGE_DESC=$(grep -A5 "^### Stage ${STAGE_UNPADDED}:" .renn/track.md)
 
 # Get specs if they exist
-SPECS=$(cat .ace/specs.md 2>/dev/null | grep -A100 "## Requirements" | head -50)
+SPECS=$(cat .renn/specs.md 2>/dev/null | grep -A100 "## Requirements" | head -50)
 
 # Get prior decisions from pulse.md
-DECISIONS=$(grep -A20 "### Decisions Made" .ace/pulse.md 2>/dev/null)
+DECISIONS=$(grep -A20 "### Decisions Made" .renn/pulse.md 2>/dev/null)
 
 # INTEL_CONTENT already loaded in ensure_stage_directory
 
 # Read UX.md for scout (if exists)
-UX_CONTENT_FOR_SCOUT=$(cat .ace/research/UX.md 2>/dev/null)
+UX_CONTENT_FOR_SCOUT=$(cat .renn/research/UX.md 2>/dev/null)
 ```
 
 Fill research prompt and spawn:
@@ -175,7 +175,7 @@ Answer: "What do I need to know to PLAN this stage well?"
 </objective>
 
 <stage_context>
-**IMPORTANT:** If intel.md exists below, it contains user decisions from /ace.discuss-stage.
+**IMPORTANT:** If intel.md exists below, it contains user decisions from /renn.discuss-stage.
 
 - **Decisions section** = Locked choices — research THESE deeply, don't explore alternatives
 - **Claude's Discretion section** = Your freedom areas — research options, make recommendations
@@ -211,7 +211,7 @@ Write research findings to: {stage_dir}/{stage}-research.md
 ```
 Task(
   prompt=research_prompt,
-  subagent_type="ace-stage-scout",
+  subagent_type="renn-stage-scout",
   model="{scout_model}",
   description="Research Stage {stage}"
 )
@@ -235,7 +235,7 @@ Task(
 Check the stage heading from track.md for a [UI] tag:
 
 ```bash
-STAGE_HEADING=$(grep "^### Stage ${STAGE_UNPADDED}:" .ace/track.md | head -1)
+STAGE_HEADING=$(grep "^### Stage ${STAGE_UNPADDED}:" .renn/track.md | head -1)
 ```
 
 If the heading contains `[UI]` -> set `UI_STAGE=true`.
@@ -246,7 +246,7 @@ No keyword matching. No UNCERTAIN state. The [UI] tag is authoritative.
 ### Design Artifact Check (only when UI_STAGE=true)
 
 ```bash
-UX_BRIEF_FILE=".ace/design/ux-brief.md"
+UX_BRIEF_FILE=".renn/design/ux-brief.md"
 if [ ! -f "$UX_BRIEF_FILE" ]; then
   UX_BRIEF_FILE="${STAGE_DIR}/${STAGE}-ux-brief.md"
 fi
@@ -256,9 +256,9 @@ if [ -f "$UX_BRIEF_FILE" ]; then
 else
   echo ""
   echo "Stage ${STAGE} is a UI stage but has no design artifacts."
-  echo "Run /ace.design-system first to create the design system."
-  echo "Then run /ace.design-screens ${STAGE} to create screen prototypes."
-  echo "Then re-run /ace.plan-stage ${STAGE}."
+  echo "Run /renn.design-system first to create the design system."
+  echo "Then run /renn.design-screens ${STAGE} to create screen prototypes."
+  echo "Then re-run /renn.plan-stage ${STAGE}."
   echo ""
   exit 1
 fi
@@ -278,9 +278,9 @@ Store `UI_STAGE` and `UX_BRIEF` for downstream use.
 
 ```bash
 DX_CONTENT=""
-if [ -f ".ace/research/UX.md" ]; then
-  if grep -q "Proven DX Patterns\|Project Type: CLI\|Project Type: API\|Project Type: Library" .ace/research/UX.md; then
-    DX_CONTENT=$(cat .ace/research/UX.md)
+if [ -f ".renn/research/UX.md" ]; then
+  if grep -q "Proven DX Patterns\|Project Type: CLI\|Project Type: API\|Project Type: Library" .renn/research/UX.md; then
+    DX_CONTENT=$(cat .renn/research/UX.md)
   fi
 fi
 if [ -z "$DX_CONTENT" ]; then
@@ -294,7 +294,7 @@ fi
 **Display banner:**
 
 ```
-ACE > DX INTERVIEW FOR STAGE {X}
+RENN > DX INTERVIEW FOR STAGE {X}
 
 Before planning, let's discuss the developer experience for this stage.
 ```
@@ -417,18 +417,18 @@ Read and store context file contents for the architect agent. The `@` syntax doe
 
 ```bash
 # Read required files
-PULSE_CONTENT=$(cat .ace/pulse.md)
-TRACK_CONTENT=$(cat .ace/track.md)
+PULSE_CONTENT=$(cat .renn/pulse.md)
+TRACK_CONTENT=$(cat .renn/track.md)
 
 # Read optional files (empty string if missing)
-SPECS_CONTENT=$(cat .ace/specs.md 2>/dev/null)
+SPECS_CONTENT=$(cat .renn/specs.md 2>/dev/null)
 # INTEL_CONTENT already loaded in ensure_stage_directory
 RESEARCH_CONTENT=$(cat "${STAGE_DIR}"/*-research.md 2>/dev/null)
 
 # Load UX brief from design-stage output (if UI stage with completed design)
 # UX_BRIEF may already be loaded from handle_ui_stage_redirect
 if [ -z "$UX_BRIEF" ]; then
-  UX_BRIEF=$(cat .ace/design/ux-brief.md 2>/dev/null)
+  UX_BRIEF=$(cat .renn/design/ux-brief.md 2>/dev/null)
 fi
 if [ -z "$UX_BRIEF" ]; then
   UX_BRIEF=$(cat "${STAGE_DIR}"/${STAGE}-ux-brief.md 2>/dev/null)
@@ -442,22 +442,22 @@ fi
 
 # Detect design artifacts (created by design-stage, not plan-stage)
 HAS_DESIGN=false
-if [ -f ".ace/design/stylekit.yaml" ] && ls .ace/design/screens/*.yaml 2>/dev/null >/dev/null; then
+if [ -f ".renn/design/stylekit.yaml" ] && ls .renn/design/screens/*.yaml 2>/dev/null >/dev/null; then
   HAS_DESIGN=true
 fi
 
 # Design context (only if design artifacts exist on disk)
 if [ "$HAS_DESIGN" = "true" ]; then
-  DESIGN_SCREEN_SPECS=$(ls .ace/design/screens/*.yaml 2>/dev/null)
+  DESIGN_SCREEN_SPECS=$(ls .renn/design/screens/*.yaml 2>/dev/null)
   DESIGN_SUMMARIES=""
   for spec in $DESIGN_SCREEN_SPECS; do
     [ -f "$spec" ] || continue
     screen_name=$(grep -m1 "^screen:" "$spec" | sed 's/screen: //')
     description=$(grep -m1 "^description:" "$spec" | sed 's/description: //')
-    DESIGN_SUMMARIES="${DESIGN_SUMMARIES}\n- ${screen_name}: ${description} (@.ace/design/screens/${screen_name}.yaml)"
+    DESIGN_SUMMARIES="${DESIGN_SUMMARIES}\n- ${screen_name}: ${description} (@.renn/design/screens/${screen_name}.yaml)"
   done
-  DESIGN_STYLEKIT_PATH=".ace/design/stylekit.yaml"
-  IMPLEMENTATION_GUIDE=$(cat .ace/design/implementation-guide.md 2>/dev/null)
+  DESIGN_STYLEKIT_PATH=".renn/design/stylekit.yaml"
+  IMPLEMENTATION_GUIDE=$(cat .renn/design/implementation-guide.md 2>/dev/null)
 fi
 
 # Gap closure files (only if --gaps mode)
@@ -470,7 +470,7 @@ UAT_CONTENT=$(cat "${STAGE_DIR}"/*-uat.md 2>/dev/null)
 Display stage banner:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► PLANNING STAGE {X}
+ RENN ► PLANNING STAGE {X}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ◆ Spawning architect...
@@ -495,7 +495,7 @@ Fill prompt with inlined content and spawn:
 
 **Stage Intel (if exists):**
 
-IMPORTANT: If stage intel exists below, it contains USER DECISIONS from /ace.discuss-stage.
+IMPORTANT: If stage intel exists below, it contains USER DECISIONS from /renn.discuss-stage.
 - **Decisions** = LOCKED — honor these exactly, do not revisit or suggest alternatives
 - **Claude's Discretion** = Your freedom — make implementation choices here
 - **Deferred Ideas** = Out of scope — do NOT include in this stage
@@ -538,9 +538,9 @@ NOT override user decisions from intel.md.
 {IF HAS_DESIGN is true:}
 
 **Design:**
-Global stylekit: .ace/design/stylekit.yaml
-All screen specs: .ace/design/screens/
-Implementation guide: .ace/design/implementation-guide.md
+Global stylekit: .renn/design/stylekit.yaml
+All screen specs: .renn/design/screens/
+Implementation guide: .renn/design/implementation-guide.md
 
 Screen summary (all screens -- [NEW] = created this stage, [EXISTING] = from prior stages):
 {design_summaries}
@@ -552,10 +552,10 @@ IMPORTANT: Every UI implementation task MUST include these @ references in
 the task's <context> section. The paths are STABLE across stages:
 
   <context>
-  @.ace/design/stylekit.yaml
-  @.ace/design/screens/{screen-name}.yaml  (structure spec)
-  @.ace/design/screens/{screen-name}.html  (visual source of truth)
-  @.ace/design/implementation-guide.md     (framework translation)
+  @.renn/design/stylekit.yaml
+  @.renn/design/screens/{screen-name}.yaml  (structure spec)
+  @.renn/design/screens/{screen-name}.html  (visual source of truth)
+  @.renn/design/implementation-guide.md     (framework translation)
   </context>
 
 The HTML prototype is the VISUAL SOURCE OF TRUTH. The YAML spec describes
@@ -571,7 +571,7 @@ to manage runner context budget. Multi-screen runs should split screen
 implementations across tasks.
 
 For screens marked [NEW]: task implements the full screen from scratch.
-For screens from prior stages that this stage modifies: task modifies the existing implementation to match updated screen spec. Use `git diff .ace/design/screens/{screen-name}.yaml` to see what changed.
+For screens from prior stages that this stage modifies: task modifies the existing implementation to match updated screen spec. Use `git diff .renn/design/screens/{screen-name}.yaml` to see what changed.
 
 Tasks that implement UI without referencing their screen spec and HTML
 prototype will produce output inconsistent with the approved design.
@@ -607,7 +607,7 @@ actual CSS entry point.
 </planning_context>
 
 <downstream_consumer>
-Output consumed by /ace.run-stage
+Output consumed by /renn.run-stage
 Runs must be executable prompts with:
 
 - Frontmatter (batch, depends_on, files_modified, autonomous)
@@ -631,7 +631,7 @@ Before returning ARCHITECTING COMPLETE:
 ```
 Task(
   prompt=filled_prompt,
-  subagent_type="ace-architect",
+  subagent_type="renn-architect",
   model="{architect_model}",
   description="Plan Stage {stage}"
 )
@@ -645,7 +645,7 @@ Parse architect output:
 **`## ARCHITECTING COMPLETE`:**
 - Display: `Architect created {N} run(s). Files on disk.`
 - If `--skip-verify`: Skip to present_final_status
-- Check config: `WORKFLOW_REVIEW=$(cat .ace/config.json 2>/dev/null | grep -o '"review"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")`
+- Check config: `WORKFLOW_REVIEW=$(cat .renn/config.json 2>/dev/null | grep -o '"review"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")`
 - If `checks.review` is `false`: Skip to present_final_status
 - Otherwise: Proceed to spawn_reviewer
 
@@ -662,7 +662,7 @@ Parse architect output:
 Display:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► VERIFYING RUNS
+ RENN ► VERIFYING RUNS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ◆ Spawning plan reviewer...
@@ -694,7 +694,7 @@ Fill reviewer prompt with inlined content and spawn:
 
 **Stage Intel (if exists):**
 
-IMPORTANT: If stage intel exists below, it contains USER DECISIONS from /ace.discuss-stage.
+IMPORTANT: If stage intel exists below, it contains USER DECISIONS from /renn.discuss-stage.
 Runs MUST honor these decisions. Flag as issue if runs contradict user's stated vision.
 
 - **Decisions** = LOCKED — runs must implement these exactly
@@ -715,7 +715,7 @@ Return one of:
 ```
 Task(
   prompt=reviewer_prompt,
-  subagent_type="ace-plan-reviewer",
+  subagent_type="renn-plan-reviewer",
   model="{reviewer_model}",
   description="Verify Stage {stage} runs"
 )
@@ -748,7 +748,7 @@ RUNS_CONTENT=$(cat "${STAGE_DIR}"/*-run.md 2>/dev/null)
 # INTEL_CONTENT already loaded in ensure_stage_directory
 ```
 
-Spawn ace-architect with revision prompt:
+Spawn renn-architect with revision prompt:
 
 ```markdown
 <revision_context>
@@ -781,7 +781,7 @@ Return what changed.
 ```
 Task(
   prompt=revision_prompt,
-  subagent_type="ace-architect",
+  subagent_type="renn-architect",
   model="{architect_model}",
   description="Revise Stage {stage} runs"
 )

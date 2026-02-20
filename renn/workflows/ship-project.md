@@ -19,18 +19,18 @@ Smart defaults, user decides. Detect the stack automatically, suggest the best-f
 Check for existing ship artifacts from a previous run:
 
 ```bash
-[ -f .ace/ship-plan.md ] && echo "EXISTING_PLAN" || echo "NO_PLAN"
-[ -f .ace/ship-target.md ] && echo "EXISTING_TARGET" || echo "NO_TARGET"
+[ -f .renn/ship-plan.md ] && echo "EXISTING_PLAN" || echo "NO_PLAN"
+[ -f .renn/ship-target.md ] && echo "EXISTING_TARGET" || echo "NO_TARGET"
 ```
 
-**Case 1: `.ace/ship-plan.md` exists (plan already generated)**
+**Case 1: `.renn/ship-plan.md` exists (plan already generated)**
 
 Read the file to extract the previous target and status:
 
 ```bash
-head -20 .ace/ship-plan.md
-cat .ace/ship-target.md 2>/dev/null
-STATUS=$(grep -m1 '^\*\*Status:\*\*' .ace/ship-target.md 2>/dev/null | sed 's/\*\*Status:\*\* //')
+head -20 .renn/ship-plan.md
+cat .renn/ship-target.md 2>/dev/null
+STATUS=$(grep -m1 '^\*\*Status:\*\*' .renn/ship-target.md 2>/dev/null | sed 's/\*\*Status:\*\* //')
 ```
 
 Present options using AskUserQuestion:
@@ -46,20 +46,20 @@ Present options using AskUserQuestion:
 **If "Restart":** Delete both files and continue to phase_1_ask:
 
 ```bash
-rm -f .ace/ship-plan.md .ace/ship-target.md .ace/ship-research.md
+rm -f .renn/ship-plan.md .renn/ship-target.md .renn/ship-research.md
 ```
 
 **If "Different target":** Delete both files and continue to phase_1_ask:
 
 ```bash
-rm -f .ace/ship-plan.md .ace/ship-target.md .ace/ship-research.md
+rm -f .renn/ship-plan.md .renn/ship-target.md .renn/ship-research.md
 ```
 
-**Case 2: `.ace/ship-target.md` exists but `.ace/ship-plan.md` does NOT (Phase 1 done, Phase 2 pending)**
+**Case 2: `.renn/ship-target.md` exists but `.renn/ship-plan.md` does NOT (Phase 1 done, Phase 2 pending)**
 
 ```bash
 # Target declared but plan not yet generated
-if [ ! -f .ace/ship-plan.md ] && [ -f .ace/ship-target.md ]; then
+if [ ! -f .renn/ship-plan.md ] && [ -f .renn/ship-target.md ]; then
   echo "TARGET_ONLY"
 fi
 ```
@@ -80,14 +80,14 @@ Phase 1 has 6 sub-steps: extract project summary, detect stack, map stack to pla
 
 **Sub-step 2a: Extract project summary from brief.md**
 
-Read `.ace/brief.md` and extract:
+Read `.renn/brief.md` and extract:
 
 ```bash
 # Project name from first heading
-PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
+PROJECT_NAME=$(head -1 .renn/brief.md 2>/dev/null | sed 's/^# //')
 
 # Platform from Context section
-PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .ace/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
+PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .renn/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
 ```
 
 Also extract from brief.md by reading these sections:
@@ -98,7 +98,7 @@ Also extract from brief.md by reading these sections:
 If brief.md does not exist, inform the user and stop:
 
 ```
-No .ace/brief.md found. Run /ace.init first to set up your project.
+No .renn/brief.md found. Run /renn.init first to set up your project.
 ```
 
 ---
@@ -111,18 +111,18 @@ Detect the project's technology stack using 5 layers in priority order:
 
 Already extracted above as `$PLATFORM`. Values like: web, mobile-ios, cli, api, desktop, etc.
 
-**Layer 2: `.ace/codebase/STACK.md` (if exists)**
+**Layer 2: `.renn/codebase/STACK.md` (if exists)**
 
 ```bash
-cat .ace/codebase/STACK.md 2>/dev/null | head -50
+cat .renn/codebase/STACK.md 2>/dev/null | head -50
 ```
 
 If present, this contains a full stack analysis from the codebase mapper. Extract framework names, language, and runtime information.
 
-**Layer 3: `.ace/research/stack.md` (if exists)**
+**Layer 3: `.renn/research/stack.md` (if exists)**
 
 ```bash
-cat .ace/research/stack.md 2>/dev/null | head -50
+cat .renn/research/stack.md 2>/dev/null | head -50
 ```
 
 If present, this contains stack recommendations from project research.
@@ -254,7 +254,7 @@ Use the response as the chosen target.
 
 **Sub-step 2e: Persist the declared target**
 
-Write the chosen target to `.ace/ship-target.md`:
+Write the chosen target to `.renn/ship-target.md`:
 
 ```markdown
 # Ship Target
@@ -267,7 +267,7 @@ Write the chosen target to `.ace/ship-target.md`:
 
 This file is small and intentional. It exists so Phase 2 can read the target without re-asking the user.
 
-Do NOT create `.ace/ship-plan.md` -- that is Phase 2's responsibility.
+Do NOT create `.renn/ship-plan.md` -- that is Phase 2's responsibility.
 
 ---
 
@@ -283,35 +283,35 @@ Continuing to Phase 2 (Research & Plan)...
 
 <step name="phase_2_research_plan">
 
-Phase 2 reads the declared target, researches deployment requirements via ace-stage-scout, and generates a deployment checklist.
+Phase 2 reads the declared target, researches deployment requirements via renn-stage-scout, and generates a deployment checklist.
 
 ---
 
 **Sub-step 2a: Read target and validate**
 
-Read `.ace/ship-target.md` to extract target, stack, and status:
+Read `.renn/ship-target.md` to extract target, stack, and status:
 
 ```bash
-TARGET=$(grep -m1 '^\*\*Target:\*\*' .ace/ship-target.md | sed 's/\*\*Target:\*\* //')
-STACK=$(grep -m1 '^\*\*Stack detected:\*\*' .ace/ship-target.md | sed 's/\*\*Stack detected:\*\* //')
-STATUS=$(grep -m1 '^\*\*Status:\*\*' .ace/ship-target.md | sed 's/\*\*Status:\*\* //')
+TARGET=$(grep -m1 '^\*\*Target:\*\*' .renn/ship-target.md | sed 's/\*\*Target:\*\* //')
+STACK=$(grep -m1 '^\*\*Stack detected:\*\*' .renn/ship-target.md | sed 's/\*\*Stack detected:\*\* //')
+STATUS=$(grep -m1 '^\*\*Status:\*\*' .renn/ship-target.md | sed 's/\*\*Status:\*\* //')
 ```
 
 **Status routing:**
 
-- **If STATUS is `plan-ready`:** `.ace/ship-plan.md` already exists. Skip Phase 2 entirely and continue to Phase 3.
+- **If STATUS is `plan-ready`:** `.renn/ship-plan.md` already exists. Skip Phase 2 entirely and continue to Phase 3.
 - **If STATUS is not `awaiting-plan` and not `plan-ready`:** Warn "Unexpected status '{STATUS}' in ship-target.md, continuing anyway." and proceed.
-- **If TARGET is empty:** Error "No target found in ship-target.md. Run /ace.ship again to declare a target." and stop execution.
+- **If TARGET is empty:** Error "No target found in ship-target.md. Run /renn.ship again to declare a target." and stop execution.
 
 ---
 
 **Sub-step 2b: Gather context for research prompt**
 
 ```bash
-PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
-WHAT_THIS_IS=$(sed -n '/## What This Is/,/^##/p' .ace/brief.md 2>/dev/null | head -5 | tail -4)
-PLATFORM_TYPE=$(grep -m1 '^\*\*Platform:\*\*' .ace/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
-MODEL_PROFILE=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+PROJECT_NAME=$(head -1 .renn/brief.md 2>/dev/null | sed 's/^# //')
+WHAT_THIS_IS=$(sed -n '/## What This Is/,/^##/p' .renn/brief.md 2>/dev/null | head -5 | tail -4)
+PLATFORM_TYPE=$(grep -m1 '^\*\*Platform:\*\*' .renn/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
+MODEL_PROFILE=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Resolve scout model from horsepower profile:
@@ -324,7 +324,7 @@ Resolve scout model from horsepower profile:
 
 ---
 
-**Sub-step 2c: Spawn ace-stage-scout**
+**Sub-step 2c: Spawn renn-stage-scout**
 
 Construct a shipping-specific research prompt with XML sections:
 
@@ -358,7 +358,7 @@ For every step, note whether it can be done via CLI/API or requires human action
 </research_focus>
 
 <output>
-Write findings to: .ace/ship-research.md
+Write findings to: .renn/ship-research.md
 
 Structure as numbered deployment steps with:
 - Step name and description
@@ -373,7 +373,7 @@ Spawn the scout:
 ```
 Task(
   prompt=research_prompt,
-  subagent_type="ace-stage-scout",
+  subagent_type="renn-stage-scout",
   model="{scout_model}",
   description="Research shipping to {target}"
 )
@@ -397,20 +397,20 @@ Display the blocker message from the scout's return. Then offer recovery options
 - question: "The scout could not complete research for {target}. How would you like to proceed?"
 - options:
   - "Retry research" (description: "Spawn the scout again with the same prompt")
-  - "Enter plan manually" (description: "Create .ace/ship-plan.md yourself and resume")
+  - "Enter plan manually" (description: "Create .renn/ship-plan.md yourself and resume")
   - "Abort" (description: "Stop the ship workflow")
 
 **If "Retry research":** Return to sub-step 2c and spawn the scout again.
 
-**If "Enter plan manually":** Display instructions for the expected ship-plan.md format, then stop. User creates the file and runs /ace.ship again (detect_existing_ship will find it).
+**If "Enter plan manually":** Display instructions for the expected ship-plan.md format, then stop. User creates the file and runs /renn.ship again (detect_existing_ship will find it).
 
-**If "Abort":** Stop the workflow with message "Ship workflow aborted. Run /ace.ship to start again."
+**If "Abort":** Stop the workflow with message "Ship workflow aborted. Run /renn.ship to start again."
 
 ---
 
 **Sub-step 2e: Convert research to checklist**
 
-Read `.ace/ship-research.md` and convert the scout's deployment research into a numbered, classified checklist. This is deterministic workflow logic performed by the orchestrator (Claude running the workflow), not another agent spawn.
+Read `.renn/ship-research.md` and convert the scout's deployment research into a numbered, classified checklist. This is deterministic workflow logic performed by the orchestrator (Claude running the workflow), not another agent spawn.
 
 **Auto/gate classification table:**
 
@@ -435,7 +435,7 @@ Read `.ace/ship-research.md` and convert the scout's deployment research into a 
 
 **Conversion process:**
 
-1. Read `.ace/ship-research.md`
+1. Read `.renn/ship-research.md`
 2. Parse deployment steps from the research
 3. Classify each step as `[auto]` or `[gate]` using the table above
 4. Number sequentially across all sections
@@ -443,7 +443,7 @@ Read `.ace/ship-research.md` and convert the scout's deployment research into a 
 6. For gate items, add an `Instructions:` sub-bullet with human-facing text explaining what the user must do
 7. Target 8-15 total checklist items. Group related micro-steps into single items. Each item should be one logical action.
 
-Write `.ace/ship-plan.md` with this format:
+Write `.renn/ship-plan.md` with this format:
 
 ```markdown
 # Ship Plan
@@ -472,8 +472,8 @@ Write `.ace/ship-plan.md` with this format:
   - Instructions: {what the user needs to verify}
 
 ---
-*Generated by /ace.ship Phase 2*
-*Research source: ace-stage-scout*
+*Generated by /renn.ship Phase 2*
+*Research source: renn-stage-scout*
 ```
 
 Gate items always include the `Instructions:` sub-bullet. Auto items do not need it (Claude will execute them directly).
@@ -485,21 +485,21 @@ Gate items always include the `Instructions:` sub-bullet. Auto items do not need
 Update ship-target.md status:
 
 ```bash
-sed -i 's/^\*\*Status:\*\* awaiting-plan/\*\*Status:\*\* plan-ready/' .ace/ship-target.md
+sed -i 's/^\*\*Status:\*\* awaiting-plan/\*\*Status:\*\* plan-ready/' .renn/ship-target.md
 ```
 
 Count auto and gate items:
 
 ```bash
-AUTO_COUNT=$(grep -c '\[auto\]' .ace/ship-plan.md)
-GATE_COUNT=$(grep -c '\[gate\]' .ace/ship-plan.md)
+AUTO_COUNT=$(grep -c '\[auto\]' .renn/ship-plan.md)
+GATE_COUNT=$(grep -c '\[gate\]' .renn/ship-plan.md)
 TOTAL=$((AUTO_COUNT + GATE_COUNT))
 ```
 
 Display completion message:
 
 ```
-Plan generated: .ace/ship-plan.md
+Plan generated: .renn/ship-plan.md
 {TOTAL} total steps ({AUTO_COUNT} auto, {GATE_COUNT} gate)
 ```
 
@@ -523,15 +523,15 @@ Read ship-plan.md and prepare for execution:
 
 ```bash
 # Verify plan exists and read metadata
-TARGET=$(grep -m1 '^\*\*Target:\*\*' .ace/ship-plan.md | sed 's/\*\*Target:\*\* //')
-STATUS=$(grep -m1 '^\*\*Status:\*\*' .ace/ship-plan.md | sed 's/\*\*Status:\*\* //')
+TARGET=$(grep -m1 '^\*\*Target:\*\*' .renn/ship-plan.md | sed 's/\*\*Target:\*\* //')
+STATUS=$(grep -m1 '^\*\*Status:\*\*' .renn/ship-plan.md | sed 's/\*\*Status:\*\* //')
 
 # Read project name for display
-PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
+PROJECT_NAME=$(head -1 .renn/brief.md 2>/dev/null | sed 's/^# //')
 
 # Count items
-TOTAL=$(grep -c '^\- \[.\] [0-9]' .ace/ship-plan.md)
-COMPLETED=$(grep -c '^\- \[x\] [0-9]' .ace/ship-plan.md)
+TOTAL=$(grep -c '^\- \[.\] [0-9]' .renn/ship-plan.md)
+COMPLETED=$(grep -c '^\- \[x\] [0-9]' .renn/ship-plan.md)
 REMAINING=$((TOTAL - COMPLETED))
 ```
 
@@ -544,7 +544,7 @@ Display: "All items already complete!" and skip to sub-step 3g (completion summa
 Update status to in-progress:
 
 ```bash
-sed -i 's/^\*\*Status:\*\* .*/\*\*Status:\*\* in-progress/' .ace/ship-plan.md
+sed -i 's/^\*\*Status:\*\* .*/\*\*Status:\*\* in-progress/' .renn/ship-plan.md
 ```
 
 Display execution header:
@@ -564,7 +564,7 @@ For each unchecked item in ship-plan.md (in order):
 
 ```bash
 # Extract unchecked items from ship-plan.md
-grep -n '^\- \[ \] [0-9]' .ace/ship-plan.md
+grep -n '^\- \[ \] [0-9]' .renn/ship-plan.md
 ```
 
 Read each item line to extract:
@@ -584,8 +584,8 @@ Read each item line to extract:
    - Update checkbox and timestamp in ship-plan.md using sed:
      ```bash
      TIMESTAMP=$(date +%H:%M)
-     sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/ship-plan.md
-     sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .ace/ship-plan.md
+     sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .renn/ship-plan.md
+     sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .renn/ship-plan.md
      ```
 4. If execution fails:
    - Check if the error is an authentication error -> go to sub-step 3c (dynamic auth gate)
@@ -608,14 +608,14 @@ Route based on response:
 - **"Done":** Update checkbox and timestamp in ship-plan.md, continue to next item:
   ```bash
   TIMESTAMP=$(date +%H:%M)
-  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/ship-plan.md
-  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .ace/ship-plan.md
+  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .renn/ship-plan.md
+  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .renn/ship-plan.md
   ```
 
 - **"Skip":** Mark as checked with "(skipped)" annotation, continue to next item:
   ```bash
-  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/ship-plan.md
-  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (skipped)/" .ace/ship-plan.md
+  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .renn/ship-plan.md
+  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (skipped)/" .renn/ship-plan.md
   ```
 
 - **"Come back later":** Go to sub-step 3e (pause and save position)
@@ -683,8 +683,8 @@ Route based on response:
 
 - **"Skip":** Mark the item as checked with "(skipped)" annotation, continue to next item:
   ```bash
-  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/ship-plan.md
-  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (skipped)/" .ace/ship-plan.md
+  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .renn/ship-plan.md
+  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (skipped)/" .renn/ship-plan.md
   ```
 
 - **"Abort":** Go to sub-step 3f (abort handling)
@@ -699,14 +699,14 @@ When user selects "Come back later" on a gate item (for long-running operations 
 
 1. Update ship-plan.md Status from `in-progress` to `paused-at-{N}` where N is the current item number:
    ```bash
-   sed -i "s/^\*\*Status:\*\* in-progress/\*\*Status:\*\* paused-at-${ITEM_NUM}/" .ace/ship-plan.md
+   sed -i "s/^\*\*Status:\*\* in-progress/\*\*Status:\*\* paused-at-${ITEM_NUM}/" .renn/ship-plan.md
    ```
 
 2. Update pulse.md Session Continuity:
    ```
    Last activity: {date} -- Shipping paused at step {N} of {TOTAL}
-   Resume file: .ace/ship-plan.md
-   Next action: Run /ace.ship to resume shipping
+   Resume file: .renn/ship-plan.md
+   Next action: Run /renn.ship to resume shipping
    ```
 
 3. Display exit message:
@@ -714,7 +714,7 @@ When user selects "Come back later" on a gate item (for long-running operations 
    Progress saved at step {N} of {TOTAL}.
    {COMPLETED} steps complete, {REMAINING} remaining.
 
-   Run /ace.ship to resume from step {N}.
+   Run /renn.ship to resume from step {N}.
    ```
 
 4. Stop execution (return from the workflow -- do NOT continue to the next item)
@@ -729,7 +729,7 @@ When user selects "Abort" from a gate item or error recovery:
 
 1. Update ship-plan.md Status to `aborted`:
    ```bash
-   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* aborted/' .ace/ship-plan.md
+   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* aborted/' .renn/ship-plan.md
    ```
 
 2. Update pulse.md with abort status:
@@ -742,7 +742,7 @@ When user selects "Abort" from a gate item or error recovery:
    Ship workflow aborted at step {N}.
    {COMPLETED}/{TOTAL} steps were completed.
 
-   Run /ace.ship to resume or restart.
+   Run /renn.ship to resume or restart.
    ```
 
 4. Stop execution
@@ -755,14 +755,14 @@ After all items in ship-plan.md are processed (no unchecked items remain):
 
 1. Count results:
    ```bash
-   COMPLETED=$(grep -c '^\- \[x\] [0-9]' .ace/ship-plan.md)
-   SKIPPED=$(grep -c '(skipped)' .ace/ship-plan.md)
-   TOTAL=$(grep -c '^\- \[.\] [0-9]' .ace/ship-plan.md)
+   COMPLETED=$(grep -c '^\- \[x\] [0-9]' .renn/ship-plan.md)
+   SKIPPED=$(grep -c '(skipped)' .renn/ship-plan.md)
+   TOTAL=$(grep -c '^\- \[.\] [0-9]' .renn/ship-plan.md)
    ```
 
 2. Verify no unchecked items remain before declaring complete:
    ```bash
-   UNCHECKED=$(grep -c '^\- \[ \] [0-9]' .ace/ship-plan.md)
+   UNCHECKED=$(grep -c '^\- \[ \] [0-9]' .renn/ship-plan.md)
    if [ "$UNCHECKED" -gt 0 ]; then
      echo "ERROR: ${UNCHECKED} unchecked items remain -- do not declare complete"
      # Return to sub-step 3b to continue processing
@@ -771,12 +771,12 @@ After all items in ship-plan.md are processed (no unchecked items remain):
 
 3. Update ship-plan.md Status to `complete`:
    ```bash
-   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* complete/' .ace/ship-plan.md
+   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* complete/' .renn/ship-plan.md
    ```
 
 4. Update ship-target.md Status to `shipped`:
    ```bash
-   sed -i 's/^\*\*Status:\*\* plan-ready/\*\*Status:\*\* shipped/' .ace/ship-target.md
+   sed -i 's/^\*\*Status:\*\* plan-ready/\*\*Status:\*\* shipped/' .renn/ship-target.md
    ```
 
 5. Update pulse.md to reflect shipping completion -- revert to standard format and note shipping completed:
@@ -810,7 +810,7 @@ After all items in ship-plan.md are processed (no unchecked items remain):
 
    Set up monitoring for your deployed project:
 
-   `/ace.watch` -- error tracking, uptime monitoring, and more
+   `/renn.watch` -- error tracking, uptime monitoring, and more
 
    <sub>`/clear` first -- fresh context window</sub>
    ```
@@ -827,17 +827,17 @@ After all items in ship-plan.md are processed (no unchecked items remain):
 </process>
 
 <success_criteria>
-- [ ] Re-ship detection works when .ace/ship-plan.md exists (resume/restart/different-target)
+- [ ] Re-ship detection works when .renn/ship-plan.md exists (resume/restart/different-target)
 - [ ] Re-ship detection handles target-only state (Phase 1 done, Phase 2 pending)
 - [ ] Project summary extracted from brief.md and displayed
 - [ ] Stack detected via 5 layers (brief.md, STACK.md, research, manifests, frameworks)
 - [ ] Detected stack mapped to platform suggestions
 - [ ] User selected target via AskUserQuestion
-- [ ] Target persisted to .ace/ship-target.md with status awaiting-plan
-- [ ] .ace/ship-plan.md is NOT created by Phase 1
-- [ ] ace-stage-scout spawned with shipping-specific research prompt
+- [ ] Target persisted to .renn/ship-target.md with status awaiting-plan
+- [ ] .renn/ship-plan.md is NOT created by Phase 1
+- [ ] renn-stage-scout spawned with shipping-specific research prompt
 - [ ] Scout research converted to numbered checklist with auto/gate classification
-- [ ] .ace/ship-plan.md created with project metadata, target, and checklist items
+- [ ] .renn/ship-plan.md created with project metadata, target, and checklist items
 - [ ] ship-target.md status updated from awaiting-plan to plan-ready
 - [ ] Auto items prefer CLI commands over dashboard instructions
 - [ ] Phase 3 walks checklist items with auto-execution and gate presentation
@@ -855,5 +855,5 @@ After all items in ship-plan.md are processed (no unchecked items remain):
 - [ ] ship-target.md updated to shipped on completion
 - [ ] pulse.md reflects shipping progress
 - [ ] Phase 3 walks checklist with auto/gate execution, progress tracking, and error recovery
-- [ ] Completion summary suggests /ace.watch as the next action (WATCH-11)
+- [ ] Completion summary suggests /renn.watch as the next action (WATCH-11)
 </success_criteria>

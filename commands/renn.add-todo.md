@@ -1,5 +1,5 @@
 ---
-name: ace.add-todo
+name: renn.add-todo
 description: Capture idea or task as todo from current conversation context
 argument-hint: [optional description]
 allowed-tools:
@@ -10,27 +10,27 @@ allowed-tools:
 ---
 
 <objective>
-Capture an idea, task, or issue that surfaces during an ACE session as a structured todo for later work.
+Capture an idea, task, or issue that surfaces during an RENN session as a structured todo for later work.
 
 Enables "thought → capture → continue" flow without losing context or derailing current work.
 </objective>
 
 <context>
 $ARGUMENTS
-@.ace/pulse.md
+@.renn/pulse.md
 </context>
 
 <process>
 
 <step name="ensure_directory">
 ```bash
-mkdir -p .ace/todos/pending .ace/todos/done
+mkdir -p .renn/todos/pending .renn/todos/done
 ```
 </step>
 
 <step name="check_existing_areas">
 ```bash
-ls .ace/todos/pending/*.md 2>/dev/null | xargs -I {} grep "^area:" {} 2>/dev/null | cut -d' ' -f2 | sort -u
+ls .renn/todos/pending/*.md 2>/dev/null | xargs -I {} grep "^area:" {} 2>/dev/null | cut -d' ' -f2 | sort -u
 ```
 
 Note existing areas for consistency in infer_area step.
@@ -38,7 +38,7 @@ Note existing areas for consistency in infer_area step.
 
 <step name="extract_content">
 **With arguments:** Use as the title/focus.
-- `/ace.add-todo Add auth token refresh` → title = "Add auth token refresh"
+- `/renn.add-todo Add auth token refresh` → title = "Add auth token refresh"
 
 **Without arguments:** Analyze recent conversation to extract:
 - The specific problem, idea, or task discussed
@@ -63,7 +63,7 @@ Infer area from file paths:
 | `src/db/*`, `database/*` | `database` |
 | `tests/*`, `__tests__/*` | `testing` |
 | `docs/*` | `docs` |
-| `.ace/*` | `planning` |
+| `.renn/*` | `planning` |
 | `scripts/*`, `bin/*` | `tooling` |
 | No files or unclear | `general` |
 
@@ -72,7 +72,7 @@ Use existing area from step 2 if similar match exists.
 
 <step name="check_duplicates">
 ```bash
-grep -l -i "[key words from title]" .ace/todos/pending/*.md 2>/dev/null
+grep -l -i "[key words from title]" .renn/todos/pending/*.md 2>/dev/null
 ```
 
 If potential duplicate found:
@@ -96,7 +96,7 @@ date_prefix=$(date "+%Y-%m-%d")
 
 Generate slug from title (lowercase, hyphens, no special chars in FILENAME only).
 
-Write to `.ace/todos/pending/${date_prefix}-${slug}.md`:
+Write to `.renn/todos/pending/${date_prefix}-${slug}.md`:
 
 ```markdown
 ---
@@ -118,9 +118,9 @@ files:
 </step>
 
 <step name="update_state">
-If `.ace/pulse.md` exists:
+If `.renn/pulse.md` exists:
 
-1. Count todos: `ls .ace/todos/pending/*.md 2>/dev/null | wc -l`
+1. Count todos: `ls .renn/todos/pending/*.md 2>/dev/null | wc -l`
 2. Update "### Pending Todos" under "## Accumulated Context"
 </step>
 
@@ -130,8 +130,8 @@ Commit the todo and any updated state:
 **Check planning config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .renn 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 **If `COMMIT_PLANNING_DOCS=false`:** Skip git operations, log "Todo saved (not committed - commit_docs: false)"
@@ -139,8 +139,8 @@ git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 **If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
-git add .ace/todos/pending/[filename]
-[ -f .ace/pulse.md ] && git add .ace/pulse.md
+git add .renn/todos/pending/[filename]
+[ -f .renn/pulse.md ] && git add .renn/pulse.md
 git commit -m "$(cat <<'EOF'
 docs: capture todo - [title]
 
@@ -154,7 +154,7 @@ Confirm: "Committed: docs: capture todo - [title]"
 
 <step name="confirm">
 ```
-Todo saved: .ace/todos/pending/[filename]
+Todo saved: .renn/todos/pending/[filename]
 
   [title]
   Area: [area]
@@ -166,15 +166,15 @@ Would you like to:
 
 1. Continue with current work
 2. Add another todo
-3. View all todos (/ace.check-todos)
+3. View all todos (/renn.check-todos)
 ```
 </step>
 
 </process>
 
 <output>
-- `.ace/todos/pending/[date]-[slug].md`
-- Updated `.ace/pulse.md` (if exists)
+- `.renn/todos/pending/[date]-[slug].md`
+- Updated `.renn/pulse.md` (if exists)
 </output>
 
 <anti_patterns>

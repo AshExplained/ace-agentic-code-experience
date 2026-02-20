@@ -1,5 +1,5 @@
 ---
-name: ace.list-stage-assumptions
+name: renn.list-stage-assumptions
 description: Surface Claude's assumptions about a stage approach before planning
 argument-hint: "[stage]"
 allowed-tools:
@@ -17,17 +17,17 @@ Output: Conversational output only (no file creation) - ends with "What do you t
 </objective>
 
 <execution_context>
-@~/.claude/ace/workflows/list-assumptions.md
+@~/.claude/renn/workflows/list-assumptions.md
 </execution_context>
 
 <context>
 Stage number: $ARGUMENTS (required)
 
 **Load project pulse first:**
-@.ace/pulse.md
+@.renn/pulse.md
 
 **Load track:**
-@.ace/track.md
+@.renn/track.md
 </context>
 
 <process>

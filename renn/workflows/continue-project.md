@@ -2,7 +2,7 @@
 Use this workflow when:
 - Starting a new session on an existing project
 - User says "continue", "what's next", "where were we", "resume"
-- Any operation when .ace/ already exists
+- Any operation when .renn/ already exists
 - User returns after time away from project
 </trigger>
 
@@ -11,7 +11,7 @@ Instantly restore full project context so "Where were we?" has an immediate, com
 </purpose>
 
 <required_reading>
-@~/.claude/ace/references/continuation-format.md
+@~/.claude/renn/references/continuation-format.md
 </required_reading>
 
 <process>
@@ -20,14 +20,14 @@ Instantly restore full project context so "Where were we?" has an immediate, com
 Check if this is an existing project:
 
 ```bash
-ls .ace/pulse.md 2>/dev/null && echo "Project exists"
-ls .ace/track.md 2>/dev/null && echo "Track exists"
-ls .ace/brief.md 2>/dev/null && echo "Brief exists"
+ls .renn/pulse.md 2>/dev/null && echo "Project exists"
+ls .renn/track.md 2>/dev/null && echo "Track exists"
+ls .renn/brief.md 2>/dev/null && echo "Brief exists"
 ```
 
 **If pulse.md exists:** Proceed to load_state
 **If only track.md/brief.md exist:** Offer to reconstruct pulse.md
-**If .ace/ doesn't exist:** This is a new project - route to /ace.start
+**If .renn/ doesn't exist:** This is a new project - route to /renn.start
 </step>
 
 <step name="load_state">
@@ -35,8 +35,8 @@ ls .ace/brief.md 2>/dev/null && echo "Brief exists"
 Read and parse pulse.md, then brief.md:
 
 ```bash
-cat .ace/pulse.md
-cat .ace/brief.md
+cat .renn/pulse.md
+cat .renn/brief.md
 ```
 
 **From pulse.md extract:**
@@ -63,17 +63,17 @@ Look for incomplete work that needs attention:
 
 ```bash
 # Check for continue-here files (mid-run resumption)
-ls .ace/stages/*/.continue-here*.md 2>/dev/null
+ls .renn/stages/*/.continue-here*.md 2>/dev/null
 
 # Check for runs without recaps (incomplete execution)
-for run in .ace/stages/*/*-run.md; do
+for run in .renn/stages/*/*-run.md; do
   recap="${run/RUN/RECAP}"
   [ ! -f "$recap" ] && echo "Incomplete: $run"
 done 2>/dev/null
 
 # Check for interrupted agents
-if [ -f .ace/current-agent-id.txt ] && [ -s .ace/current-agent-id.txt ]; then
-  AGENT_ID=$(cat .ace/current-agent-id.txt | tr -d '\n')
+if [ -f .renn/current-agent-id.txt ] && [ -s .renn/current-agent-id.txt ]; then
+  AGENT_ID=$(cat .renn/current-agent-id.txt | tr -d '\n')
   echo "Interrupted agent: $AGENT_ID"
 fi
 ```
@@ -123,7 +123,7 @@ Interrupted agent detected:
   Resume with: Task tool (resume parameter with agent ID)
 
 [If pending todos exist:]
-[N] pending todos — /ace.check-todos to review
+[N] pending todos — /renn.check-todos to review
 
 [If blockers exist:]
 Carried concerns:
@@ -179,11 +179,11 @@ What would you like to do?
 [Primary action based on state - e.g.:]
 1. Resume interrupted agent [if interrupted agent found]
    OR
-1. Run stage (/ace.run-stage {stage})
+1. Run stage (/renn.run-stage {stage})
    OR
-1. Discuss Stage 3 context (/ace.discuss-stage 3) [if intel.md missing]
+1. Discuss Stage 3 context (/renn.discuss-stage 3) [if intel.md missing]
    OR
-1. Plan Stage 3 (/ace.plan-stage 3) [if intel.md exists or discuss option declined]
+1. Plan Stage 3 (/renn.plan-stage 3) [if intel.md exists or discuss option declined]
 
 [Secondary options:]
 2. Review current stage status
@@ -195,7 +195,7 @@ What would you like to do?
 **Note:** When offering stage planning, check for intel.md existence first:
 
 ```bash
-ls .ace/stages/XX-name/*-intel.md 2>/dev/null
+ls .renn/stages/XX-name/*-intel.md 2>/dev/null
 ```
 
 If missing, suggest discuss-stage before plan. If exists, offer plan directly.
@@ -214,7 +214,7 @@ Based on user selection, route to appropriate workflow:
 
   **{stage}.{run}: [Run Name]** — [objective from run.md]
 
-  /ace.run-stage {stage}
+  /renn.run-stage {stage}
 
   <sub>/clear first — fresh context window</sub>
 
@@ -228,21 +228,21 @@ Based on user selection, route to appropriate workflow:
 
   **Stage [N]: [Name]** — [Goal from track.md]
 
-  /ace.plan-stage [stage-number]
+  /renn.plan-stage [stage-number]
 
   <sub>/clear first — fresh context window</sub>
 
   ---
 
   **Also available:**
-  - /ace.design-system — create design system (if UI stage)
-  - /ace.discuss-stage [N] — gather context first
-  - /ace.research-stage [N] — investigate unknowns
+  - /renn.design-system — create design system (if UI stage)
+  - /renn.discuss-stage [N] — gather context first
+  - /renn.research-stage [N] — investigate unknowns
 
   ---
   ```
 - **Transition** → ./transition.md
-- **Check todos** → Read .ace/todos/pending/, present summary
+- **Check todos** → Read .renn/todos/pending/, present summary
 - **Review alignment** → Read brief.md, compare to current state
 - **Something else** → Ask what they need
 </step>
@@ -273,7 +273,7 @@ If pulse.md is missing but other artifacts exist:
 1. Read brief.md → Extract "What This Is" and Core Value
 2. Read track.md → Determine stages, find current position
 3. Scan \*-recap.md files → Extract decisions, concerns
-4. Count pending todos in .ace/todos/pending/
+4. Count pending todos in .renn/todos/pending/
 5. Check for .continue-here files → Session continuity
 
 Reconstruct and write pulse.md, then proceed normally.
@@ -282,7 +282,7 @@ This handles cases where:
 
 - Project predates pulse.md introduction
 - File was accidentally deleted
-- Cloning repo without full .ace/ state
+- Cloning repo without full .renn/ state
 </reconstruction>
 
 <quick_resume>

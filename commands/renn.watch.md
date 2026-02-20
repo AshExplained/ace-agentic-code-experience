@@ -1,5 +1,5 @@
 ---
-name: ace.watch
+name: renn.watch
 description: Set up monitoring for your deployed project
 allowed-tools:
   - Read
@@ -14,7 +14,7 @@ allowed-tools:
 <objective>
 Set up monitoring for your deployed project (error tracking, uptime, analytics, etc.).
 
-Reads brief.md and ship-target.md for project context. If no ACE context exists,
+Reads brief.md and ship-target.md for project context. If no RENN context exists,
 asks the user directly for stack and platform info.
 
 **Three phases:**
@@ -22,18 +22,18 @@ asks the user directly for stack and platform info.
 2. RESEARCH & PLAN -- Investigate monitoring tools, generate setup checklist
 3. WALK CHECKLIST -- Execute auto items, present gates for human steps, track progress
 
-When `.ace/watch-plan.md` exists from a prior run, offers resume/restart/add-more.
+When `.renn/watch-plan.md` exists from a prior run, offers resume/restart/add-more.
 </objective>
 
 <execution_context>
-@~/.claude/ace/workflows/watch-project.md
+@~/.claude/renn/workflows/watch-project.md
 </execution_context>
 
 <context>
 $ARGUMENTS
 
-@.ace/pulse.md
-@.ace/brief.md
+@.renn/pulse.md
+@.renn/brief.md
 </context>
 
 <process>
@@ -41,11 +41,11 @@ $ARGUMENTS
 </process>
 
 <success_criteria>
-- [ ] Project context presented from brief.md/ship-target.md (or asked directly if no ACE context)
+- [ ] Project context presented from brief.md/ship-target.md (or asked directly if no RENN context)
 - [ ] User selected monitoring scope
-- [ ] Monitoring scope persisted to .ace/watch-scope.md
+- [ ] Monitoring scope persisted to .renn/watch-scope.md
 - [ ] Re-watch detection offers resume/restart/add-more when watch-plan.md exists
 - [ ] Scout research spawned for monitoring tools (Phase 2)
-- [ ] Monitoring checklist saved to .ace/watch-plan.md with auto/gate classification
+- [ ] Monitoring checklist saved to .renn/watch-plan.md with auto/gate classification
 - [ ] Checklist items executed (auto) or presented (gate) with progress tracking
 </success_criteria>

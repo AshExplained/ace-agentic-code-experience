@@ -1,5 +1,5 @@
 ---
-name: ace.discuss-stage
+name: renn.discuss-stage
 description: Gather stage context through adaptive questioning before architecting
 argument-hint: "<stage>"
 allowed-tools:
@@ -24,18 +24,18 @@ Extract implementation decisions that downstream agents need — scout and archi
 </objective>
 
 <execution_context>
-@~/.claude/ace/workflows/scope-stage.md
-@~/.claude/ace/templates/intel.md
+@~/.claude/renn/workflows/scope-stage.md
+@~/.claude/renn/templates/intel.md
 </execution_context>
 
 <context>
 Stage number: $ARGUMENTS (required)
 
 **Load project state:**
-@.ace/pulse.md
+@.renn/pulse.md
 
 **Load track:**
-@.ace/track.md
+@.renn/track.md
 </context>
 
 <process>

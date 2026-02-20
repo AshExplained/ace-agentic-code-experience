@@ -1,6 +1,6 @@
 ---
 type: prompt
-name: ace.complete-milestone
+name: renn.complete-milestone
 description: Archive completed milestone and prepare for next version
 argument-hint: <milestone-id>
 allowed-tools:
@@ -19,18 +19,18 @@ Output: Milestone archived (track + specs), brief.md evolved, local git tag crea
 <execution_context>
 **Load these files NOW (before proceeding):**
 
-- @~/.claude/ace/workflows/complete-milestone.md (main workflow)
-- @~/.claude/ace/templates/milestone-archive.md (archive template)
+- @~/.claude/renn/workflows/complete-milestone.md (main workflow)
+- @~/.claude/renn/templates/milestone-archive.md (archive template)
   </execution_context>
 
 <context>
 $ARGUMENTS
 
 **Project files:**
-- `.ace/track.md`
-- `.ace/specs.md`
-- `.ace/pulse.md`
-- `.ace/brief.md`
+- `.renn/track.md`
+- `.renn/specs.md`
+- `.renn/pulse.md`
+- `.renn/brief.md`
 </context>
 
 <process>
@@ -39,20 +39,20 @@ $ARGUMENTS
 
 0. **Check for audit:**
 
-   - Look for `.ace/{{milestone-id}}-MILESTONE-AUDIT.md`
-   - If missing or stale: recommend `/ace.audit-milestone` first
-   - If audit status is `gaps_found`: recommend `/ace.plan-milestone-gaps` first
+   - Look for `.renn/{{milestone-id}}-MILESTONE-AUDIT.md`
+   - If missing or stale: recommend `/renn.audit-milestone` first
+   - If audit status is `gaps_found`: recommend `/renn.plan-milestone-gaps` first
    - If audit status is `passed`: proceed to step 1
 
    ```markdown
    ## Pre-flight Check
 
    {If no {{milestone-id}}-MILESTONE-AUDIT.md:}
-   No milestone audit found. Run `/ace.audit-milestone` first to verify
+   No milestone audit found. Run `/renn.audit-milestone` first to verify
    specs coverage, cross-stage integration, and E2E flows.
 
    {If audit has gaps:}
-   Milestone audit found gaps. Run `/ace.plan-milestone-gaps` to create
+   Milestone audit found gaps. Run `/renn.plan-milestone-gaps` to create
    stages that close the gaps, or proceed anyway to accept as tech debt.
 
    {If audit passed:}
@@ -80,17 +80,17 @@ $ARGUMENTS
 
 4. **Archive milestone:**
 
-   - Create `.ace/milestones/{{milestone-id}}-track.md`
+   - Create `.renn/milestones/{{milestone-id}}-track.md`
    - Extract full stage details from track.md
    - Fill milestone-archive.md template
    - Update track.md to one-line summary with link
 
 5. **Archive specs:**
 
-   - Create `.ace/milestones/{{milestone-id}}-specs.md`
+   - Create `.renn/milestones/{{milestone-id}}-specs.md`
    - Mark all v1 specs as complete (checkboxes checked)
    - Note spec outcomes (validated, adjusted, dropped)
-   - Delete `.ace/specs.md` (fresh one created for next milestone)
+   - Delete `.renn/specs.md` (fresh one created for next milestone)
 
 6. **Update brief.md:**
 
@@ -105,16 +105,16 @@ $ARGUMENTS
    - Commit archive files (if commit_docs=true)
 
 8. **Offer next steps:**
-   - `/ace.ship` -- ship the completed milestone to a deployment target
-   - `/ace.new-milestone` -- start next milestone (questioning -> research -> specs -> track)
+   - `/renn.ship` -- ship the completed milestone to a deployment target
+   - `/renn.new-milestone` -- start next milestone (questioning -> research -> specs -> track)
 
 </process>
 
 <success_criteria>
 
-- Milestone archived to `.ace/milestones/{{milestone-id}}-track.md`
-- Specs archived to `.ace/milestones/{{milestone-id}}-specs.md`
-- `.ace/specs.md` deleted (fresh for next milestone)
+- Milestone archived to `.renn/milestones/{{milestone-id}}-track.md`
+- Specs archived to `.renn/milestones/{{milestone-id}}-specs.md`
+- `.renn/specs.md` deleted (fresh for next milestone)
 - track.md collapsed to one-line entry
 - brief.md updated with current state
 - Local git tag created (`{{milestone-id}}-[slug]`)
@@ -131,6 +131,6 @@ $ARGUMENTS
 - **Archive before deleting:** Always create archive files before updating/deleting originals
 - **One-line summary:** Collapsed milestone in track.md should be single line with link
 - **Context efficiency:** Archive keeps track.md and specs.md constant size per milestone
-- **Fresh specs:** Next milestone starts with `/ace.new-milestone` which includes specs definition
-- **M-format tags only:** Never create semver tags -- version tags belong to the project's version manager, not ACE
+- **Fresh specs:** Next milestone starts with `/renn.new-milestone` which includes specs definition
+- **M-format tags only:** Never create semver tags -- version tags belong to the project's version manager, not RENN
   </critical_rules>

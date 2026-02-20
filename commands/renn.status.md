@@ -1,5 +1,5 @@
 ---
-name: ace.status
+name: renn.status
 description: Check project progress, show context, and route to next action (run or plan)
 allowed-tools:
   - Read
@@ -21,38 +21,38 @@ Provides situational awareness before continuing work.
 <step name="verify">
 **Verify planning structure exists:**
 
-Use Bash (not Glob) to check—Glob respects .gitignore but .ace/ is often gitignored:
+Use Bash (not Glob) to check—Glob respects .gitignore but .renn/ is often gitignored:
 
 ```bash
-test -d .ace && echo "exists" || echo "missing"
+test -d .renn && echo "exists" || echo "missing"
 ```
 
-If no `.ace/` directory:
+If no `.renn/` directory:
 
 ```
 No planning structure found.
 
-Run /ace.start to start a new project.
+Run /renn.start to start a new project.
 ```
 
 Exit.
 
-If missing pulse.md: suggest `/ace.start`.
+If missing pulse.md: suggest `/renn.start`.
 
 **If track.md missing but brief.md exists:**
 
 This means a milestone was completed and archived. Go to **Route F** (between milestones).
 
-If missing both track.md and brief.md: suggest `/ace.start`.
+If missing both track.md and brief.md: suggest `/renn.start`.
 </step>
 
 <step name="load">
 **Load full project context:**
 
-- Read `.ace/pulse.md` for living memory (position, decisions, issues)
-- Read `.ace/track.md` for stage structure and objectives
-- Read `.ace/brief.md` for current state (What This Is, Core Value, Requirements)
-- Read `.ace/config.json` for settings (horsepower, workflow toggles)
+- Read `.renn/pulse.md` for living memory (position, decisions, issues)
+- Read `.renn/track.md` for stage structure and objectives
+- Read `.renn/brief.md` for current state (What This Is, Core Value, Requirements)
+- Read `.renn/config.json` for settings (horsepower, workflow toggles)
   </step>
 
 <step name="recent">
@@ -70,8 +70,8 @@ If missing both track.md and brief.md: suggest `/ace.start`.
 - Calculate: total runs, completed runs, remaining runs
 - Note any blockers or concerns
 - Check for intel.md: For stages without run.md files, check if `{stage}-intel.md` exists in stage directory
-- Count pending todos: `ls .ace/todos/pending/*.md 2>/dev/null | wc -l`
-- Check for active debug sessions: `ls .ace/debug/*.md 2>/dev/null | grep -v resolved | wc -l`
+- Count pending todos: `ls .renn/todos/pending/*.md 2>/dev/null | wc -l`
+- Check for active debug sessions: `ls .renn/debug/*.md 2>/dev/null | grep -v resolved | wc -l`
   </step>
 
 <step name="report">
@@ -100,10 +100,10 @@ INTEL: [✓ if intel.md exists | - if not]
 - [any blockers or concerns from pulse.md]
 
 ## Pending Todos
-- [count] pending — /ace.check-todos to review
+- [count] pending — /renn.check-todos to review
 
 ## Active Debug Sessions
-- [count] active — /ace.debug to continue
+- [count] active — /renn.debug to continue
 (Only show this section if count > 0)
 
 ## What's Next
@@ -120,9 +120,9 @@ INTEL: [✓ if intel.md exists | - if not]
 List files in the current stage directory:
 
 ```bash
-ls -1 .ace/stages/[current-stage-dir]/*-run.md 2>/dev/null | wc -l
-ls -1 .ace/stages/[current-stage-dir]/*-recap.md 2>/dev/null | wc -l
-ls -1 .ace/stages/[current-stage-dir]/*-uat.md 2>/dev/null | wc -l
+ls -1 .renn/stages/[current-stage-dir]/*-run.md 2>/dev/null | wc -l
+ls -1 .renn/stages/[current-stage-dir]/*-recap.md 2>/dev/null | wc -l
+ls -1 .renn/stages/[current-stage-dir]/*-uat.md 2>/dev/null | wc -l
 ```
 
 State: "This stage has {X} runs, {Y} recaps."
@@ -133,7 +133,7 @@ Check for uat.md files with status "diagnosed" (has gaps needing fixes).
 
 ```bash
 # Check for diagnosed UAT with gaps
-grep -l "status: diagnosed" .ace/stages/[current-stage-dir]/*-uat.md 2>/dev/null
+grep -l "status: diagnosed" .renn/stages/[current-stage-dir]/*-uat.md 2>/dev/null
 ```
 
 Track:
@@ -162,7 +162,7 @@ Read its `<objective>` section.
 
 **{stage}-{run}: [Run Name]** — [objective summary from run.md]
 
-`/ace.run-stage {stage}`
+`/renn.run-stage {stage}`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -186,8 +186,8 @@ Otherwise -> IS_UI_STAGE=false.
 If IS_UI_STAGE=true, check design artifacts:
 
 ```bash
-HAS_STYLEKIT=$(ls .ace/design/stylekit.yaml 2>/dev/null && echo "yes")
-HAS_SCREENS=$(ls .ace/design/screens/*.yaml 2>/dev/null && echo "yes")
+HAS_STYLEKIT=$(ls .renn/design/stylekit.yaml 2>/dev/null && echo "yes")
+HAS_SCREENS=$(ls .renn/design/screens/*.yaml 2>/dev/null && echo "yes")
 ```
 
 **If UI stage + no stylekit:**
@@ -200,14 +200,14 @@ HAS_SCREENS=$(ls .ace/design/screens/*.yaml 2>/dev/null && echo "yes")
 **Stage {N}: {Name}** — {Goal from track.md}
 <sub>✓ Context gathered — design system needed before planning</sub>
 
-`/ace.design-system`
+`/renn.design-system`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.plan-stage {stage}` — skip design, Claude designs inline during execution
+- `/renn.plan-stage {stage}` — skip design, Claude designs inline during execution
 
 ---
 ```
@@ -222,14 +222,14 @@ HAS_SCREENS=$(ls .ace/design/screens/*.yaml 2>/dev/null && echo "yes")
 **Stage {N}: {Name}** — {Goal from track.md}
 <sub>✓ Context gathered — screen prototypes needed before planning</sub>
 
-`/ace.design-screens {stage}`
+`/renn.design-screens {stage}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.plan-stage {stage}` — skip screen design, Claude designs inline during execution
+- `/renn.plan-stage {stage}` — skip screen design, Claude designs inline during execution
 
 ---
 ```
@@ -244,7 +244,7 @@ HAS_SCREENS=$(ls .ace/design/screens/*.yaml 2>/dev/null && echo "yes")
 **Stage {N}: {Name}** — {Goal from track.md}
 <sub>✓ Context gathered, ready to plan</sub>
 
-`/ace.plan-stage {stage-number}`
+`/renn.plan-stage {stage-number}`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -264,17 +264,17 @@ Run the same [UI] tag check on the stage heading (see above).
 
 **Stage {N}: {Name}** — {Goal from track.md}
 
-`/ace.discuss-stage {stage}` — gather context and clarify approach
+`/renn.discuss-stage {stage}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
-**Then:** `/ace.design-system` — create design system before planning
+**Then:** `/renn.design-system` — create design system before planning
 
 **Also available:**
-- `/ace.plan-stage {stage}` — skip discussion and design, Claude designs inline
-- `/ace.list-stage-assumptions {stage}` — see Claude's assumptions
+- `/renn.plan-stage {stage}` — skip discussion and design, Claude designs inline
+- `/renn.list-stage-assumptions {stage}` — see Claude's assumptions
 
 ---
 ```
@@ -288,17 +288,17 @@ Run the same [UI] tag check on the stage heading (see above).
 
 **Stage {N}: {Name}** — {Goal from track.md}
 
-`/ace.discuss-stage {stage}` — gather context and clarify approach
+`/renn.discuss-stage {stage}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
-**Then:** `/ace.design-screens {stage}` — create screen prototypes before planning
+**Then:** `/renn.design-screens {stage}` — create screen prototypes before planning
 
 **Also available:**
-- `/ace.plan-stage {stage}` — skip discussion and design, Claude designs inline
-- `/ace.list-stage-assumptions {stage}` — see Claude's assumptions
+- `/renn.plan-stage {stage}` — skip discussion and design, Claude designs inline
+- `/renn.list-stage-assumptions {stage}` — see Claude's assumptions
 
 ---
 ```
@@ -312,15 +312,15 @@ Run the same [UI] tag check on the stage heading (see above).
 
 **Stage {N}: {Name}** — {Goal from track.md}
 
-`/ace.discuss-stage {stage}` — gather context and clarify approach
+`/renn.discuss-stage {stage}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.plan-stage {stage}` — skip discussion, plan directly
-- `/ace.list-stage-assumptions {stage}` — see Claude's assumptions
+- `/renn.plan-stage {stage}` — skip discussion, plan directly
+- `/renn.list-stage-assumptions {stage}` — see Claude's assumptions
 
 ---
 ```
@@ -338,15 +338,15 @@ uat.md exists with gaps (diagnosed issues). User needs to plan fixes.
 
 **{stage}-uat.md** has {N} gaps requiring fixes.
 
-`/ace.plan-stage {stage} --gaps`
+`/renn.plan-stage {stage} --gaps`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.run-stage {stage}` — execute stage runs
-- `/ace.audit {stage}` — run more UAT testing
+- `/renn.run-stage {stage}` — execute stage runs
+- `/renn.audit {stage}` — run more UAT testing
 
 ---
 ```
@@ -388,17 +388,17 @@ Run the same [UI] tag check on the NEXT stage's heading from track.md.
 
 **Stage {Z+1}: {Name}** — {Goal from track.md}
 
-`/ace.discuss-stage {Z+1}` — gather context and clarify approach
+`/renn.discuss-stage {Z+1}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
-**Then:** `/ace.design-system` — create design system before planning
+**Then:** `/renn.design-system` — create design system before planning
 
 **Also available:**
-- `/ace.plan-stage {Z+1}` — skip discussion and design, Claude designs inline
-- `/ace.audit {Z}` — user acceptance test before continuing
+- `/renn.plan-stage {Z+1}` — skip discussion and design, Claude designs inline
+- `/renn.audit {Z}` — user acceptance test before continuing
 
 ---
 ```
@@ -414,17 +414,17 @@ Run the same [UI] tag check on the NEXT stage's heading from track.md.
 
 **Stage {Z+1}: {Name}** — {Goal from track.md}
 
-`/ace.discuss-stage {Z+1}` — gather context and clarify approach
+`/renn.discuss-stage {Z+1}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
-**Then:** `/ace.design-screens {Z+1}` — create screen prototypes before planning
+**Then:** `/renn.design-screens {Z+1}` — create screen prototypes before planning
 
 **Also available:**
-- `/ace.plan-stage {Z+1}` — skip discussion and design, Claude designs inline
-- `/ace.audit {Z}` — user acceptance test before continuing
+- `/renn.plan-stage {Z+1}` — skip discussion and design, Claude designs inline
+- `/renn.audit {Z}` — user acceptance test before continuing
 
 ---
 ```
@@ -440,15 +440,15 @@ Run the same [UI] tag check on the NEXT stage's heading from track.md.
 
 **Stage {Z+1}: {Name}** — {Goal from track.md}
 
-`/ace.discuss-stage {Z+1}` — gather context and clarify approach
+`/renn.discuss-stage {Z+1}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.plan-stage {Z+1}` — skip discussion, plan directly
-- `/ace.audit {Z}` — user acceptance test before continuing
+- `/renn.plan-stage {Z+1}` — skip discussion, plan directly
+- `/renn.audit {Z}` — user acceptance test before continuing
 
 ---
 ```
@@ -468,14 +468,14 @@ All {N} stages finished!
 
 **Complete Milestone** — archive and prepare for next
 
-`/ace.complete-milestone`
+`/renn.complete-milestone`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.audit` — user acceptance test before completing milestone
+- `/renn.audit` — user acceptance test before completing milestone
 
 ---
 ```
@@ -499,7 +499,7 @@ Ready to plan the next milestone.
 
 **Start Next Milestone** — questioning → research → requirements → track
 
-`/ace.new-milestone`
+`/renn.new-milestone`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -511,10 +511,10 @@ Ready to plan the next milestone.
 <step name="edge_cases">
 **Handle edge cases:**
 
-- Stage complete but next stage not planned → offer `/ace.plan-stage [next]`
+- Stage complete but next stage not planned → offer `/renn.plan-stage [next]`
 - All work complete → offer milestone completion
 - Blockers present → highlight before offering to continue
-- Handoff file exists → mention it, offer `/ace.continue`
+- Handoff file exists → mention it, offer `/renn.continue`
   </step>
 
 </process>
@@ -524,7 +524,7 @@ Ready to plan the next milestone.
 - [ ] Rich context provided (recent work, decisions, issues)
 - [ ] Current position clear with visual progress
 - [ ] What's next clearly explained
-- [ ] Smart routing: /ace.run-stage if runs exist, /ace.plan-stage if not
+- [ ] Smart routing: /renn.run-stage if runs exist, /renn.plan-stage if not
 - [ ] User confirms before any action
 - [ ] Seamless handoff to appropriate ace command
       </success_criteria>

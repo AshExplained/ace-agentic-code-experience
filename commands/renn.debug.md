@@ -1,5 +1,5 @@
 ---
-name: ace.debug
+name: renn.debug
 description: Systematic debugging with persistent state across context resets
 argument-hint: [issue description]
 allowed-tools:
@@ -12,7 +12,7 @@ allowed-tools:
 <objective>
 Debug issues using scientific method with subagent isolation.
 
-**Orchestrator role:** Gather symptoms, spawn ace-detective agent, handle gates, spawn continuations.
+**Orchestrator role:** Gather symptoms, spawn renn-detective agent, handle gates, spawn continuations.
 
 **Why subagent:** Investigation burns context fast (reading files, forming hypotheses, testing). Fresh 200k context per investigation. Main context stays lean for user interaction.
 </objective>
@@ -22,7 +22,7 @@ User's issue: $ARGUMENTS
 
 Check for active sessions:
 ```bash
-ls .ace/debug/*.md 2>/dev/null | grep -v resolved | head -5
+ls .renn/debug/*.md 2>/dev/null | grep -v resolved | head -5
 ```
 </context>
 
@@ -33,7 +33,7 @@ ls .ace/debug/*.md 2>/dev/null | grep -v resolved | head -5
 Read horsepower profile for agent spawning:
 
 ```bash
-HORSEPOWER=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+HORSEPOWER=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -42,7 +42,7 @@ Default to "balanced" if not set.
 
 | Agent | max | balanced | eco |
 |-------|---------|----------|--------|
-| ace-detective | opus | sonnet | sonnet |
+| renn-detective | opus | sonnet | sonnet |
 
 Store resolved model for use in Task calls below.
 
@@ -67,7 +67,7 @@ Use AskUserQuestion for each:
 
 After all gathered, confirm ready to investigate.
 
-## 3. Spawn ace-detective Agent
+## 3. Spawn renn-detective Agent
 
 Fill prompt and spawn:
 
@@ -92,14 +92,14 @@ goal: find_and_fix
 </mode>
 
 <debug_file>
-Create: .ace/debug/{slug}.md
+Create: .renn/debug/{slug}.md
 </debug_file>
 ```
 
 ```
 Task(
   prompt=filled_prompt,
-  subagent_type="ace-detective",
+  subagent_type="renn-detective",
   model="{detective_model}",
   description="Debug {slug}"
 )
@@ -111,7 +111,7 @@ Task(
 - Display root cause and evidence summary
 - Offer options:
   - "Fix now" - spawn fix subagent
-  - "Plan fix" - suggest ace.plan-stage --gaps
+  - "Plan fix" - suggest renn.plan-stage --gaps
   - "Manual fix" - done
 
 **If `## GATE REACHED`:**
@@ -136,7 +136,7 @@ Continue debugging {slug}. Evidence is in the debug file.
 </objective>
 
 <prior_state>
-Debug file: @.ace/debug/{slug}.md
+Debug file: @.renn/debug/{slug}.md
 </prior_state>
 
 <checkpoint_response>
@@ -152,7 +152,7 @@ goal: find_and_fix
 ```
 Task(
   prompt=continuation_prompt,
-  subagent_type="ace-detective",
+  subagent_type="renn-detective",
   model="{detective_model}",
   description="Continue debug {slug}"
 )
@@ -163,7 +163,7 @@ Task(
 <success_criteria>
 - [ ] Active sessions checked
 - [ ] Symptoms gathered (if new)
-- [ ] ace-detective spawned with context
+- [ ] renn-detective spawned with context
 - [ ] Gates handled correctly
 - [ ] Root cause confirmed before fixing
 </success_criteria>

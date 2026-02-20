@@ -11,18 +11,18 @@ Fresh context per agent. Orchestrator stays lean (~15%), each subagent gets 100%
 <process>
 
 <step name="validate_environment" priority="first">
-Validate .ace/ exists and resolve model profile:
+Validate .renn/ exists and resolve model profile:
 
 ```bash
-ls .ace/ 2>/dev/null
+ls .renn/ 2>/dev/null
 ```
 
-**If not found:** Error - user should run `/ace.start` first.
+**If not found:** Error - user should run `/renn.start` first.
 
 **Resolve model profile for agent spawning:**
 
 ```bash
-MODEL_PROFILE=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+MODEL_PROFILE=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -31,11 +31,11 @@ Default to "balanced" if not set.
 
 | Agent | max | balanced | eco |
 |-------|---------|----------|--------|
-| ace-stage-scout | opus | sonnet | haiku |
-| ace-architect | opus | opus | sonnet |
-| ace-plan-reviewer | sonnet | sonnet | haiku |
-| ace-designer | opus | sonnet | sonnet |
-| ace-design-reviewer | sonnet | sonnet | haiku |
+| renn-stage-scout | opus | sonnet | haiku |
+| renn-architect | opus | opus | sonnet |
+| renn-plan-reviewer | sonnet | sonnet | haiku |
+| renn-designer | opus | sonnet | sonnet |
+| renn-design-reviewer | sonnet | sonnet | haiku |
 
 Store resolved models for use in Task calls below.
 </step>
@@ -76,7 +76,7 @@ fi
 **Check for existing research:**
 
 ```bash
-ls .ace/stages/${STAGE}-*/*-research.md 2>/dev/null
+ls .renn/stages/${STAGE}-*/*-research.md 2>/dev/null
 ```
 </step>
 
@@ -88,7 +88,7 @@ ls .ace/stages/${STAGE}-*/*-research.md 2>/dev/null
 ```bash
 # Extract all stage headings and goals from track.md
 # Track uses "### Stage N:" format (anchored to ### headings)
-grep -A5 "^### Stage [0-9]*:" .ace/track.md | grep -v "^\-\-$"
+grep -A5 "^### Stage [0-9]*:" .renn/track.md | grep -v "^\-\-$"
 ```
 
 For each stage heading found, check if it contains a [UI] tag:
@@ -129,7 +129,7 @@ Design system will cover all {N} UI stages.
 ```bash
 # Strip leading zeros for track.md lookup (track uses "Stage 1:", not "Stage 01:")
 STAGE_UNPADDED=$(echo "$STAGE" | sed 's/^0\+\([0-9]\)/\1/')
-grep -A5 "^### Stage ${STAGE_UNPADDED}:" .ace/track.md 2>/dev/null
+grep -A5 "^### Stage ${STAGE_UNPADDED}:" .renn/track.md 2>/dev/null
 ```
 
 **If not found:** Error with available stages. **If found:** Extract stage number, name, description.
@@ -148,9 +148,9 @@ COMMIT_PREFIX="design"  # For commit messages (used by handle_design)
 COMMIT_MSG_SCOPE="project design system"  # For commit message body text
 
 # Project-level variables are still extracted from brief.md (they are project-scoped already)
-PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
-PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .ace/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
-VIEWPORT_RAW=$(grep -m1 '^\*\*Viewport:\*\*' .ace/brief.md 2>/dev/null | sed 's/\*\*Viewport:\*\* //')
+PROJECT_NAME=$(head -1 .renn/brief.md 2>/dev/null | sed 's/^# //')
+PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .renn/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
+VIEWPORT_RAW=$(grep -m1 '^\*\*Viewport:\*\*' .renn/brief.md 2>/dev/null | sed 's/\*\*Viewport:\*\* //')
 ```
 
 Display: `Using project-level mode (no stage directory). Designing for all UI stages.`
@@ -159,14 +159,14 @@ Display: `Using project-level mode (no stage directory). Designing for all UI st
 
 ```bash
 # STAGE is already normalized (08, 02.1, etc.) from parse_arguments
-STAGE_DIR=$(ls -d .ace/stages/${STAGE}-* 2>/dev/null | head -1)
+STAGE_DIR=$(ls -d .renn/stages/${STAGE}-* 2>/dev/null | head -1)
 if [ -z "$STAGE_DIR" ]; then
   # Create stage directory from track name
   # Anchor to ### headings to avoid matching list items (which contain markdown ** and descriptions)
   STAGE_UNPADDED=$(echo "$STAGE" | sed 's/^0\+\([0-9]\)/\1/')
-  STAGE_NAME=$(grep "^### Stage ${STAGE_UNPADDED}:" .ace/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | sed 's/ \[UI\]$//' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-  mkdir -p ".ace/stages/${STAGE}-${STAGE_NAME}"
-  STAGE_DIR=".ace/stages/${STAGE}-${STAGE_NAME}"
+  STAGE_NAME=$(grep "^### Stage ${STAGE_UNPADDED}:" .renn/track.md | head -1 | sed 's/^### Stage [0-9]*: //' | sed 's/ \[UI\]$//' | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
+  mkdir -p ".renn/stages/${STAGE}-${STAGE_NAME}"
+  STAGE_DIR=".renn/stages/${STAGE}-${STAGE_NAME}"
 fi
 
 # Set COMMIT_PREFIX for stage-level mode (symmetry with project-level)
@@ -177,11 +177,11 @@ COMMIT_MSG_SCOPE="Stage ${STAGE}: ${STAGE_NAME}"
 INTEL_CONTENT=$(cat "${STAGE_DIR}"/*-intel.md 2>/dev/null)
 
 # Extract project name from brief.md heading (used in designer spawn)
-PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
+PROJECT_NAME=$(head -1 .renn/brief.md 2>/dev/null | sed 's/^# //')
 
 # Extract viewport context from brief.md (used in Phase 1 designer spawn)
-PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .ace/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
-VIEWPORT_RAW=$(grep -m1 '^\*\*Viewport:\*\*' .ace/brief.md 2>/dev/null | sed 's/\*\*Viewport:\*\* //')
+PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .renn/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
+VIEWPORT_RAW=$(grep -m1 '^\*\*Viewport:\*\*' .renn/brief.md 2>/dev/null | sed 's/\*\*Viewport:\*\* //')
 ```
 
 **CRITICAL:** Store `INTEL_CONTENT` now. It must be passed to:
@@ -197,12 +197,12 @@ If intel.md exists, display: `Using stage context from: ${STAGE_DIR}/*-intel.md`
 
 **If PROJECT_LEVEL=false:**
 
-**If `--phase-2-only` flag is set:** Skip handle_research entirely. Do NOT check config, do NOT check for existing research.md, do NOT offer the scout agent. Research was done during /ace.design-system. Load from disk if available: `RESEARCH_CONTENT=$(cat ${STAGE_DIR}/${STAGE}-research.md 2>/dev/null || echo "")`. If the file does not exist, set `RESEARCH_CONTENT=""` (empty string). Continue to detect_ui_stage.
+**If `--phase-2-only` flag is set:** Skip handle_research entirely. Do NOT check config, do NOT check for existing research.md, do NOT offer the scout agent. Research was done during /renn.design-system. Load from disk if available: `RESEARCH_CONTENT=$(cat ${STAGE_DIR}/${STAGE}-research.md 2>/dev/null || echo "")`. If the file does not exist, set `RESEARCH_CONTENT=""` (empty string). Continue to detect_ui_stage.
 
 Check config for research setting:
 
 ```bash
-WORKFLOW_RESEARCH=$(cat .ace/config.json 2>/dev/null | grep -o '"research"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+WORKFLOW_RESEARCH=$(cat .renn/config.json 2>/dev/null | grep -o '"research"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 ```
 
 **If `checks.research` is `false`:** Skip to detect_ui_stage.
@@ -236,7 +236,7 @@ Options:
 
 Display stage banner:
 ```
-ACE > SCOUTING STAGE {X}
+RENN > SCOUTING STAGE {X}
 
 Spawning scout...
 ```
@@ -245,18 +245,18 @@ Gather additional context for research prompt:
 
 ```bash
 # Get stage description from track (use STAGE_UNPADDED from validate_stage)
-STAGE_DESC=$(grep -A5 "^### Stage ${STAGE_UNPADDED}:" .ace/track.md)
+STAGE_DESC=$(grep -A5 "^### Stage ${STAGE_UNPADDED}:" .renn/track.md)
 
 # Get specs if they exist
-SPECS=$(cat .ace/specs.md 2>/dev/null | grep -A100 "## Requirements" | head -50)
+SPECS=$(cat .renn/specs.md 2>/dev/null | grep -A100 "## Requirements" | head -50)
 
 # Get prior decisions from pulse.md
-DECISIONS=$(grep -A20 "### Decisions Made" .ace/pulse.md 2>/dev/null)
+DECISIONS=$(grep -A20 "### Decisions Made" .renn/pulse.md 2>/dev/null)
 
 # INTEL_CONTENT already loaded in ensure_stage_directory
 
 # Read UX.md for scout (if exists)
-UX_CONTENT_FOR_SCOUT=$(cat .ace/research/UX.md 2>/dev/null)
+UX_CONTENT_FOR_SCOUT=$(cat .renn/research/UX.md 2>/dev/null)
 ```
 
 Fill research prompt and spawn:
@@ -269,7 +269,7 @@ Answer: "What do I need to know to PLAN this stage well?"
 </objective>
 
 <stage_context>
-**IMPORTANT:** If intel.md exists below, it contains user decisions from /ace.discuss-stage.
+**IMPORTANT:** If intel.md exists below, it contains user decisions from /renn.discuss-stage.
 
 - **Decisions section** = Locked choices -- research THESE deeply, don't explore alternatives
 - **Claude's Discretion section** = Your freedom areas -- research options, make recommendations
@@ -305,7 +305,7 @@ Write research findings to: {stage_dir}/{stage}-research.md
 ```
 Task(
   prompt=research_prompt,
-  subagent_type="ace-stage-scout",
+  subagent_type="renn-stage-scout",
   model="{scout_model}",
   description="Research Stage {stage}"
 )
@@ -340,7 +340,7 @@ Task(
 Check the stage heading from track.md:
 
 ```bash
-STAGE_HEADING=$(grep "^### Stage ${STAGE_UNPADDED}:" .ace/track.md | head -1)
+STAGE_HEADING=$(grep "^### Stage ${STAGE_UNPADDED}:" .renn/track.md | head -1)
 ```
 
 If the heading contains `[UI]` -> set `UI_STAGE=true`.
@@ -349,7 +349,7 @@ If the heading does NOT contain `[UI]` -> this is not a UI stage. **ERROR and ex
 ```
 Stage {N} is not a UI stage (no [UI] tag in track.md heading). Design pipeline is for UI stages only.
 
-Use /ace.plan-stage {N} directly.
+Use /renn.plan-stage {N} directly.
 ```
 
 No keyword matching. No UNCERTAIN state. The [UI] tag is authoritative.
@@ -359,13 +359,13 @@ Store `UI_STAGE` for use by handle_ux_interview and handle_design.
 
 <step name="handle_ux_interview">
 **Skip conditions (check in order):**
-1. UX.md does not exist -> skip (display: "No UX.md found. Skipping UX interview. Run /ace.start or /ace.new-milestone to generate UX research.")
+1. UX.md does not exist -> skip (display: "No UX.md found. Skipping UX interview. Run /renn.start or /renn.new-milestone to generate UX research.")
 2. `--skip-ux-interview` flag set -> skip
 
 **Read UX context:**
 
 ```bash
-UX_CONTENT=$(cat .ace/research/UX.md 2>/dev/null)
+UX_CONTENT=$(cat .renn/research/UX.md 2>/dev/null)
 if [ -z "$UX_CONTENT" ]; then
   echo "No UX.md found. Skipping UX interview."
   UX_INTERVIEW_ANSWERS=""
@@ -389,7 +389,7 @@ fi
 **If PROJECT_LEVEL=true:**
 
 ```
-ACE > UX INTERVIEW FOR PROJECT
+RENN > UX INTERVIEW FOR PROJECT
 
 Before visual design, let's discuss how users should experience this project across all UI stages.
 ```
@@ -397,7 +397,7 @@ Before visual design, let's discuss how users should experience this project acr
 **If PROJECT_LEVEL=false:**
 
 ```
-ACE > UX INTERVIEW FOR STAGE {X}
+RENN > UX INTERVIEW FOR STAGE {X}
 
 Before visual design, let's discuss how users should experience this stage.
 ```
@@ -529,12 +529,12 @@ Produce `UX_BRIEF` by combining all three sources into concrete design implicati
 **If PROJECT_LEVEL=true:**
 
 ```bash
-mkdir -p .ace/design/
+mkdir -p .renn/design/
 ```
 
-Write the UX_BRIEF content to `.ace/design/ux-brief.md` as plain markdown. The file contains the synthesized UX brief sections WITHOUT XML tags -- just the markdown content between `<ux_brief>` and `</ux_brief>`.
+Write the UX_BRIEF content to `.renn/design/ux-brief.md` as plain markdown. The file contains the synthesized UX brief sections WITHOUT XML tags -- just the markdown content between `<ux_brief>` and `</ux_brief>`.
 
-Display: `UX brief synthesized and saved to .ace/design/ux-brief.md. Proceeding to design...`
+Display: `UX brief synthesized and saved to .renn/design/ux-brief.md. Proceeding to design...`
 
 **If PROJECT_LEVEL=false:**
 
@@ -579,7 +579,7 @@ Display: `UX brief synthesized and saved to ${STAGE_DIR}/${STAGE}-ux-brief.md. P
 **Load commit config for design artifact commits:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
@@ -605,19 +605,19 @@ If a recap references screen specs and no `--force` flag: Display "Using existin
 ### Mode Determination (PLAN-03)
 
 ```bash
-ls .ace/design/stylekit.yaml 2>/dev/null
-ls .ace/codebase/DESIGN.md 2>/dev/null
+ls .renn/design/stylekit.yaml 2>/dev/null
+ls .renn/codebase/DESIGN.md 2>/dev/null
 ```
 
 **Phase 2 only mode override (when --phase-2-only flag is set):**
 
 If `PHASE_2_ONLY=true`:
-- Check `ls .ace/design/stylekit.yaml 2>/dev/null`
-- If stylekit.yaml does NOT exist: **ERROR** -- Display: "No design system found at .ace/design/stylekit.yaml\n\nRun /ace.design-system first to create the design system,\nthen run /ace.design-screens {N} to create screen prototypes." STOP.
+- Check `ls .renn/design/stylekit.yaml 2>/dev/null`
+- If stylekit.yaml does NOT exist: **ERROR** -- Display: "No design system found at .renn/design/stylekit.yaml\n\nRun /renn.design-system first to create the design system,\nthen run /renn.design-screens {N} to create screen prototypes." STOP.
 - If stylekit.yaml exists: Set `DESIGN_MODE="screens_only"`. Skip normal mode determination. Skip Restyle Trigger. Jump directly to Phase 2.
 - Load UX brief from disk (project-level path first, stage-level fallback):
   ```bash
-  UX_BRIEF=$(cat .ace/design/ux-brief.md 2>/dev/null)
+  UX_BRIEF=$(cat .renn/design/ux-brief.md 2>/dev/null)
   if [ -z "$UX_BRIEF" ]; then
     UX_BRIEF=$(cat ${STAGE_DIR}/${STAGE}-ux-brief.md 2>/dev/null)
   fi
@@ -627,15 +627,15 @@ If `PHASE_2_ONLY=true`:
 **Restyle mode override (when --restyle flag is set):**
 
 If `RESTYLE_MODE=true`:
-- Check `ls .ace/design/stylekit.yaml 2>/dev/null`
-- If stylekit.yaml does NOT exist: **ERROR** -- Display: "No existing design to restyle. Run `/ace.design-system` first." STOP.
+- Check `ls .renn/design/stylekit.yaml 2>/dev/null`
+- If stylekit.yaml does NOT exist: **ERROR** -- Display: "No existing design to restyle. Run `/renn.design-system` first." STOP.
 - If stylekit.yaml exists: Set `DESIGN_MODE="screens_only"`. Skip the normal priority order below. Jump directly to the Restyle Trigger (PLAN-07) section.
 
 **Normal mode determination (when --restyle flag is NOT set):**
 
 Priority order (check in this sequence):
 1. If stylekit.yaml exists: `DESIGN_MODE="screens_only"` (approved design system takes precedence)
-2. Else if .ace/codebase/DESIGN.md exists: `DESIGN_MODE="translate"` (brownfield design detected)
+2. Else if .renn/codebase/DESIGN.md exists: `DESIGN_MODE="translate"` (brownfield design detected)
 3. Else: `DESIGN_MODE="full"` (greenfield, no existing design)
 
 ### Translate Mode Checkpoint (only when DESIGN_MODE="translate")
@@ -645,12 +645,12 @@ Priority order (check in this sequence):
 Present `checkpoint:decision`:
 
 ```
-Existing design patterns detected in .ace/codebase/DESIGN.md
+Existing design patterns detected in .renn/codebase/DESIGN.md
 
-Your project already has a visual design system. How should ACE handle it?
+Your project already has a visual design system. How should RENN handle it?
 
 Options:
-  Absorb - Extract existing patterns into ACE stylekit as-is (fastest, no interview)
+  Absorb - Extract existing patterns into RENN stylekit as-is (fastest, no interview)
   Extend - Extract existing patterns + discuss enhancements (balanced)
   Replace - Ignore existing patterns, create fresh design system (full interview)
 
@@ -658,8 +658,8 @@ Select: absorb, extend, or replace
 ```
 
 Routing:
-- `absorb`: Set `TRANSLATE_STRATEGY="absorb"`. Skip the design interview entirely. Read `.ace/codebase/DESIGN.md` content into `TRANSLATION_CONTEXT`. Display: "Absorbing existing design. Skipping interview..."
-- `extend`: Set `TRANSLATE_STRATEGY="extend"`. Read `.ace/codebase/DESIGN.md` content into `TRANSLATION_CONTEXT`. Continue to the scoped interview (see Scoped Interview below).
+- `absorb`: Set `TRANSLATE_STRATEGY="absorb"`. Skip the design interview entirely. Read `.renn/codebase/DESIGN.md` content into `TRANSLATION_CONTEXT`. Display: "Absorbing existing design. Skipping interview..."
+- `extend`: Set `TRANSLATE_STRATEGY="extend"`. Read `.renn/codebase/DESIGN.md` content into `TRANSLATION_CONTEXT`. Continue to the scoped interview (see Scoped Interview below).
 - `replace`: Set `DESIGN_MODE="full"`. Display: "Replacing existing design. Running full interview..." Continue to existing greenfield flow (design interview, Phase 1, etc.) as if DESIGN.md did not exist.
 
 ### Scoped Interview (only when TRANSLATE_STRATEGY="extend")
@@ -737,13 +737,13 @@ Only when `DESIGN_MODE="screens_only"` (existing stylekit detected):
 Display:
 ```
 Restyling: creating new screen prototypes with existing design system.
-To create an entirely new design system, run /ace.design-system instead.
+To create an entirely new design system, run /renn.design-system instead.
 ```
 
 **If RESTYLE_MODE is NOT set (normal flow):** Present the existing checkpoint:
 
 ```
-Existing stylekit found at .ace/design/stylekit.yaml
+Existing stylekit found at .renn/design/stylekit.yaml
 
 Options:
   Use existing - Create new screens using current design system
@@ -770,7 +770,7 @@ Display banner:
 **If PROJECT_LEVEL=true:**
 
 ```
-ACE > PROJECT DESIGN -- DESIGN INTERVIEW
+RENN > PROJECT DESIGN -- DESIGN INTERVIEW
 
 Before creating your project design system, let me understand your vision.
 ```
@@ -778,7 +778,7 @@ Before creating your project design system, let me understand your vision.
 **If PROJECT_LEVEL=false:**
 
 ```
-ACE > DESIGNING STAGE {X} -- DESIGN INTERVIEW
+RENN > DESIGNING STAGE {X} -- DESIGN INTERVIEW
 
 Before creating your design system, let me understand your vision.
 ```
@@ -891,7 +891,7 @@ For each remaining core question, use AskUserQuestion with the standard options:
 After all design questions are answered, collect the Pexels API key as part of the same flow.
 
 ```bash
-PEXELS_KEY=$(cat .ace/secrets.json 2>/dev/null | grep -o '"pexels_api_key"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "")
+PEXELS_KEY=$(cat .renn/secrets.json 2>/dev/null | grep -o '"pexels_api_key"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "")
 ```
 
 If key already exists in secrets.json: read silently, no prompt. Display: "Pexels key found."
@@ -907,9 +907,9 @@ If empty or missing, present as AskUserQuestion:
 ```
 
 If user selects "Paste my key", prompt for the key value. Then:
-1. Read existing `.ace/secrets.json` content (if file exists) to preserve other fields
+1. Read existing `.renn/secrets.json` content (if file exists) to preserve other fields
 2. Merge `{"pexels_api_key": "{user_input}"}` into the existing JSON object
-3. Write merged JSON back to `.ace/secrets.json`
+3. Write merged JSON back to `.renn/secrets.json`
 4. Set `PEXELS_KEY` to the provided value
 5. Display: "Pexels API key saved."
 
@@ -918,10 +918,10 @@ If user selects "Skip":
 2. Display: "Using placeholder images."
 3. Do NOT create or modify secrets.json
 
-Ensure `.ace/secrets.json` is gitignored:
+Ensure `.renn/secrets.json` is gitignored:
 
 ```bash
-grep -q "secrets.json" .gitignore 2>/dev/null || echo ".ace/secrets.json" >> .gitignore
+grep -q "secrets.json" .gitignore 2>/dev/null || echo ".renn/secrets.json" >> .gitignore
 ```
 
 #### Step 6: Compile Design Preferences
@@ -1101,9 +1101,9 @@ Use this viewport metadata to populate the stylekit.yaml viewport section (step 
 **Pexels API Key:** {pexels_key}
 
 **Output Directories:**
-- Stylekit: .ace/design/
-- Components: .ace/design/components/
-- Preview: .ace/design/stylekit-preview.html
+- Stylekit: .renn/design/
+- Components: .renn/design/components/
+- Preview: .renn/design/stylekit-preview.html
 
 </design_context>
 ```
@@ -1133,7 +1133,7 @@ Display banner before spawning:
 **If PROJECT_LEVEL=true:**
 
 ```
-ACE > PROJECT DESIGN -- PHASE 1: DESIGN SYSTEM
+RENN > PROJECT DESIGN -- PHASE 1: DESIGN SYSTEM
 {IF DESIGN_MODE == "translate":}
 Spawning designer (mode: translate, strategy: {TRANSLATE_STRATEGY}, phase: stylekit)...
 {ELSE:}
@@ -1144,7 +1144,7 @@ Spawning designer (mode: full, phase: stylekit)...
 **If PROJECT_LEVEL=false:**
 
 ```
-ACE > DESIGNING STAGE {X} -- PHASE 1: DESIGN SYSTEM
+RENN > DESIGNING STAGE {X} -- PHASE 1: DESIGN SYSTEM
 {IF DESIGN_MODE == "translate":}
 Spawning designer (mode: translate, strategy: {TRANSLATE_STRATEGY}, phase: stylekit)...
 {ELSE:}
@@ -1159,7 +1159,7 @@ Spawn:
 ```
 Task(
   prompt=designer_prompt,
-  subagent_type="ace-designer",
+  subagent_type="renn-designer",
   model="{designer_model}",
   description="Design Project - Phase 1 (stylekit)"
 )
@@ -1170,7 +1170,7 @@ Task(
 ```
 Task(
   prompt=designer_prompt,
-  subagent_type="ace-designer",
+  subagent_type="renn-designer",
   model="{designer_model}",
   description="Design Stage {stage} - Phase 1 (stylekit)"
 )
@@ -1205,7 +1205,7 @@ Return REVIEW PASSED or ISSUES FOUND with actionable feedback.
 ```
 Task(
   prompt=reviewer_prompt,
-  subagent_type="ace-design-reviewer",
+  subagent_type="renn-design-reviewer",
   model="{reviewer_model}",
   description="Review design Phase 1 (stylekit) for project"
 )
@@ -1216,7 +1216,7 @@ Task(
 ```
 Task(
   prompt=reviewer_prompt,
-  subagent_type="ace-design-reviewer",
+  subagent_type="renn-design-reviewer",
   model="{reviewer_model}",
   description="Review design Phase 1 (stylekit) for Stage {stage}"
 )
@@ -1245,11 +1245,11 @@ If `## REVIEW PASSED`:
 
 **Step 1 -- Auto-open preview in browser:**
 
-Build the file list for Phase 1: `.ace/design/stylekit-preview.html` ONLY.
+Build the file list for Phase 1: `.renn/design/stylekit-preview.html` ONLY.
 
 ```bash
 # EXECUTE THIS NOW -- open Phase 1 preview before showing gate
-GATE_FILES=".ace/design/stylekit-preview.html"
+GATE_FILES=".renn/design/stylekit-preview.html"
 for file in $GATE_FILES; do
   if [[ -f "$file" ]]; then
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
@@ -1274,7 +1274,7 @@ done
 what-built: "Design system for project"
 how-to-verify:
   1. Review design system preview in browser (auto-opened):
-     - .ace/design/stylekit-preview.html (colors, typography, spacing, components)
+     - .renn/design/stylekit-preview.html (colors, typography, spacing, components)
   2. Check that color palette matches your brand vision
   3. Verify typography feels right for your project
   4. Review component styling (buttons, cards, inputs, etc.)
@@ -1288,7 +1288,7 @@ resume-signal: Type "approved" or describe what to change (e.g., "make primary c
 what-built: "Design system for Stage {N}: {stage_name}"
 how-to-verify:
   1. Review design system preview in browser (auto-opened):
-     - .ace/design/stylekit-preview.html (colors, typography, spacing, components)
+     - .renn/design/stylekit-preview.html (colors, typography, spacing, components)
   2. Check that color palette matches your brand vision
   3. Verify typography feels right for your project
   4. Review component styling (buttons, cards, inputs, etc.)
@@ -1347,8 +1347,8 @@ Select: accept, restart, or skip
 
 Behavior:
 - `accept`: Proceed to Phase 2 with current stylekit (treated as approved).
-- `restart`: Delete `.ace/design/` contents (stylekit, CSS, components, preview). Reset both counters to 0. Re-run Phase 1 from designer spawn.
-- `skip`: Delete `.ace/design/` contents. Set `HAS_DESIGN=false`. Skip Phase 2. Continue to present_final_status.
+- `restart`: Delete `.renn/design/` contents (stylekit, CSS, components, preview). Reset both counters to 0. Re-run Phase 1 from designer spawn.
+- `skip`: Delete `.renn/design/` contents. Set `HAS_DESIGN=false`. Skip Phase 2. Continue to present_final_status.
 
 **CRITICAL:** Phase 1 skip aborts BOTH phases. There is no path where Phase 1 is skipped but Phase 2 runs.
 
@@ -1358,10 +1358,10 @@ Behavior:
 
 ```bash
 if [ "$COMMIT_PLANNING_DOCS" = "true" ]; then
-  git add .ace/design/stylekit.yaml
-  git add .ace/design/stylekit.css
-  git add .ace/design/stylekit-preview.html
-  git add .ace/design/components/
+  git add .renn/design/stylekit.yaml
+  git add .renn/design/stylekit.css
+  git add .renn/design/stylekit-preview.html
+  git add .renn/design/components/
   git commit -m "docs(${COMMIT_PREFIX}): approve Phase 1 design system
 
 Phase 1 (stylekit) approved for ${COMMIT_MSG_SCOPE}
@@ -1395,8 +1395,8 @@ After Phase 1 approval (or accept-as-is):
 
 2. Store Phase 1 artifacts for Phase 2 context:
    ```
-   APPROVED_STYLEKIT_PATH=".ace/design/stylekit.yaml"
-   APPROVED_COMPONENT_NAMES=$(ls .ace/design/components/ 2>/dev/null)
+   APPROVED_STYLEKIT_PATH=".renn/design/stylekit.yaml"
+   APPROVED_COMPONENT_NAMES=$(ls .renn/design/components/ 2>/dev/null)
    ```
 
 3. Proceed to Phase 2.
@@ -1415,11 +1415,11 @@ After Phase 1 approval (or accept-as-is):
 | `stage_goal` | track.md stage details |
 | `research_content` | `${STAGE_DIR}/research.md` content |
 | `intel_content` | INTEL_CONTENT |
-| `stylekit_content` | Content of `.ace/design/stylekit.yaml` (read now -- locked, do not modify) |
-| `component_names` | `ls .ace/design/components/` directory listing |
+| `stylekit_content` | Content of `.renn/design/stylekit.yaml` (read now -- locked, do not modify) |
+| `component_names` | `ls .renn/design/components/` directory listing |
 | `pexels_key` | Pexels API key check result |
 | `stage_dir` | STAGE_DIR path |
-| `existing_screens` | `ls .ace/design/screens/*.yaml 2>/dev/null` with name + description for each |
+| `existing_screens` | `ls .renn/design/screens/*.yaml 2>/dev/null` with name + description for each |
 | `ux_brief` | UX_BRIEF (from ux_synthesis step, if non-empty) |
 | `project_name` | PROJECT_NAME (from brief.md heading) |
 
@@ -1427,7 +1427,7 @@ After Phase 1 approval (or accept-as-is):
 
 ```bash
 EXISTING_SCREENS=""
-for spec in .ace/design/screens/*.yaml; do
+for spec in .renn/design/screens/*.yaml; do
   [ -f "$spec" ] || continue
   screen_name=$(grep -m1 "^screen:" "$spec" | sed 's/screen: //')
   description=$(grep -m1 "^description:" "$spec" | sed 's/description: //')
@@ -1482,11 +1482,11 @@ The ux_brief is INFORMATIONAL -- it supplements intel decisions.
 
 **Pexels API Key:** {pexels_key}
 
-**Existing Screens** (at .ace/design/screens/ -- read before creating):
+**Existing Screens** (at .renn/design/screens/ -- read before creating):
 {EXISTING_SCREENS}
 
 **Output Directory:**
-- Screen specs and prototypes: .ace/design/screens/
+- Screen specs and prototypes: .renn/design/screens/
 
 </design_context>
 ```
@@ -1516,7 +1516,7 @@ Display banner:
 **If PROJECT_LEVEL=true:**
 
 ```
-ACE > PROJECT DESIGN -- PHASE 2: SCREEN PROTOTYPES
+RENN > PROJECT DESIGN -- PHASE 2: SCREEN PROTOTYPES
 
 Spawning designer (mode: {design_mode}, phase: screens)...
 ```
@@ -1524,7 +1524,7 @@ Spawning designer (mode: {design_mode}, phase: screens)...
 **If PROJECT_LEVEL=false:**
 
 ```
-ACE > DESIGNING STAGE {X} -- PHASE 2: SCREEN PROTOTYPES
+RENN > DESIGNING STAGE {X} -- PHASE 2: SCREEN PROTOTYPES
 
 Spawning designer (mode: {design_mode}, phase: screens)...
 ```
@@ -1536,7 +1536,7 @@ Spawn:
 ```
 Task(
   prompt=designer_prompt,
-  subagent_type="ace-designer",
+  subagent_type="renn-designer",
   model="{designer_model}",
   description="Design Project - Phase 2 (screens)"
 )
@@ -1547,7 +1547,7 @@ Task(
 ```
 Task(
   prompt=designer_prompt,
-  subagent_type="ace-designer",
+  subagent_type="renn-designer",
   model="{designer_model}",
   description="Design Stage {stage} - Phase 2 (screens)"
 )
@@ -1580,7 +1580,7 @@ Return REVIEW PASSED or ISSUES FOUND with actionable feedback.
 ```
 Task(
   prompt=reviewer_prompt,
-  subagent_type="ace-design-reviewer",
+  subagent_type="renn-design-reviewer",
   model="{reviewer_model}",
   description="Review design Phase 2 (screens) for project"
 )
@@ -1591,7 +1591,7 @@ Task(
 ```
 Task(
   prompt=reviewer_prompt,
-  subagent_type="ace-design-reviewer",
+  subagent_type="renn-design-reviewer",
   model="{reviewer_model}",
   description="Review design Phase 2 (screens) for Stage {stage}"
 )
@@ -1620,7 +1620,7 @@ If `## REVIEW PASSED`:
 
 **Step 1 -- Auto-open prototypes in browser:**
 
-Build the file list for Phase 2: `.ace/design/screens/*.html` ONLY (screen prototypes created or modified this session, not stylekit-preview.html).
+Build the file list for Phase 2: `.renn/design/screens/*.html` ONLY (screen prototypes created or modified this session, not stylekit-preview.html).
 
 ```bash
 # EXECUTE THIS NOW -- open Phase 2 prototypes before showing gate
@@ -1628,7 +1628,7 @@ Build the file list for Phase 2: `.ace/design/screens/*.html` ONLY (screen proto
 # The designer return lists artifacts with [NEW] and [MODIFIED] markers
 # Parse the artifact list from the designer's last return to get specific files
 GATE_FILES=""
-for f in .ace/design/screens/*.html; do
+for f in .renn/design/screens/*.html; do
   [ -f "$f" ] || continue
   # Only include screens that the designer created or modified this session
   # The designer's structured return lists specific files -- parse them
@@ -1637,7 +1637,7 @@ done
 # NOTE: The orchestrator should filter GATE_FILES using the artifact paths
 # from the designer's ## DESIGN COMPLETE return (new + modified only).
 # If the designer return is not parseable, fall back to opening all screens
-# in .ace/design/screens/ (user can identify which are relevant).
+# in .renn/design/screens/ (user can identify which are relevant).
 for file in $GATE_FILES; do
   if [[ -f "$file" ]]; then
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
@@ -1663,9 +1663,9 @@ what-built: "Screen prototypes for project"
 how-to-verify:
   1. Review screen prototypes in browser (auto-opened):
      {For each [NEW] screen from designer return:}
-     - .ace/design/screens/{screen-name}.html [NEW] -- {description}
+     - .renn/design/screens/{screen-name}.html [NEW] -- {description}
      {For each [MODIFIED] screen from designer return:}
-     - .ace/design/screens/{screen-name}.html [MODIFIED] -- {modification summary}
+     - .renn/design/screens/{screen-name}.html [MODIFIED] -- {modification summary}
   2. Check that layouts match your vision for each screen
   3. Verify components are used consistently across screens
   4. Review responsive behavior if applicable
@@ -1680,9 +1680,9 @@ what-built: "Screen prototypes for Stage {N}: {stage_name}"
 how-to-verify:
   1. Review screen prototypes in browser (auto-opened):
      {For each [NEW] screen from designer return:}
-     - .ace/design/screens/{screen-name}.html [NEW] -- {description}
+     - .renn/design/screens/{screen-name}.html [NEW] -- {description}
      {For each [MODIFIED] screen from designer return:}
-     - .ace/design/screens/{screen-name}.html [MODIFIED] -- {modification summary}
+     - .renn/design/screens/{screen-name}.html [MODIFIED] -- {modification summary}
   2. Check that layouts match your vision for each screen
   3. Verify components are used consistently across screens
   4. Review responsive behavior if applicable
@@ -1743,9 +1743,9 @@ Select: accept, restart, or skip
 
 Behavior:
 - `accept`: Store current screen artifacts as approved. Continue to Store Design Output.
-- `restart`: Revert current session's screen changes only (NOT all screens in .ace/design/screens/):
-  - For screens marked [NEW] in the designer's return: delete the .yaml and .html files from .ace/design/screens/
-  - For screens marked [MODIFIED] in the designer's return: `git checkout .ace/design/screens/{screen-name}.yaml .ace/design/screens/{screen-name}.html` to restore pre-session state
+- `restart`: Revert current session's screen changes only (NOT all screens in .renn/design/screens/):
+  - For screens marked [NEW] in the designer's return: delete the .yaml and .html files from .renn/design/screens/
+  - For screens marked [MODIFIED] in the designer's return: `git checkout .renn/design/screens/{screen-name}.yaml .renn/design/screens/{screen-name}.html` to restore pre-session state
   - The stylekit and screens from prior stages are untouched.
   Reset Phase 2 counters to 0. Re-run Phase 2 from designer spawn.
 - `skip`: Revert current session's screen changes (same scoped approach as restart). Stylekit remains. Continue to Store Design Output (HAS_DESIGN still true since stylekit exists, but no new/modified screen specs for this stage).
@@ -1758,7 +1758,7 @@ Behavior:
 
 ```bash
 if [ "$COMMIT_PLANNING_DOCS" = "true" ]; then
-  git add .ace/design/screens/
+  git add .renn/design/screens/
   git commit -m "docs(${COMMIT_PREFIX}): approve Phase 2 screen prototypes
 
 Phase 2 (screens) approved for ${COMMIT_MSG_SCOPE}
@@ -1775,8 +1775,8 @@ After Phase 2 approval (or accept-as-is escalation), store the design output pat
 ```
 # Screen specs are now at the global location
 # Use the designer's return to know which screens belong to this stage
-DESIGN_SCREEN_SPECS=$(ls .ace/design/screens/*.yaml 2>/dev/null)
-DESIGN_STYLEKIT_PATH=".ace/design/stylekit.yaml"
+DESIGN_SCREEN_SPECS=$(ls .renn/design/screens/*.yaml 2>/dev/null)
+DESIGN_STYLEKIT_PATH=".renn/design/stylekit.yaml"
 HAS_DESIGN=true
 ```
 
@@ -1784,7 +1784,7 @@ If Phase 2 was skipped but Phase 1 completed (Phase 2 skip escalation):
 
 ```
 DESIGN_SCREEN_SPECS=""
-DESIGN_STYLEKIT_PATH=".ace/design/stylekit.yaml"
+DESIGN_STYLEKIT_PATH=".renn/design/stylekit.yaml"
 HAS_DESIGN=true
 ```
 
@@ -1793,17 +1793,17 @@ HAS_DESIGN=true
 <step name="generate_implementation_guide">
 **Trigger:** `HAS_DESIGN=true` (design phase completed and approved).
 
-**Skip if:** `.ace/design/implementation-guide.md` already exists AND no design artifacts have changed since last generation:
+**Skip if:** `.renn/design/implementation-guide.md` already exists AND no design artifacts have changed since last generation:
 
 ```bash
 if [ "$HAS_DESIGN" != "true" ]; then
   # No design -- skip entirely
   :
-elif [ -f ".ace/design/implementation-guide.md" ]; then
+elif [ -f ".renn/design/implementation-guide.md" ]; then
   # Guide exists -- check if design artifacts changed since guide was generated
-  GUIDE_MTIME=$(stat -c %Y .ace/design/implementation-guide.md 2>/dev/null || stat -f %m .ace/design/implementation-guide.md 2>/dev/null)
+  GUIDE_MTIME=$(stat -c %Y .renn/design/implementation-guide.md 2>/dev/null || stat -f %m .renn/design/implementation-guide.md 2>/dev/null)
   DESIGN_CHANGED=false
-  for f in .ace/design/screens/*.html .ace/design/stylekit.yaml .ace/design/stylekit.css; do
+  for f in .renn/design/screens/*.html .renn/design/stylekit.yaml .renn/design/stylekit.css; do
     [ -f "$f" ] || continue
     FILE_MTIME=$(stat -c %Y "$f" 2>/dev/null || stat -f %m "$f" 2>/dev/null)
     if [ "$FILE_MTIME" -gt "$GUIDE_MTIME" ] 2>/dev/null; then
@@ -1851,16 +1851,16 @@ echo "Detected CSS framework: $CSS_FRAMEWORK"
 ### 2. Read Prototype HTML File List
 
 ```bash
-PROTOTYPE_FILES=$(ls .ace/design/screens/*.html 2>/dev/null)
-STYLEKIT_YAML=".ace/design/stylekit.yaml"
-STYLEKIT_CSS=".ace/design/stylekit.css"
+PROTOTYPE_FILES=$(ls .renn/design/screens/*.html 2>/dev/null)
+STYLEKIT_YAML=".renn/design/stylekit.yaml"
+STYLEKIT_CSS=".renn/design/stylekit.css"
 ```
 
 ### 3. Spawn Implementation Guide Generator
 
 Display:
 ```
-ACE > GENERATING IMPLEMENTATION GUIDE
+RENN > GENERATING IMPLEMENTATION GUIDE
 
 Detected CSS framework: {CSS_FRAMEWORK}
 Spawning guide generator...
@@ -1873,10 +1873,10 @@ Task(
   prompt="You are generating a design implementation guide that bridges HTML prototypes (Tailwind v3 CDN) to the project's actual CSS framework.\n\n" +
     "<guide_context>\n" +
     "**Project CSS Framework:** " + CSS_FRAMEWORK + "\n" +
-    "**Stylekit YAML:** Read @.ace/design/stylekit.yaml\n" +
-    "**Stylekit CSS:** Read @.ace/design/stylekit.css\n" +
-    "**HTML Prototypes:** Read each file in .ace/design/screens/*.html\n\n" +
-    "Generate .ace/design/implementation-guide.md with these sections (5 required + 1 conditional):\n\n" +
+    "**Stylekit YAML:** Read @.renn/design/stylekit.yaml\n" +
+    "**Stylekit CSS:** Read @.renn/design/stylekit.css\n" +
+    "**HTML Prototypes:** Read each file in .renn/design/screens/*.html\n\n" +
+    "Generate .renn/design/implementation-guide.md with these sections (5 required + 1 conditional):\n\n" +
     "## Framework Detection\n" +
     "- CSS framework: {detected}\n" +
     "- Version: {detected}\n" +
@@ -1915,7 +1915,7 @@ Task(
     "  - Device-specific safe areas (notch, home indicator, status bar) and how to handle them\n" +
     "  - RTL handling if direction is rtl (CSS logical properties, framework RTL support)\n\n" +
     "**Target:** 100-250 lines (longer if viewport section included). Summary document, not full prototype inline.\n" +
-    "**Output:** Write to .ace/design/implementation-guide.md\n" +
+    "**Output:** Write to .renn/design/implementation-guide.md\n" +
     "</guide_context>",
   subagent_type="general-purpose",
   model="{designer_model}",
@@ -1926,20 +1926,20 @@ Task(
 ### 4. Verify Guide Was Created
 
 ```bash
-if [ ! -f ".ace/design/implementation-guide.md" ]; then
+if [ ! -f ".renn/design/implementation-guide.md" ]; then
   echo "WARNING: Implementation guide was not created. Continuing without guide."
 fi
 ```
 
-Display: `Implementation guide generated at .ace/design/implementation-guide.md`
+Display: `Implementation guide generated at .renn/design/implementation-guide.md`
 </step>
 
 <step name="commit_implementation_guide">
-**Trigger:** `generate_implementation_guide` step completed and `.ace/design/implementation-guide.md` exists on disk.
+**Trigger:** `generate_implementation_guide` step completed and `.renn/design/implementation-guide.md` exists on disk.
 
 ```bash
-if [ "$COMMIT_PLANNING_DOCS" = "true" ] && [ -f ".ace/design/implementation-guide.md" ]; then
-  git add .ace/design/implementation-guide.md
+if [ "$COMMIT_PLANNING_DOCS" = "true" ] && [ -f ".renn/design/implementation-guide.md" ]; then
+  git add .renn/design/implementation-guide.md
   git commit -m "docs(${COMMIT_PREFIX}): generate implementation guide
 
 Implementation guide for ${COMMIT_MSG_SCOPE}
@@ -1960,59 +1960,59 @@ Display the design-specific completion banner with actual artifact paths:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► PROJECT DESIGN COMPLETE
+ RENN ► PROJECT DESIGN COMPLETE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Design artifacts:
-  Stylekit:     .ace/design/stylekit.yaml
-  CSS:          .ace/design/stylekit.css
-  Preview:      .ace/design/stylekit-preview.html
-  Components:   .ace/design/components/
-  Guide:        .ace/design/implementation-guide.md
+  Stylekit:     .renn/design/stylekit.yaml
+  CSS:          .renn/design/stylekit.css
+  Preview:      .renn/design/stylekit-preview.html
+  Components:   .renn/design/components/
+  Guide:        .renn/design/implementation-guide.md
 
-Design system ready. Run /ace.design-screens {N} for each UI stage, then /ace.plan-stage {N}.
+Design system ready. Run /renn.design-screens {N} for each UI stage, then /renn.plan-stage {N}.
 ```
 
 **If `HAS_DESIGN=true` AND `PROJECT_LEVEL=false`:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► DESIGN COMPLETE FOR STAGE {X}
+ RENN ► DESIGN COMPLETE FOR STAGE {X}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Design artifacts:
-  Stylekit:     .ace/design/stylekit.yaml
-  CSS:          .ace/design/stylekit.css
-  Preview:      .ace/design/stylekit-preview.html
-  Components:   .ace/design/components/
-  Screens:      .ace/design/screens/
-  Guide:        .ace/design/implementation-guide.md
+  Stylekit:     .renn/design/stylekit.yaml
+  CSS:          .renn/design/stylekit.css
+  Preview:      .renn/design/stylekit-preview.html
+  Components:   .renn/design/components/
+  Screens:      .renn/design/screens/
+  Guide:        .renn/design/implementation-guide.md
 
-Ready for /ace.plan-stage {X} to create executable runs.
+Ready for /renn.plan-stage {X} to create executable runs.
 ```
 
 **If `HAS_DESIGN=false` AND `PROJECT_LEVEL=true`:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► PROJECT DESIGN SKIPPED
+ RENN ► PROJECT DESIGN SKIPPED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Design was skipped for this project.
 
-You can still run /ace.plan-stage {N} for each stage -- they will proceed without design artifacts.
+You can still run /renn.plan-stage {N} for each stage -- they will proceed without design artifacts.
 ```
 
 **If `HAS_DESIGN=false` AND `PROJECT_LEVEL=false`:**
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► DESIGN SKIPPED FOR STAGE {X}
+ RENN ► DESIGN SKIPPED FOR STAGE {X}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Design was skipped for this stage.
 
-You can still run /ace.plan-stage {X} -- it will proceed without design artifacts.
+You can still run /renn.plan-stage {X} -- it will proceed without design artifacts.
 ```
 </step>
 

@@ -1,5 +1,5 @@
 ---
-name: ace.pause
+name: renn.pause
 description: Create context handoff when pausing work mid-stage
 allowed-tools:
   - Read
@@ -14,7 +14,7 @@ Enables seamless resumption in fresh session with full context restoration.
 </objective>
 
 <context>
-@.ace/pulse.md
+@.renn/pulse.md
 </context>
 
 <process>
@@ -38,7 +38,7 @@ Ask user for clarifications if needed.
 </step>
 
 <step name="write">
-**Write handoff to `.ace/stages/XX-name/.continue-here.md`:**
+**Write handoff to `.renn/stages/XX-name/.continue-here.md`:**
 
 ```markdown
 ---
@@ -93,8 +93,8 @@ Be specific enough for a fresh Claude to understand immediately.
 **Check config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .renn 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 **If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
@@ -102,14 +102,14 @@ git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 **If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
-git add .ace/stages/*/.continue-here.md
+git add .renn/stages/*/.continue-here.md
 git commit -m "wip: [stage-name] paused at task [X]/[Y]"
 ```
 </step>
 
 <step name="confirm">
 ```
-GATE REACHED ⏸ Handoff created: .ace/stages/[XX-name]/.continue-here.md
+GATE REACHED ⏸ Handoff created: .renn/stages/[XX-name]/.continue-here.md
 
 Current state:
 
@@ -118,7 +118,7 @@ Current state:
 - Status: [in_progress/blocked]
 - Committed as WIP
 
-To resume: /ace.continue
+To resume: /renn.continue
 ```
 </step>
 

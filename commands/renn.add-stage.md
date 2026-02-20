@@ -1,5 +1,5 @@
 ---
-name: ace.add-stage
+name: renn.add-stage
 description: Add stage to end of current milestone in track
 argument-hint: <description>
 allowed-tools:
@@ -17,8 +17,8 @@ Purpose: Add planned work discovered during execution that belongs at the end of
 </objective>
 
 <execution_context>
-@.ace/track.md
-@.ace/pulse.md
+@.renn/track.md
+@.renn/pulse.md
 </execution_context>
 
 <context>
@@ -30,15 +30,15 @@ $ARGUMENTS
 <step name="parse_arguments">
 Parse the command arguments:
 - All arguments become the stage description
-- Example: `/ace.add-stage Add authentication` → description = "Add authentication"
-- Example: `/ace.add-stage Fix critical performance issues` → description = "Fix critical performance issues"
+- Example: `/renn.add-stage Add authentication` → description = "Add authentication"
+- Example: `/renn.add-stage Fix critical performance issues` → description = "Fix critical performance issues"
 
 If no arguments provided:
 
 ```
 ERROR: Stage description required
-Usage: /ace.add-stage <description>
-Example: /ace.add-stage Add authentication system
+Usage: /renn.add-stage <description>
+Example: /renn.add-stage Add authentication system
 ```
 
 Exit.
@@ -48,10 +48,10 @@ Exit.
 Load the track file:
 
 ```bash
-if [ -f .ace/track.md ]; then
-  TRACK=".ace/track.md"
+if [ -f .renn/track.md ]; then
+  TRACK=".renn/track.md"
 else
-  echo "ERROR: No track found (.ace/track.md)"
+  echo "ERROR: No track found (.renn/track.md)"
   exit 1
 fi
 ```
@@ -111,7 +111,7 @@ Example: `07-add-authentication`
 Create the stage directory structure:
 
 ```bash
-stage_dir=".ace/stages/${stage_num}-${slug}"
+stage_dir=".renn/stages/${stage_num}-${slug}"
 mkdir -p "$stage_dir"
 ```
 
@@ -132,7 +132,7 @@ Add the new stage entry to the track:
    **Runs:** 0 runs
 
    Runs:
-   - [ ] TBD (run /ace.plan-stage {N} to break down)
+   - [ ] TBD (run /renn.plan-stage {N} to break down)
 
    **Details:**
    [To be added during planning]
@@ -146,7 +146,7 @@ Preserve all other content exactly (formatting, spacing, other stages).
 <step name="update_pulse">
 Update pulse.md to reflect the new stage:
 
-1. Read `.ace/pulse.md`
+1. Read `.renn/pulse.md`
 2. Under "## Current Position" → "**Next Stage:**" add reference to new stage
 3. Under "## Accumulated Context" → "### Track Evolution" add entry:
    ```
@@ -162,11 +162,11 @@ Present completion summary:
 ```
 Stage {N} added to current milestone:
 - Description: {description}
-- Directory: .ace/stages/{stage-num}-{slug}/
+- Directory: .renn/stages/{stage-num}-{slug}/
 - Status: Not planned yet
 
 Track updated: {track-path}
-Pulse updated: .ace/pulse.md
+Pulse updated: .renn/pulse.md
 
 ---
 
@@ -174,14 +174,14 @@ Pulse updated: .ace/pulse.md
 
 **Stage {N}: {description}**
 
-`/ace.plan-stage {N}`
+`/renn.plan-stage {N}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.add-stage <description>` — add another stage
+- `/renn.add-stage <description>` — add another stage
 - Review track
 
 ---
@@ -194,15 +194,15 @@ Pulse updated: .ace/pulse.md
 
 - Don't modify stages outside current milestone
 - Don't renumber existing stages
-- Don't use decimal numbering (that's /ace.insert-stage)
-- Don't create runs yet (that's /ace.plan-stage)
+- Don't use decimal numbering (that's /renn.insert-stage)
+- Don't create runs yet (that's /renn.plan-stage)
 - Don't commit changes (user decides when to commit)
   </anti_patterns>
 
 <success_criteria>
 Stage addition is complete when:
 
-- [ ] Stage directory created: `.ace/stages/{NN}-{slug}/`
+- [ ] Stage directory created: `.renn/stages/{NN}-{slug}/`
 - [ ] Track updated with new stage entry
 - [ ] pulse.md updated with track evolution note
 - [ ] New stage appears at end of current milestone

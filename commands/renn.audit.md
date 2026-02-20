@@ -1,5 +1,5 @@
 ---
-name: ace.audit
+name: renn.audit
 description: Validate built features through conversational UAT
 argument-hint: "[stage number, e.g., '4']"
 allowed-tools:
@@ -17,12 +17,12 @@ Validate built features through conversational testing with persistent state.
 
 Purpose: Confirm what Claude built actually works from user's perspective. One test at a time, plain text responses, no interrogation. When issues are found, automatically diagnose, plan fixes, and prepare for execution.
 
-Output: {stage}-uat.md tracking all test results. If issues found: diagnosed gaps, verified fix runs ready for /ace.run-stage
+Output: {stage}-uat.md tracking all test results. If issues found: diagnosed gaps, verified fix runs ready for /renn.run-stage
 </objective>
 
 <execution_context>
-@~/.claude/ace/workflows/audit-work.md
-@~/.claude/ace/templates/uat.md
+@~/.claude/renn/workflows/audit-work.md
+@~/.claude/renn/templates/uat.md
 </execution_context>
 
 <context>
@@ -30,8 +30,8 @@ Stage: $ARGUMENTS (optional)
 - If provided: Test specific stage (e.g., "4")
 - If not provided: Check for active sessions or prompt for stage
 
-@.ace/pulse.md
-@.ace/track.md
+@.renn/pulse.md
+@.renn/track.md
 </context>
 
 <process>
@@ -47,10 +47,10 @@ Stage: $ARGUMENTS (optional)
 7. On completion: commit, present summary
 8. If issues found:
    - Spawn parallel debug agents to diagnose root causes
-   - Spawn ace-architect in --gaps mode to create fix runs
-   - Spawn ace-plan-reviewer to verify fix runs
+   - Spawn renn-architect in --gaps mode to create fix runs
+   - Spawn renn-plan-reviewer to verify fix runs
    - Iterate architect <-> reviewer until runs pass (max 3)
-   - Present ready status with `/clear` then `/ace.run-stage`
+   - Present ready status with `/clear` then `/renn.run-stage`
 </process>
 
 <anti_patterns>
@@ -76,7 +76,7 @@ Output this markdown directly (not as a code block). Route based on UAT results:
 **Route A: All tests pass, more stages remain**
 
 =====================================================
- ACE > STAGE {Z} VERIFIED
+ RENN > STAGE {Z} VERIFIED
 =====================================================
 
 **Stage {Z}: {Name}**
@@ -90,15 +90,15 @@ UAT complete
 
 **Stage {Z+1}: {Name}** — {Goal from track.md}
 
-/ace.discuss-stage {Z+1} — gather context and clarify approach
+/renn.discuss-stage {Z+1} — gather context and clarify approach
 
 <sub>/clear first -> fresh context window</sub>
 
 ---------------------------------------------------------------
 
 **Also available:**
-- /ace.plan-stage {Z+1} — skip discussion, plan directly
-- /ace.run-stage {Z+1} — skip to execution (if already planned)
+- /renn.plan-stage {Z+1} — skip discussion, plan directly
+- /renn.run-stage {Z+1} — skip to execution (if already planned)
 
 ---------------------------------------------------------------
 
@@ -107,7 +107,7 @@ UAT complete
 **Route B: All tests pass, milestone complete**
 
 =====================================================
- ACE > STAGE {Z} VERIFIED
+ RENN > STAGE {Z} VERIFIED
 =====================================================
 
 **Stage {Z}: {Name}**
@@ -121,14 +121,14 @@ Final stage verified
 
 **Audit milestone** — verify requirements, cross-stage integration, E2E flows
 
-/ace.audit-milestone
+/renn.audit-milestone
 
 <sub>/clear first -> fresh context window</sub>
 
 ---------------------------------------------------------------
 
 **Also available:**
-- /ace.complete-milestone — skip audit, archive directly
+- /renn.complete-milestone — skip audit, archive directly
 
 ---------------------------------------------------------------
 
@@ -137,7 +137,7 @@ Final stage verified
 **Route C: Issues found, fix runs ready**
 
 =====================================================
- ACE > STAGE {Z} ISSUES FOUND
+ RENN > STAGE {Z} ISSUES FOUND
 =====================================================
 
 **Stage {Z}: {Name}**
@@ -156,15 +156,15 @@ Fix runs verified
 
 **Execute fix runs** — run diagnosed fixes
 
-/ace.run-stage {Z} --gaps-only
+/renn.run-stage {Z} --gaps-only
 
 <sub>/clear first -> fresh context window</sub>
 
 ---------------------------------------------------------------
 
 **Also available:**
-- cat .ace/stages/{stage_dir}/*-run.md — review fix runs
-- /ace.plan-stage {Z} --gaps — regenerate fix runs
+- cat .renn/stages/{stage_dir}/*-run.md — review fix runs
+- /renn.plan-stage {Z} --gaps — regenerate fix runs
 
 ---------------------------------------------------------------
 
@@ -173,7 +173,7 @@ Fix runs verified
 **Route D: Issues found, planning blocked**
 
 =====================================================
- ACE > STAGE {Z} BLOCKED
+ RENN > STAGE {Z} BLOCKED
 =====================================================
 
 **Stage {Z}: {Name}**
@@ -199,8 +199,8 @@ Review the issues above and either:
 ---------------------------------------------------------------
 
 **Options:**
-- /ace.plan-stage {Z} --gaps — retry fix planning with guidance
-- /ace.discuss-stage {Z} — gather more context before replanning
+- /renn.plan-stage {Z} --gaps — retry fix planning with guidance
+- /renn.discuss-stage {Z} — gather more context before replanning
 
 ---------------------------------------------------------------
 </offer_next>
@@ -213,7 +213,7 @@ Review the issues above and either:
 - [ ] Batched writes: on issue, every 5 passes, or completion
 - [ ] Committed on completion
 - [ ] If issues: parallel debug agents diagnose root causes
-- [ ] If issues: ace-architect creates fix runs from diagnosed gaps
-- [ ] If issues: ace-plan-reviewer verifies fix runs (max 3 iterations)
-- [ ] Ready for `/ace.run-stage` when complete
+- [ ] If issues: renn-architect creates fix runs from diagnosed gaps
+- [ ] If issues: renn-plan-reviewer verifies fix runs (max 3 iterations)
+- [ ] Ready for `/renn.run-stage` when complete
 </success_criteria>

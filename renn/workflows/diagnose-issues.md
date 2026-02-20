@@ -7,9 +7,9 @@ Orchestrator stays lean: parse gaps, spawn agents, collect results, update UAT.
 </purpose>
 
 <paths>
-DEBUG_DIR=.ace/debug
+DEBUG_DIR=.renn/debug
 
-Debug files use the `.ace/debug/` path (hidden directory with leading dot).
+Debug files use the `.renn/debug/` path (hidden directory with leading dot).
 </paths>
 
 <core_principle>
@@ -80,7 +80,7 @@ For each gap, fill the detective-prompt template and spawn:
 ```
 Task(
   prompt=filled_detective_prompt,
-  subagent_type="ace-detective",
+  subagent_type="renn-detective",
   description="Debug: {truth_short}"
 )
 ```
@@ -151,7 +151,7 @@ For each gap in the Gaps section, add artifacts and missing fields:
   missing:
     - "Add commentCount to useEffect dependency array"
     - "Trigger re-render when new comment added"
-  debug_session: .ace/debug/comment-not-refreshing.md
+  debug_session: .renn/debug/comment-not-refreshing.md
 ```
 
 Update status in frontmatter to "diagnosed".
@@ -159,7 +159,7 @@ Update status in frontmatter to "diagnosed".
 **Check planning config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
@@ -169,7 +169,7 @@ git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 
 Commit the updated uat.md:
 ```bash
-git add ".ace/stages/XX-name/{stage}-uat.md"
+git add ".renn/stages/XX-name/{stage}-uat.md"
 git commit -m "docs({stage}): add root causes from diagnosis"
 ```
 </step>
@@ -180,7 +180,7 @@ git commit -m "docs({stage}): add root causes from diagnosis"
 Display:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► DIAGNOSIS COMPLETE
+ RENN ► DIAGNOSIS COMPLETE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 | Gap (Truth) | Root Cause | Files |

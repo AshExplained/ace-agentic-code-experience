@@ -1,6 +1,6 @@
 ---
-name: ace.dash
-description: Execute a quick task with ACE guarantees (atomic commits, state tracking) but skip optional agents
+name: renn.dash
+description: Execute a quick task with RENN guarantees (atomic commits, state tracking) but skip optional agents
 allowed-tools:
   - Read
   - Write
@@ -13,23 +13,23 @@ allowed-tools:
 ---
 
 <objective>
-Execute small, ad-hoc tasks with ACE guarantees (atomic commits, pulse.md tracking) while skipping optional agents (research, plan-reviewer, auditor).
+Execute small, ad-hoc tasks with RENN guarantees (atomic commits, pulse.md tracking) while skipping optional agents (research, plan-reviewer, auditor).
 
 Dash mode is the same system with a shorter path:
-- Spawns ace-architect (quick mode) + ace-runner(s)
-- Skips ace-stage-scout, ace-plan-reviewer, ace-auditor
-- Dash tasks live in `.ace/quick/` separate from planned stages
+- Spawns renn-architect (quick mode) + renn-runner(s)
+- Skips renn-stage-scout, renn-plan-reviewer, renn-auditor
+- Dash tasks live in `.renn/quick/` separate from planned stages
 - Updates pulse.md "Quick Tasks Completed" table (NOT track.md)
 
 Use when: You know exactly what to do and the task is small enough to not need research or verification.
 </objective>
 
 <execution_context>
-Orchestration is inline - no separate workflow file. Dash mode is deliberately simpler than full ACE.
+Orchestration is inline - no separate workflow file. Dash mode is deliberately simpler than full RENN.
 </execution_context>
 
 <context>
-@.ace/pulse.md
+@.renn/pulse.md
 </context>
 
 <process>
@@ -38,7 +38,7 @@ Orchestration is inline - no separate workflow file. Dash mode is deliberately s
 Read horsepower profile for agent spawning:
 
 ```bash
-HORSEPOWER=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+HORSEPOWER=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -47,8 +47,8 @@ Default to "balanced" if not set.
 
 | Agent | max | balanced | eco |
 |-------|-----|----------|-----|
-| ace-architect | opus | opus | sonnet |
-| ace-runner | opus | sonnet | sonnet |
+| renn-architect | opus | opus | sonnet |
+| renn-runner | opus | sonnet | sonnet |
 
 Store resolved models for use in Task calls below.
 
@@ -56,12 +56,12 @@ Store resolved models for use in Task calls below.
 
 **Step 1: Pre-flight validation**
 
-Check that an active ACE project exists:
+Check that an active RENN project exists:
 
 ```bash
-if [ ! -f .ace/track.md ]; then
+if [ ! -f .renn/track.md ]; then
   echo "Dash mode requires an active project with track.md."
-  echo "Run /ace.start first."
+  echo "Run /renn.start first."
   exit 1
 fi
 ```
@@ -97,14 +97,14 @@ slug=$(echo "$DESCRIPTION" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' 
 
 **Step 3: Calculate next dash task number**
 
-Ensure `.ace/quick/` directory exists and find the next sequential number:
+Ensure `.renn/quick/` directory exists and find the next sequential number:
 
 ```bash
-# Ensure .ace/quick/ exists
-mkdir -p .ace/quick
+# Ensure .renn/quick/ exists
+mkdir -p .renn/quick
 
 # Find highest existing number and increment
-last=$(ls -1d .ace/quick/[0-9][0-9][0-9]-* 2>/dev/null | sort -r | head -1 | xargs -I{} basename {} | grep -oE '^[0-9]+')
+last=$(ls -1d .renn/quick/[0-9][0-9][0-9]-* 2>/dev/null | sort -r | head -1 | xargs -I{} basename {} | grep -oE '^[0-9]+')
 
 if [ -z "$last" ]; then
   next_num="001"
@@ -120,7 +120,7 @@ fi
 Create the directory for this dash task:
 
 ```bash
-DASH_DIR=".ace/quick/${next_num}-${slug}"
+DASH_DIR=".renn/quick/${next_num}-${slug}"
 mkdir -p "$DASH_DIR"
 ```
 
@@ -136,7 +136,7 @@ Store `$DASH_DIR` for use in orchestration.
 
 **Step 5: Spawn architect (quick mode)**
 
-Spawn ace-architect with quick mode context:
+Spawn renn-architect with quick mode context:
 
 ```
 Task(
@@ -148,7 +148,7 @@ Task(
 **Description:** ${DESCRIPTION}
 
 **Project State:**
-@.ace/pulse.md
+@.renn/pulse.md
 
 </planning_context>
 
@@ -164,7 +164,7 @@ Write run to: ${DASH_DIR}/${next_num}-run.md
 Return: ## PLANNING COMPLETE with run path
 </output>
 ",
-  subagent_type="ace-architect",
+  subagent_type="renn-architect",
   model="{architect_model}",
   description="Dash run: ${DESCRIPTION}"
 )
@@ -181,7 +181,7 @@ If run not found, error: "Architect failed to create ${next_num}-run.md"
 
 **Step 6: Spawn runner**
 
-Spawn ace-runner with run reference:
+Spawn renn-runner with run reference:
 
 ```
 Task(
@@ -189,7 +189,7 @@ Task(
 Execute dash task ${next_num}.
 
 Run: @${DASH_DIR}/${next_num}-run.md
-Project state: @.ace/pulse.md
+Project state: @.renn/pulse.md
 
 <constraints>
 - Execute all tasks in the run
@@ -198,7 +198,7 @@ Project state: @.ace/pulse.md
 - Do NOT update track.md (dash tasks are separate from planned stages)
 </constraints>
 ",
-  subagent_type="ace-runner",
+  subagent_type="renn-runner",
   model="{runner_model}",
   description="Execute: ${DESCRIPTION}"
 )
@@ -259,7 +259,7 @@ Stage and commit dash task artifacts:
 # Stage dash task artifacts
 git add ${DASH_DIR}/${next_num}-run.md
 git add ${DASH_DIR}/${next_num}-recap.md
-git add .ace/pulse.md
+git add .renn/pulse.md
 
 # Commit with dash task format
 git commit -m "$(cat <<'EOF'
@@ -281,7 +281,7 @@ Display completion output:
 ```
 ---
 
-ACE > DASH TASK COMPLETE
+RENN > DASH TASK COMPLETE
 
 Dash Task ${next_num}: ${DESCRIPTION}
 
@@ -290,7 +290,7 @@ Commit: ${commit_hash}
 
 ---
 
-Ready for next task: /ace.dash
+Ready for next task: /renn.dash
 ```
 
 </process>
@@ -300,7 +300,7 @@ Ready for next task: /ace.dash
 - [ ] User provides task description
 - [ ] Slug generated (lowercase, hyphens, max 40 chars)
 - [ ] Next number calculated (001, 002, 003...)
-- [ ] Directory created at `.ace/quick/NNN-slug/`
+- [ ] Directory created at `.renn/quick/NNN-slug/`
 - [ ] `${next_num}-run.md` created by architect
 - [ ] `${next_num}-recap.md` created by runner
 - [ ] pulse.md updated with dash task row

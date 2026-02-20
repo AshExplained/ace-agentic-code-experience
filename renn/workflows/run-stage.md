@@ -17,7 +17,7 @@ Read config.json for planning behavior settings.
 Read model profile for agent spawning:
 
 ```bash
-MODEL_PROFILE=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+MODEL_PROFILE=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -26,8 +26,8 @@ Default to "balanced" if not set.
 
 | Agent | quality | balanced | budget |
 |-------|---------|----------|--------|
-| ace-runner | opus | sonnet | sonnet |
-| ace-auditor | sonnet | sonnet | haiku |
+| renn-runner | opus | sonnet | sonnet |
+| renn-auditor | sonnet | sonnet | haiku |
 | general-purpose | — | — | — |
 
 Store resolved models for use in Task calls below.
@@ -37,7 +37,7 @@ Store resolved models for use in Task calls below.
 Before any operation, read project state:
 
 ```bash
-cat .ace/pulse.md 2>/dev/null
+cat .renn/pulse.md 2>/dev/null
 ```
 
 **If file exists:** Parse and internalize:
@@ -45,7 +45,7 @@ cat .ace/pulse.md 2>/dev/null
 - Accumulated decisions (constraints on this execution)
 - Blockers/concerns (things to watch for)
 
-**If file missing but .ace/ exists:**
+**If file missing but .renn/ exists:**
 ```
 pulse.md missing but planning artifacts exist.
 Options:
@@ -53,13 +53,13 @@ Options:
 2. Continue without project state (may lose accumulated context)
 ```
 
-**If .ace/ doesn't exist:** Error - project not initialized.
+**If .renn/ doesn't exist:** Error - project not initialized.
 
 **Load planning config:**
 
 ```bash
 # Check if planning docs should be committed (default: true)
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 # Auto-detect gitignored (overrides config)
 git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
@@ -70,7 +70,7 @@ Store `COMMIT_PLANNING_DOCS` for use in git operations.
 
 ```bash
 # Check if parallelization is enabled (default: true)
-PARALLELIZATION=$(cat .ace/config.json 2>/dev/null | grep -o '"parallelization"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+PARALLELIZATION=$(cat .renn/config.json 2>/dev/null | grep -o '"parallelization"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 ```
 
 Store `PARALLELIZATION` for use in batch execution step. When `false`, runs within a batch execute sequentially instead of in parallel.
@@ -79,11 +79,11 @@ Store `PARALLELIZATION` for use in batch execution step. When `false`, runs with
 
 ```bash
 # Get branching strategy (default: none)
-BRANCHING_STRATEGY=$(cat .ace/config.json 2>/dev/null | grep -o '"branching_strategy"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "none")
+BRANCHING_STRATEGY=$(cat .renn/config.json 2>/dev/null | grep -o '"branching_strategy"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "none")
 
 # Get templates
-STAGE_BRANCH_TEMPLATE=$(cat .ace/config.json 2>/dev/null | grep -o '"stage_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "ace/stage-{stage}-{slug}")
-MILESTONE_BRANCH_TEMPLATE=$(cat .ace/config.json 2>/dev/null | grep -o '"milestone_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "ace/{milestone}-{slug}")
+STAGE_BRANCH_TEMPLATE=$(cat .renn/config.json 2>/dev/null | grep -o '"stage_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "renn/stage-{stage}-{slug}")
+MILESTONE_BRANCH_TEMPLATE=$(cat .renn/config.json 2>/dev/null | grep -o '"milestone_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "renn/{milestone}-{slug}")
 ```
 
 Store `BRANCHING_STRATEGY` and templates for use in branch creation step.
@@ -126,8 +126,8 @@ fi
 ```bash
 if [ "$BRANCHING_STRATEGY" = "milestone" ]; then
   # Get current milestone info from track.md
-  MILESTONE_VERSION=$(grep -oE 'v[0-9]+\.[0-9]+' .ace/track.md | head -1 || echo "v1.0")
-  MILESTONE_NAME=$(grep -A1 "## .*$MILESTONE_VERSION" .ace/track.md | tail -1 | sed 's/.*- //' | cut -d'(' -f1 | tr -d ' ' || echo "milestone")
+  MILESTONE_VERSION=$(grep -oE 'v[0-9]+\.[0-9]+' .renn/track.md | head -1 || echo "v1.0")
+  MILESTONE_NAME=$(grep -A1 "## .*$MILESTONE_VERSION" .renn/track.md | tail -1 | sed 's/.*- //' | cut -d'(' -f1 | tr -d ' ' || echo "milestone")
 
   # Create slug
   MILESTONE_SLUG=$(echo "$MILESTONE_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
@@ -157,7 +157,7 @@ Confirm stage exists and has runs:
 ```bash
 # Match both zero-padded (05-*) and unpadded (5-*) folders
 PADDED_STAGE=$(printf "%02d" ${STAGE_ARG} 2>/dev/null || echo "${STAGE_ARG}")
-STAGE_DIR=$(ls -d .ace/stages/${PADDED_STAGE}-* .ace/stages/${STAGE_ARG}-* 2>/dev/null | head -1)
+STAGE_DIR=$(ls -d .renn/stages/${PADDED_STAGE}-* .renn/stages/${STAGE_ARG}-* 2>/dev/null | head -1)
 if [ -z "$STAGE_DIR" ]; then
   echo "ERROR: No stage directory matching '${STAGE_ARG}'"
   exit 1
@@ -225,7 +225,7 @@ batches = {
 }
 ```
 
-**No dependency analysis needed.** Batch numbers are pre-computed during `/ace.plan-stage`.
+**No dependency analysis needed.** Batch numbers are pre-computed during `/renn.plan-stage`.
 
 Report batch structure with context:
 ```
@@ -283,8 +283,8 @@ Execute each batch in sequence. Autonomous runs within a batch run in parallel *
    ```bash
    # Read each run in the batch
    RUN_CONTENT=$(cat "{run_path}")
-   STATE_CONTENT=$(cat .ace/pulse.md)
-   CONFIG_CONTENT=$(cat .ace/config.json 2>/dev/null)
+   STATE_CONTENT=$(cat .renn/pulse.md)
+   CONFIG_CONTENT=$(cat .renn/config.json 2>/dev/null)
    ```
 
    **If `PARALLELIZATION=true` (default):** Use Task tool with multiple parallel calls.
@@ -301,10 +301,10 @@ Execute each batch in sequence. Autonomous runs within a batch run in parallel *
    </objective>
 
    <execution_context>
-   @~/.claude/ace/workflows/run-plan.md
-   @~/.claude/ace/templates/recap.md
-   @~/.claude/ace/references/gates.md
-   @~/.claude/ace/references/tdd.md
+   @~/.claude/renn/workflows/run-plan.md
+   @~/.claude/renn/templates/recap.md
+   @~/.claude/renn/references/gates.md
+   @~/.claude/renn/references/tdd.md
    </execution_context>
 
    <context>
@@ -384,7 +384,7 @@ Runs with `autonomous: false` require user interaction.
 
 1. **Spawn agent for gate run:**
    ```
-   Task(prompt="{subagent-task-prompt}", subagent_type="ace-runner", model="{runner_model}")
+   Task(prompt="{subagent-task-prompt}", subagent_type="renn-runner", model="{runner_model}")
    ```
 
 2. **Agent runs until gate:**
@@ -423,7 +423,7 @@ Runs with `autonomous: false` require user interaction.
    ```
    Task(
      prompt=filled_continuation_template,
-     subagent_type="ace-runner",
+     subagent_type="renn-runner",
      model="{runner_model}"
    )
    ```
@@ -500,7 +500,7 @@ Stage goal: {goal from track.md}
 
 Check must_haves against actual codebase. Create proof.md.
 Verify what actually exists in the code.",
-  subagent_type="ace-auditor",
+  subagent_type="renn-auditor",
   model="{auditor_model}"
 )
 ```
@@ -523,7 +523,7 @@ should trust the data over the label.
 |--------|--------|
 | `passed` | Continue to update_roadmap |
 | `human_needed` | Present items to user, get approval or feedback |
-| `gaps_found` | Present gap summary, offer `/ace.plan-stage {stage} --gaps` |
+| `gaps_found` | Present gap summary, offer `/renn.plan-stage {stage} --gaps` |
 
 **If passed:**
 
@@ -570,7 +570,7 @@ Present gaps and offer next command:
 
 **Plan gap closure** — create additional runs to complete the stage
 
-`/ace.plan-stage {X} --gaps`
+`/renn.plan-stage {X} --gaps`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -578,13 +578,13 @@ Present gaps and offer next command:
 
 **Also available:**
 - `cat {stage_dir}/{stage}-proof.md` — see full report
-- `/ace.audit {X}` — manual testing before planning
+- `/renn.audit {X}` — manual testing before planning
 ```
 
-User runs `/ace.plan-stage {X} --gaps` which:
+User runs `/renn.plan-stage {X} --gaps` which:
 1. Reads proof.md gaps
 2. Creates additional runs (04, 05, etc.) with `gap_closure: true` to close gaps
-3. User then runs `/ace.run-stage {X} --gaps-only`
+3. User then runs `/renn.run-stage {X} --gaps-only`
 4. Run-stage runs only gap closure runs (04-05)
 5. Auditor runs again after new runs complete
 
@@ -603,7 +603,7 @@ Update track.md to reflect stage completion:
 **Check planning config:**
 
 If `COMMIT_PLANNING_DOCS=false` (set in load_project_state):
-- Skip all git operations for .ace/ files
+- Skip all git operations for .renn/ files
 - Planning docs exist locally but are gitignored
 - Log: "Skipping planning docs commit (commit_docs: false)"
 - Proceed to offer_next step
@@ -613,8 +613,8 @@ If `COMMIT_PLANNING_DOCS=true` (default):
 
 Commit stage completion (track, state, verification):
 ```bash
-git add .ace/track.md .ace/pulse.md .ace/stages/{stage_dir}/*-proof.md
-git add .ace/specs.md  # if updated
+git add .renn/track.md .renn/pulse.md .renn/stages/{stage_dir}/*-proof.md
+git add .renn/specs.md  # if updated
 git commit -m "docs(stage-{X}): complete stage execution"
 ```
 </step>
@@ -628,7 +628,7 @@ Present next steps based on milestone status:
 
 **Stage {X+1}: {Name}** — {Goal}
 
-`/ace.plan-stage {X+1}`
+`/renn.plan-stage {X+1}`
 
 <sub>`/clear` first for fresh context</sub>
 ```
@@ -639,7 +639,7 @@ MILESTONE COMPLETE!
 
 All {N} stages executed.
 
-`/ace.complete-milestone`
+`/renn.complete-milestone`
 ```
 </step>
 
@@ -679,7 +679,7 @@ No polling (Task blocks). No context bleed.
 
 If stage execution was interrupted (context limit, user exit, error):
 
-1. Run `/ace.run-stage {stage}` again
+1. Run `/renn.run-stage {stage}` again
 2. discover_runs finds completed RECAPs
 3. Skips completed runs
 4. Resumes from first incomplete run

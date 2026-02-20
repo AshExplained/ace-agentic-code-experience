@@ -18,8 +18,8 @@ Then verify each level against the actual codebase.
 </core_principle>
 
 <required_reading>
-@~/.claude/ace/references/verification-patterns.md
-@~/.claude/ace/templates/proof.md
+@~/.claude/renn/references/verification-patterns.md
+@~/.claude/renn/templates/proof.md
 </required_reading>
 
 <process>
@@ -30,13 +30,13 @@ Then verify each level against the actual codebase.
 ```bash
 # Stage directory (match both zero-padded and unpadded)
 PADDED_STAGE=$(printf "%02d" ${STAGE_ARG} 2>/dev/null || echo "${STAGE_ARG}")
-STAGE_DIR=$(ls -d .ace/stages/${PADDED_STAGE}-* .ace/stages/${STAGE_ARG}-* 2>/dev/null | head -1)
+STAGE_DIR=$(ls -d .renn/stages/${PADDED_STAGE}-* .renn/stages/${STAGE_ARG}-* 2>/dev/null | head -1)
 
 # Stage goal from TRACK
-grep -A 5 "Stage ${STAGE_NUM}" .ace/track.md
+grep -A 5 "Stage ${STAGE_NUM}" .renn/track.md
 
 # Requirements mapped to this stage
-grep -E "^| ${STAGE_NUM}" .ace/specs.md 2>/dev/null
+grep -E "^| ${STAGE_NUM}" .renn/specs.md 2>/dev/null
 
 # All RECAP files (claims to verify)
 ls "$STAGE_DIR"/*-recap.md 2>/dev/null
@@ -96,7 +96,7 @@ If no must_haves in frontmatter, derive using goal-backward process:
 
 5. **Document derived must-haves** before proceeding to verification.
 
-<!-- Goal-backward derivation expertise is baked into the ace-auditor agent -->
+<!-- Goal-backward derivation expertise is baked into the renn-auditor agent -->
 </step>
 
 <step name="verify_truths">
@@ -380,7 +380,7 @@ For each key link in must_haves:
 
 ```bash
 # Find requirements mapped to this stage
-grep -E "Stage ${STAGE_NUM}" .ace/specs.md 2>/dev/null
+grep -E "Stage ${STAGE_NUM}" .renn/specs.md 2>/dev/null
 ```
 
 For each requirement:
@@ -450,7 +450,7 @@ This step fires on every audit run. Relevance filtering happens internally per c
 
 Load the security checklist:
 
-@~/.claude/ace/references/security-checklist.md
+@~/.claude/renn/references/security-checklist.md
 
 ### Identify Changed Files
 
@@ -653,7 +653,7 @@ Fill template sections:
 9. **Recommended Fix Runs:** If gaps_found
 10. **Verification Metadata:** Approach, timing, counts
 
-See ~/.claude/ace/templates/proof.md for complete template.
+See ~/.claude/renn/templates/proof.md for complete template.
 </step>
 
 <step name="return_to_orchestrator">
@@ -666,7 +666,7 @@ See ~/.claude/ace/templates/proof.md for complete template.
 
 **Status:** {passed | gaps_found | human_needed}
 **Score:** {N}/{M} must-haves verified
-**Report:** .ace/stages/{stage_dir}/{stage}-proof.md
+**Report:** .renn/stages/{stage_dir}/{stage}-proof.md
 
 {If passed:}
 All must-haves verified. Stage goal achieved. Ready to proceed.

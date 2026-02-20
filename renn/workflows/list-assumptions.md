@@ -14,8 +14,8 @@ Stage number: $ARGUMENTS (required)
 ```
 Error: Stage number required.
 
-Usage: /ace.list-stage-assumptions [stage-number]
-Example: /ace.list-stage-assumptions 3
+Usage: /renn.list-stage-assumptions [stage-number]
+Example: /renn.list-stage-assumptions 3
 ```
 
 Exit workflow.
@@ -24,7 +24,7 @@ Exit workflow.
 Validate stage exists in track:
 
 ```bash
-cat .ace/track.md | grep -i "Stage ${STAGE}"
+cat .renn/track.md | grep -i "Stage ${STAGE}"
 ```
 
 **If stage not found:**
@@ -153,8 +153,8 @@ Present next steps:
 
 ```
 What's next?
-1. Discuss context (/ace.discuss-stage ${STAGE}) - Let me ask you questions to build comprehensive context
-2. Plan this stage (/ace.plan-stage ${STAGE}) - Create detailed execution runs
+1. Discuss context (/renn.discuss-stage ${STAGE}) - Let me ask you questions to build comprehensive context
+2. Plan this stage (/renn.plan-stage ${STAGE}) - Create detailed execution runs
 3. Re-examine assumptions - I'll analyze again with your corrections
 4. Done for now
 ```

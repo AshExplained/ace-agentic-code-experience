@@ -1,5 +1,5 @@
 ---
-name: ace.continue
+name: renn.continue
 description: Resume work from previous session with full context restoration
 allowed-tools:
   - Read
@@ -22,11 +22,11 @@ Routes to the continue-project workflow which handles:
 </objective>
 
 <execution_context>
-@~/.claude/ace/workflows/continue-project.md
+@~/.claude/renn/workflows/continue-project.md
 </execution_context>
 
 <process>
-**Follow the continue-project workflow** from `@~/.claude/ace/workflows/continue-project.md`.
+**Follow the continue-project workflow** from `@~/.claude/renn/workflows/continue-project.md`.
 
 The workflow handles all resumption logic including:
 

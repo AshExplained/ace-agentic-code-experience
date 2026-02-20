@@ -2,9 +2,9 @@
 
 **Read these files NOW:**
 
-1. `.ace/pulse.md`
-2. `.ace/brief.md`
-3. `.ace/track.md`
+1. `.renn/pulse.md`
+2. `.renn/brief.md`
+3. `.renn/track.md`
 4. Current stage's run files (`*-run.md`)
 5. Current stage's recap files (`*-recap.md`)
 
@@ -25,8 +25,8 @@ Mark current stage complete and advance to next. This is the natural point where
 Before transition, read project state:
 
 ```bash
-cat .ace/pulse.md 2>/dev/null
-cat .ace/brief.md 2>/dev/null
+cat .renn/pulse.md 2>/dev/null
+cat .renn/brief.md 2>/dev/null
 ```
 
 Parse current position to verify we're transitioning the right stage.
@@ -39,8 +39,8 @@ Note accumulated context that may need updating after transition.
 Check current stage has all run recaps:
 
 ```bash
-ls .ace/stages/XX-current/*-run.md 2>/dev/null | sort
-ls .ace/stages/XX-current/*-recap.md 2>/dev/null | sort
+ls .renn/stages/XX-current/*-run.md 2>/dev/null | sort
+ls .renn/stages/XX-current/*-recap.md 2>/dev/null | sort
 ```
 
 **Verification logic:**
@@ -53,7 +53,7 @@ ls .ace/stages/XX-current/*-recap.md 2>/dev/null | sort
 <config-check>
 
 ```bash
-cat .ace/config.json 2>/dev/null
+cat .renn/config.json 2>/dev/null
 ```
 
 </config-check>
@@ -111,7 +111,7 @@ Wait for user decision.
 Check for lingering handoffs:
 
 ```bash
-ls .ace/stages/XX-current/.continue-here*.md 2>/dev/null
+ls .renn/stages/XX-current/.continue-here*.md 2>/dev/null
 ```
 
 If found, delete them — stage is complete, handoffs are stale.
@@ -123,7 +123,7 @@ If found, delete them — stage is complete, handoffs are stale.
 Update the track file:
 
 ```bash
-TRACK_FILE=".ace/track.md"
+TRACK_FILE=".renn/track.md"
 ```
 
 Update the file:
@@ -168,7 +168,7 @@ Evolve brief.md to reflect learnings from completed stage.
 **Read stage recaps:**
 
 ```bash
-cat .ace/stages/XX-current/*-recap.md
+cat .renn/stages/XX-current/*-recap.md
 ```
 
 **Assess requirement changes:**
@@ -316,7 +316,7 @@ Update Project Reference section in pulse.md.
 ```markdown
 ## Project Reference
 
-See: .ace/brief.md (updated [today])
+See: .renn/brief.md (updated [today])
 
 **Core value:** [Current core value from brief.md]
 **Current focus:** [Next stage name]
@@ -433,7 +433,7 @@ Next: Stage [X+1] — [Name]
 ⚡ Auto-continuing: Plan Stage [X+1] in detail
 ```
 
-Exit skill and invoke SlashCommand("/ace.plan-stage [X+1]")
+Exit skill and invoke SlashCommand("/renn.plan-stage [X+1]")
 
 </if>
 
@@ -448,15 +448,15 @@ Exit skill and invoke SlashCommand("/ace.plan-stage [X+1]")
 
 **Stage [X+1]: [Name]** — [Goal from track.md]
 
-`/ace.plan-stage [X+1]`
+`/renn.plan-stage [X+1]`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.discuss-stage [X+1]` — gather context first
-- `/ace.research-stage [X+1]` — investigate unknowns
+- `/renn.discuss-stage [X+1]` — gather context first
+- `/renn.research-stage [X+1]` — investigate unknowns
 - Review track
 
 ---
@@ -478,7 +478,7 @@ Stage {X} marked complete.
 ⚡ Auto-continuing: Complete milestone and archive
 ```
 
-Exit skill and invoke SlashCommand("/ace.complete-milestone {version}")
+Exit skill and invoke SlashCommand("/renn.complete-milestone {version}")
 
 </if>
 
@@ -495,7 +495,7 @@ Exit skill and invoke SlashCommand("/ace.complete-milestone {version}")
 
 **Complete Milestone {version}** — archive and prepare for next
 
-`/ace.complete-milestone {version}`
+`/renn.complete-milestone {version}`
 
 <sub>`/clear` first → fresh context window</sub>
 

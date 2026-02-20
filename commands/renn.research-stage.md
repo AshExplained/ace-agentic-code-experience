@@ -1,6 +1,6 @@
 ---
-name: ace.research-stage
-description: Research how to implement a stage (standalone - usually use /ace.plan-stage instead)
+name: renn.research-stage
+description: Research how to implement a stage (standalone - usually use /renn.plan-stage instead)
 argument-hint: "[stage]"
 allowed-tools:
   - Read
@@ -9,9 +9,9 @@ allowed-tools:
 ---
 
 <objective>
-Research how to implement a stage. Spawns ace-stage-scout agent with stage context.
+Research how to implement a stage. Spawns renn-stage-scout agent with stage context.
 
-**Note:** This is a standalone research command. For most workflows, use `/ace.plan-stage` which integrates research automatically.
+**Note:** This is a standalone research command. For most workflows, use `/renn.plan-stage` which integrates research automatically.
 
 **Use this command when:**
 - You want to research without architecting yet
@@ -36,7 +36,7 @@ Normalize stage input in step 1 before any directory lookups.
 Read horsepower profile for agent spawning:
 
 ```bash
-HORSEPOWER=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+HORSEPOWER=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -45,7 +45,7 @@ Default to "balanced" if not set.
 
 | Agent | max | balanced | eco |
 |-------|---------|----------|--------|
-| ace-stage-scout | opus | sonnet | haiku |
+| renn-stage-scout | opus | sonnet | haiku |
 
 Store resolved model for use in Task calls below.
 
@@ -61,7 +61,7 @@ else
   STAGE="$ARGUMENTS"
 fi
 
-grep -A5 "Stage ${STAGE}:" .ace/track.md 2>/dev/null
+grep -A5 "Stage ${STAGE}:" .renn/track.md 2>/dev/null
 ```
 
 **If not found:** Error and exit. **If found:** Extract stage number, name, description.
@@ -69,7 +69,7 @@ grep -A5 "Stage ${STAGE}:" .ace/track.md 2>/dev/null
 ## 2. Check Existing Research
 
 ```bash
-ls .ace/stages/${STAGE}-*/research.md 2>/dev/null
+ls .renn/stages/${STAGE}-*/research.md 2>/dev/null
 ```
 
 **If exists:** Offer: 1) Update research, 2) View existing, 3) Skip. Wait for response.
@@ -79,15 +79,15 @@ ls .ace/stages/${STAGE}-*/research.md 2>/dev/null
 ## 3. Gather Stage Context
 
 ```bash
-grep -A20 "Stage ${STAGE}:" .ace/track.md
-cat .ace/specs.md 2>/dev/null
-cat .ace/stages/${STAGE}-*/*-intel.md 2>/dev/null
-grep -A30 "### Decisions Made" .ace/pulse.md 2>/dev/null
+grep -A20 "Stage ${STAGE}:" .renn/track.md
+cat .renn/specs.md 2>/dev/null
+cat .renn/stages/${STAGE}-*/*-intel.md 2>/dev/null
+grep -A30 "### Decisions Made" .renn/pulse.md 2>/dev/null
 ```
 
 Present summary with stage description, requirements, prior decisions.
 
-## 4. Spawn ace-stage-scout Agent
+## 4. Spawn renn-stage-scout Agent
 
 Research modes: ecosystem (default), feasibility, implementation, comparison.
 
@@ -122,7 +122,7 @@ Mode: ecosystem
 </context>
 
 <downstream_consumer>
-Your research.md will be loaded by `/ace.plan-stage` which uses specific sections:
+Your research.md will be loaded by `/renn.plan-stage` which uses specific sections:
 - `## Standard Stack` → Runs use these libraries
 - `## Architecture Patterns` → Task structure follows these
 - `## Don't Hand-Roll` → Tasks NEVER build custom solutions for listed problems
@@ -142,14 +142,14 @@ Before declaring complete, verify:
 </quality_gate>
 
 <output>
-Write to: .ace/stages/${STAGE}-{slug}/${STAGE}-research.md
+Write to: .renn/stages/${STAGE}-{slug}/${STAGE}-research.md
 </output>
 ```
 
 ```
 Task(
   prompt=filled_prompt,
-  subagent_type="ace-stage-scout",
+  subagent_type="renn-stage-scout",
   model="{scout_model}",
   description="Research Stage {stage}"
 )
@@ -171,7 +171,7 @@ Continue research for Stage {stage_number}: {stage_name}
 </objective>
 
 <prior_state>
-Research file: @.ace/stages/${STAGE}-{slug}/${STAGE}-research.md
+Research file: @.renn/stages/${STAGE}-{slug}/${STAGE}-research.md
 </prior_state>
 
 <checkpoint_response>
@@ -183,7 +183,7 @@ Research file: @.ace/stages/${STAGE}-{slug}/${STAGE}-research.md
 ```
 Task(
   prompt=continuation_prompt,
-  subagent_type="ace-stage-scout",
+  subagent_type="renn-stage-scout",
   model="{scout_model}",
   description="Continue research Stage {stage}"
 )
@@ -194,7 +194,7 @@ Task(
 <success_criteria>
 - [ ] Stage validated against track
 - [ ] Existing research checked
-- [ ] ace-stage-scout spawned with context
+- [ ] renn-stage-scout spawned with context
 - [ ] Gates handled correctly
 - [ ] User knows next steps
 </success_criteria>

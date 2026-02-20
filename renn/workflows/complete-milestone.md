@@ -12,9 +12,9 @@ This is the ritual that separates "development" from "shipped."
 
 1. templates/milestone.md
 2. templates/milestone-archive.md
-3. `.ace/track.md`
-4. `.ace/specs.md`
-5. `.ace/brief.md`
+3. `.renn/track.md`
+4. `.renn/specs.md`
+5. `.renn/brief.md`
 
 </required_reading>
 
@@ -22,8 +22,8 @@ This is the ritual that separates "development" from "shipped."
 
 When a milestone completes, this workflow:
 
-1. Extracts full milestone details to `.ace/milestones/[MILESTONE]-track.md`
-2. Archives specs to `.ace/milestones/[MILESTONE]-specs.md`
+1. Extracts full milestone details to `.renn/milestones/[MILESTONE]-track.md`
+2. Archives specs to `.renn/milestones/[MILESTONE]-specs.md`
 3. Updates track.md to replace milestone details with one-line summary
 4. Deletes specs.md (fresh one created for next milestone)
 5. Performs full brief.md evolution review
@@ -52,8 +52,8 @@ When a milestone completes, this workflow:
 Check if milestone is truly complete:
 
 ```bash
-cat .ace/track.md
-ls .ace/stages/*/recap.md 2>/dev/null | wc -l
+cat .renn/track.md
+ls .renn/stages/*/recap.md 2>/dev/null | wc -l
 ```
 
 **Questions to ask:**
@@ -80,7 +80,7 @@ Total: 4 stages, 8 runs, all complete
 <config-check>
 
 ```bash
-cat .ace/config.json 2>/dev/null
+cat .renn/config.json 2>/dev/null
 ```
 
 </config-check>
@@ -157,8 +157,8 @@ Milestone Stats:
 Read all stage recap.md files in milestone range:
 
 ```bash
-cat .ace/stages/01-*/01-*-recap.md
-cat .ace/stages/02-*/02-*-recap.md
+cat .renn/stages/01-*/01-*-recap.md
+cat .renn/stages/02-*/02-*-recap.md
 # ... for each stage in milestone
 ```
 
@@ -179,7 +179,7 @@ Key accomplishments for this milestone:
 
 <step name="create_milestone_entry">
 
-Create or update `.ace/milestones.md`.
+Create or update `.renn/milestones.md`.
 
 If file doesn't exist:
 
@@ -229,14 +229,14 @@ Perform full brief.md evolution review at milestone completion.
 **Read all stage recaps in this milestone:**
 
 ```bash
-cat .ace/stages/*-*/*-recap.md
+cat .renn/stages/*-*/*-recap.md
 ```
 
 **Full review checklist:**
 
 1. **Project identity check:**
    - Read the `# Heading` (project name) and `## What This Is` description
-   - Cross-reference against `package.json` description (if exists) and `.ace/codebase/ARCHITECTURE.md` (if exists)
+   - Cross-reference against `package.json` description (if exists) and `.renn/codebase/ARCHITECTURE.md` (if exists)
    - Does the heading still name the full project, or has it narrowed to a phase/milestone?
    - Does "What This Is" describe the product as it exists today, or an earlier version?
    - Update heading and description if the project has grown beyond what they capture
@@ -300,7 +300,7 @@ Make all edits inline. Update "Last updated" footer:
 
 <step name="reorganize_track">
 
-Update `.ace/track.md` to group completed milestone stages.
+Update `.renn/track.md` to group completed milestone stages.
 
 Add milestone headers and collapse completed work:
 
@@ -350,9 +350,9 @@ Extract completed milestone details and create archive file.
 
 **Process:**
 
-1. Create archive file path: `.ace/milestones/[MILESTONE]-track.md`
+1. Create archive file path: `.renn/milestones/[MILESTONE]-track.md`
 
-2. Read `~/.claude/ace/templates/milestone-archive.md` template
+2. Read `~/.claude/renn/templates/milestone-archive.md` template
 
 3. Extract data from current track.md:
    - All stages belonging to this milestone (by stage number range)
@@ -375,16 +375,16 @@ Extract completed milestone details and create archive file.
    - {{DECISIONS_FROM_BRIEF}} -- Key decisions from brief.md
    - {{ISSUES_RESOLVED_DURING_MILESTONE}} -- From recaps
 
-6. Write filled template to `.ace/milestones/[MILESTONE]-track.md`
+6. Write filled template to `.renn/milestones/[MILESTONE]-track.md`
 
 7. Delete track.md (fresh one created for next milestone):
    ```bash
-   rm .ace/track.md
+   rm .renn/track.md
    ```
 
 8. Verify archive exists:
    ```bash
-   ls .ace/milestones/[MILESTONE]-track.md
+   ls .renn/milestones/[MILESTONE]-track.md
    ```
 
 9. Confirm track archive complete:
@@ -394,7 +394,7 @@ Extract completed milestone details and create archive file.
    track.md deleted (fresh one for next milestone)
    ```
 
-**Note:** Stage directories (`.ace/stages/`) are NOT deleted. They accumulate across milestones as the raw execution history. Stage numbering continues (M01 stages 1-4, M02 stages 5-8, etc.).
+**Note:** Stage directories (`.renn/stages/`) are NOT deleted. They accumulate across milestones as the raw execution history. Stage numbering continues (M01 stages 1-4, M02 stages 5-8, etc.).
 
 </step>
 
@@ -406,10 +406,10 @@ Archive specs and prepare for fresh specs in next milestone.
 
 1. Read current specs.md:
    ```bash
-   cat .ace/specs.md
+   cat .renn/specs.md
    ```
 
-2. Create archive file: `.ace/milestones/[MILESTONE]-specs.md`
+2. Create archive file: `.renn/milestones/[MILESTONE]-specs.md`
 
 3. Transform specs for archive:
    - Mark all v1 specs as `[x]` complete
@@ -428,7 +428,7 @@ Archive specs and prepare for fresh specs in next milestone.
    **Status:** SHIPPED
 
    This is the archived specs for [MILESTONE].
-   For current specs, see `.ace/specs.md` (created for next milestone).
+   For current specs, see `.renn/specs.md` (created for next milestone).
 
    ---
 
@@ -448,7 +448,7 @@ Archive specs and prepare for fresh specs in next milestone.
 
 5. Delete original specs.md:
    ```bash
-   rm .ace/specs.md
+   rm .renn/specs.md
    ```
 
 6. Confirm:
@@ -457,7 +457,7 @@ Archive specs and prepare for fresh specs in next milestone.
    specs.md deleted (fresh one needed for next milestone)
    ```
 
-**Important:** The next milestone workflow starts with `/ace.new-milestone` which includes specs definition. brief.md's Validated section carries the cumulative record across milestones.
+**Important:** The next milestone workflow starts with `/renn.new-milestone` which includes specs definition. brief.md's Validated section carries the cumulative record across milestones.
 
 </step>
 
@@ -467,7 +467,7 @@ Move the milestone audit file to the archive (if it exists):
 
 ```bash
 # Move audit to milestones folder (if exists)
-[ -f .ace/[MILESTONE]-MILESTONE-AUDIT.md ] && mv .ace/[MILESTONE]-MILESTONE-AUDIT.md .ace/milestones/
+[ -f .renn/[MILESTONE]-MILESTONE-AUDIT.md ] && mv .renn/[MILESTONE]-MILESTONE-AUDIT.md .renn/milestones/
 ```
 
 Confirm:
@@ -488,7 +488,7 @@ Update pulse.md to reflect milestone completion.
 ```markdown
 ## Project Reference
 
-See: .ace/brief.md (updated [today])
+See: .renn/brief.md (updated [today])
 
 **Core value:** [Current core value from brief.md]
 **Current focus:** [Next milestone or "Planning next milestone"]
@@ -521,7 +521,7 @@ Check if branching was used and offer merge options.
 
 ```bash
 # Get branching strategy from config
-BRANCHING_STRATEGY=$(cat .ace/config.json 2>/dev/null | grep -o '"branching_strategy"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "none")
+BRANCHING_STRATEGY=$(cat .renn/config.json 2>/dev/null | grep -o '"branching_strategy"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "none")
 ```
 
 **If strategy is "none":** Skip to git_tag step.
@@ -529,7 +529,7 @@ BRANCHING_STRATEGY=$(cat .ace/config.json 2>/dev/null | grep -o '"branching_stra
 **For "stage" strategy -- find stage branches:**
 
 ```bash
-STAGE_BRANCH_TEMPLATE=$(cat .ace/config.json 2>/dev/null | grep -o '"stage_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "ace/stage-{stage}-{slug}")
+STAGE_BRANCH_TEMPLATE=$(cat .renn/config.json 2>/dev/null | grep -o '"stage_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "renn/stage-{stage}-{slug}")
 
 # Extract prefix from template (before first variable)
 BRANCH_PREFIX=$(echo "$STAGE_BRANCH_TEMPLATE" | sed 's/{.*//')
@@ -541,7 +541,7 @@ STAGE_BRANCHES=$(git branch --list "${BRANCH_PREFIX}*" 2>/dev/null | sed 's/^\*/
 **For "milestone" strategy -- find milestone branch:**
 
 ```bash
-MILESTONE_BRANCH_TEMPLATE=$(cat .ace/config.json 2>/dev/null | grep -o '"milestone_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "ace/{milestone}-{slug}")
+MILESTONE_BRANCH_TEMPLATE=$(cat .renn/config.json 2>/dev/null | grep -o '"milestone_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "renn/{milestone}-{slug}")
 
 # Extract prefix from template
 BRANCH_PREFIX=$(echo "$MILESTONE_BRANCH_TEMPLATE" | sed 's/{.*//')
@@ -687,7 +687,7 @@ Key accomplishments:
 - [Item 2]
 - [Item 3]
 
-See .ace/milestones.md for full details.
+See .renn/milestones.md for full details.
 EOF
 )"
 ```
@@ -707,7 +707,7 @@ If yes:
 git push origin [TAG_NAME]
 ```
 
-If no: Tag stays local. Can be pushed later manually or by `/ace.ship`.
+If no: Tag stays local. Can be pushed later manually or by `/renn.ship`.
 
 </step>
 
@@ -718,7 +718,7 @@ Commit milestone completion including archive files and deletions.
 **Check config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
@@ -728,17 +728,17 @@ git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 
 ```bash
 # Stage archive files (new)
-git add .ace/milestones/[MILESTONE]-track.md
-git add .ace/milestones/[MILESTONE]-specs.md
-git add .ace/milestones/[MILESTONE]-MILESTONE-AUDIT.md 2>/dev/null || true
+git add .renn/milestones/[MILESTONE]-track.md
+git add .renn/milestones/[MILESTONE]-specs.md
+git add .renn/milestones/[MILESTONE]-MILESTONE-AUDIT.md 2>/dev/null || true
 
 # Stage updated files
-git add .ace/milestones.md
-git add .ace/brief.md
-git add .ace/pulse.md
+git add .renn/milestones.md
+git add .renn/brief.md
+git add .renn/pulse.md
 
 # Stage deletions
-git add -u .ace/
+git add -u .renn/
 
 # Commit with descriptive message
 git commit -m "$(cat <<'EOF'
@@ -780,7 +780,7 @@ Archived:
 - milestones/[MILESTONE]-track.md
 - milestones/[MILESTONE]-specs.md
 
-Summary: .ace/milestones.md
+Summary: .renn/milestones.md
 Tag: [TAG_NAME]
 
 ---
@@ -789,11 +789,11 @@ Tag: [TAG_NAME]
 
 **Ship Your Project** -- deploy to a platform
 
-`/ace.ship`
+`/renn.ship`
 
 **Start Next Milestone** -- questioning -> research -> specs -> track
 
-`/ace.new-milestone`
+`/renn.new-milestone`
 
 <sub>`/clear` first -> fresh context window</sub>
 
@@ -808,7 +808,7 @@ Tag: [TAG_NAME]
 
 **Milestone IDs use M-format (M01, M02, M03, etc.):**
 
-This is universal across all projects regardless of versioning strategy. ACE milestones are project management markers, not software version numbers.
+This is universal across all projects regardless of versioning strategy. RENN milestones are project management markers, not software version numbers.
 
 - **M01** -- First milestone (often MVP)
 - **M02, M03** -- Subsequent milestones
@@ -870,6 +870,6 @@ Milestone completion is successful when:
 - [ ] Git tag created locally ([MILESTONE]-[slug])
 - [ ] User asked about pushing tag to remote
 - [ ] Milestone commit made (if commit_docs=true)
-- [ ] User knows next step (/ace.new-milestone)
+- [ ] User knows next step (/renn.new-milestone)
 
 </success_criteria>

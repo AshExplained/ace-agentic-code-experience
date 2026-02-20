@@ -1,5 +1,5 @@
 ---
-name: ace.run-stage
+name: renn.run-stage
 description: Execute all runs in a stage with batch-based parallelization
 argument-hint: "<stage-number> [--gaps-only]"
 allowed-tools:
@@ -23,8 +23,8 @@ Context budget: ~15% orchestrator, 100% fresh per subagent.
 </objective>
 
 <execution_context>
-@~/.claude/ace/references/ui-brand.md
-@~/.claude/ace/workflows/run-stage.md
+@~/.claude/renn/references/ui-brand.md
+@~/.claude/renn/workflows/run-stage.md
 </execution_context>
 
 <context>
@@ -33,8 +33,8 @@ Stage: $ARGUMENTS
 **Flags:**
 - `--gaps-only` — Execute only gap closure runs (runs with `gap_closure: true` in frontmatter). Use after audit creates fix runs.
 
-@.ace/track.md
-@.ace/pulse.md
+@.renn/track.md
+@.renn/pulse.md
 </context>
 
 <process>
@@ -42,7 +42,7 @@ Stage: $ARGUMENTS
 
    Read horsepower profile for agent spawning:
    ```bash
-   HORSEPOWER=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+   HORSEPOWER=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
    ```
 
    Default to "balanced" if not set.
@@ -51,8 +51,8 @@ Stage: $ARGUMENTS
 
    | Agent | max | balanced | eco |
    |-------|-----|----------|-----|
-   | ace-runner | opus | sonnet | sonnet |
-   | ace-auditor | sonnet | sonnet | haiku |
+   | renn-runner | opus | sonnet | sonnet |
+   | renn-auditor | sonnet | sonnet | haiku |
 
    Store resolved models for use in Task calls below.
 
@@ -74,7 +74,7 @@ Stage: $ARGUMENTS
 
 4. **Execute batches**
    For each batch in order:
-   - Spawn `ace-runner` for each run in batch (parallel Task calls)
+   - Spawn `renn-runner` for each run in batch (parallel Task calls)
    - Wait for completion (Task blocks)
    - Verify RECAPs created
    - Proceed to next batch
@@ -101,18 +101,18 @@ Stage: $ARGUMENTS
    **If clean:** Continue to verification.
 
 7. **Verify stage goal**
-   Check config: `CHECKS_AUDITOR=$(cat .ace/config.json 2>/dev/null | grep -o '"auditor"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")`
+   Check config: `CHECKS_AUDITOR=$(cat .renn/config.json 2>/dev/null | grep -o '"auditor"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")`
 
    **If `checks.auditor` is `false`:** Skip to step 8 (treat as passed).
 
    **Otherwise:**
-   - Spawn `ace-auditor` subagent with stage directory and goal
+   - Spawn `renn-auditor` subagent with stage directory and goal
    - Auditor checks must_haves against actual codebase (not RECAP claims)
    - Creates proof.md with detailed report
    - Route by status:
      - `passed` → continue to step 8
      - `human_needed` → present items, get approval or feedback
-     - `gaps_found` → present gaps, offer `/ace.plan-stage {X} --gaps`
+     - `gaps_found` → present gaps, offer `/renn.plan-stage {X} --gaps`
 
 8. **Update track and pulse**
    - Update track.md, pulse.md
@@ -127,10 +127,10 @@ Stage: $ARGUMENTS
 
 10. **Commit stage completion**
     Check `COMMIT_PLANNING_DOCS` from config.json (default: true).
-    If false: Skip git operations for .ace/ files.
+    If false: Skip git operations for .renn/ files.
     If true: Bundle all stage metadata updates in one commit:
-    - Stage: `git add .ace/track.md .ace/pulse.md`
-    - Stage specs.md if updated: `git add .ace/specs.md`
+    - Stage: `git add .renn/track.md .renn/pulse.md`
+    - Stage specs.md if updated: `git add .renn/specs.md`
     - Commit: `docs({stage}): complete {stage-name} stage`
 
 11. **Offer next steps**
@@ -152,7 +152,7 @@ Output this markdown directly (not as a code block). Route based on status:
 **Route A: Stage verified, more stages remain**
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► STAGE {Z} COMPLETE ✓
+ RENN ► STAGE {Z} COMPLETE ✓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **Stage {Z}: {Name}**
@@ -166,15 +166,15 @@ Goal verified ✓
 
 **Stage {Z+1}: {Name}** — {Goal from track.md}
 
-/ace.discuss-stage {Z+1} — gather context and clarify approach
+/renn.discuss-stage {Z+1} — gather context and clarify approach
 
 <sub>/clear first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- /ace.plan-stage {Z+1} — skip discussion, plan directly
-- /ace.audit {Z} — manual acceptance testing before continuing
+- /renn.plan-stage {Z+1} — skip discussion, plan directly
+- /renn.audit {Z} — manual acceptance testing before continuing
 
 ───────────────────────────────────────────────────────────────
 
@@ -183,7 +183,7 @@ Goal verified ✓
 **Route B: Stage verified, milestone complete**
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► MILESTONE COMPLETE 🎉
+ RENN ► MILESTONE COMPLETE 🎉
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **v1.0**
@@ -197,15 +197,15 @@ All stage goals verified ✓
 
 **Audit milestone** — verify requirements, cross-stage integration, E2E flows
 
-/ace.audit-milestone
+/renn.audit-milestone
 
 <sub>/clear first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- /ace.audit — manual acceptance testing
-- /ace.complete-milestone — skip audit, archive directly
+- /renn.audit — manual acceptance testing
+- /renn.complete-milestone — skip audit, archive directly
 
 ───────────────────────────────────────────────────────────────
 
@@ -214,13 +214,13 @@ All stage goals verified ✓
 **Route C: Gaps found — need additional planning**
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► STAGE {Z} GAPS FOUND ⚠
+ RENN ► STAGE {Z} GAPS FOUND ⚠
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **Stage {Z}: {Name}**
 
 Score: {N}/{M} must-haves verified
-Report: .ace/stages/{stage_dir}/{stage}-proof.md
+Report: .renn/stages/{stage_dir}/{stage}-proof.md
 
 ### What's Missing
 
@@ -232,24 +232,24 @@ Report: .ace/stages/{stage_dir}/{stage}-proof.md
 
 **Plan gap closure** — create additional runs to complete the stage
 
-/ace.plan-stage {Z} --gaps
+/renn.plan-stage {Z} --gaps
 
 <sub>/clear first → fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- cat .ace/stages/{stage_dir}/{stage}-proof.md — see full report
-- /ace.audit {Z} — manual testing before planning
+- cat .renn/stages/{stage_dir}/{stage}-proof.md — see full report
+- /renn.audit {Z} — manual testing before planning
 
 ───────────────────────────────────────────────────────────────
 
 ---
 
-After user runs /ace.plan-stage {Z} --gaps:
+After user runs /renn.plan-stage {Z} --gaps:
 1. Architect reads proof.md gaps
 2. Creates runs 04, 05, etc. to close gaps
-3. User runs /ace.run-stage {Z} again
+3. User runs /renn.run-stage {Z} again
 4. Run-stage runs incomplete runs (04, 05...)
 5. Auditor runs again → loop until passed
 </offer_next>
@@ -264,15 +264,15 @@ Before spawning, read file contents. The `@` syntax does not work across Task() 
 RUN_01_CONTENT=$(cat "{run_01_path}")
 RUN_02_CONTENT=$(cat "{run_02_path}")
 RUN_03_CONTENT=$(cat "{run_03_path}")
-PULSE_CONTENT=$(cat .ace/pulse.md)
+PULSE_CONTENT=$(cat .renn/pulse.md)
 ```
 
 Spawn all runs in a batch with a single message containing multiple Task calls, with inlined content:
 
 ```
-Task(prompt="Execute run at {run_01_path}\n\nRun:\n{run_01_content}\n\nProject pulse:\n{pulse_content}", subagent_type="ace-runner", model="{runner_model}")
-Task(prompt="Execute run at {run_02_path}\n\nRun:\n{run_02_content}\n\nProject pulse:\n{pulse_content}", subagent_type="ace-runner", model="{runner_model}")
-Task(prompt="Execute run at {run_03_path}\n\nRun:\n{run_03_content}\n\nProject pulse:\n{pulse_content}", subagent_type="ace-runner", model="{runner_model}")
+Task(prompt="Execute run at {run_01_path}\n\nRun:\n{run_01_content}\n\nProject pulse:\n{pulse_content}", subagent_type="renn-runner", model="{runner_model}")
+Task(prompt="Execute run at {run_02_path}\n\nRun:\n{run_02_content}\n\nProject pulse:\n{pulse_content}", subagent_type="renn-runner", model="{runner_model}")
+Task(prompt="Execute run at {run_03_path}\n\nRun:\n{run_03_content}\n\nProject pulse:\n{pulse_content}", subagent_type="renn-runner", model="{runner_model}")
 ```
 
 All three run in parallel. Task tool blocks until all complete.
@@ -286,7 +286,7 @@ Runs with `autonomous: false` have gates. The run-stage.md workflow handles the 
 - Orchestrator presents to user, collects response
 - Spawns fresh continuation agent (not resume)
 
-See `@~/.claude/ace/workflows/run-stage.md` step `gate_handling` for complete details.
+See `@~/.claude/renn/workflows/run-stage.md` step `gate_handling` for complete details.
 </gate_handling>
 
 <drift_rules>

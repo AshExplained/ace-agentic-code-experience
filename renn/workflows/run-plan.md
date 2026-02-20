@@ -6,7 +6,7 @@ Execute a stage prompt (run.md) and create the outcome summary (recap.md).
 Read pulse.md before any operation to load project context.
 Read config.json for planning behavior settings.
 
-@~/.claude/ace/references/git-integration.md
+@~/.claude/renn/references/git-integration.md
 </required_reading>
 
 <process>
@@ -15,7 +15,7 @@ Read config.json for planning behavior settings.
 Read horsepower profile for agent spawning:
 
 ```bash
-HORSEPOWER=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+HORSEPOWER=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -24,7 +24,7 @@ Default to "balanced" if not set.
 
 | Agent | max | balanced | eco |
 |-------|---------|----------|--------|
-| ace-runner | opus | sonnet | sonnet |
+| renn-runner | opus | sonnet | sonnet |
 
 Store resolved model for use in Task calls below.
 </step>
@@ -33,7 +33,7 @@ Store resolved model for use in Task calls below.
 Before any operation, read project state:
 
 ```bash
-cat .ace/pulse.md 2>/dev/null
+cat .renn/pulse.md 2>/dev/null
 ```
 
 **If file exists:** Parse and internalize:
@@ -43,7 +43,7 @@ cat .ace/pulse.md 2>/dev/null
 - Blockers/concerns (things to watch for)
 - Brief alignment status
 
-**If file missing but .ace/ exists:**
+**If file missing but .renn/ exists:**
 
 ```
 pulse.md missing but planning artifacts exist.
@@ -52,7 +52,7 @@ Options:
 2. Continue without project state (may lose accumulated context)
 ```
 
-**If .ace/ doesn't exist:** Error - project not initialized.
+**If .renn/ doesn't exist:** Error - project not initialized.
 
 This ensures every execution has full project context.
 
@@ -60,7 +60,7 @@ This ensures every execution has full project context.
 
 ```bash
 # Check if planning docs should be committed (default: true)
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 # Auto-detect gitignored (overrides config)
 git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
@@ -75,11 +75,11 @@ Find the next run to execute:
 - Identify first run without corresponding RECAP
 
 ```bash
-cat .ace/track.md
+cat .renn/track.md
 # Look for stage with "In progress" status
 # Then find runs in that stage
-ls .ace/stages/XX-name/*-run.md 2>/dev/null | sort
-ls .ace/stages/XX-name/*-recap.md 2>/dev/null | sort
+ls .renn/stages/XX-name/*-run.md 2>/dev/null | sort
+ls .renn/stages/XX-name/*-recap.md 2>/dev/null | sort
 ```
 
 **Logic:**
@@ -92,8 +92,8 @@ ls .ace/stages/XX-name/*-recap.md 2>/dev/null | sort
 
 Stage directories can be integer or decimal format:
 
-- Integer: `.ace/stages/01-foundation/01.01-run.md`
-- Decimal: `.ace/stages/01.1-hotfix/01.1.01-run.md`
+- Integer: `.renn/stages/01-foundation/01.01-run.md`
+- Decimal: `.renn/stages/01.1-hotfix/01.1.01-run.md`
 
 Parse stage number from path (handles both formats):
 
@@ -111,7 +111,7 @@ Confirm with user if ambiguous.
 
 <config-check>
 ```bash
-cat .ace/config.json 2>/dev/null
+cat .renn/config.json 2>/dev/null
 ```
 </config-check>
 
@@ -160,7 +160,7 @@ Runs are divided into segments by gates. Each segment is routed to optimal execu
 
 ```bash
 # Find all gates and their types
-grep -n "type=\"checkpoint" .ace/stages/XX-name/{stage}.{run}-run.md
+grep -n "type=\"checkpoint" .renn/stages/XX-name/{stage}.{run}-run.md
 ```
 
 **2. Analyze execution strategy:**
@@ -225,9 +225,9 @@ No segmentation benefit - execute entirely in main
 ```
 1. Run init_agent_tracking step first (see step below)
 
-2. Use Task tool with subagent_type="ace-runner" and model="{runner_model}":
+2. Use Task tool with subagent_type="renn-runner" and model="{runner_model}":
 
-   Prompt: "Execute run at .ace/stages/{stage}.{run}-run.md
+   Prompt: "Execute run at .renn/stages/{stage}.{run}-run.md
 
    This is an autonomous run (no gates). Execute all tasks, create recap.md in stage directory, commit with message following run's commit guidance.
 
@@ -238,7 +238,7 @@ No segmentation benefit - execute entirely in main
 3. After Task tool returns with agent_id:
 
    a. Write agent_id to current-agent-id.txt:
-      echo "[agent_id]" > .ace/current-agent-id.txt
+      echo "[agent_id]" > .renn/current-agent-id.txt
 
    b. Append spawn entry to agent-history.json:
       {
@@ -262,7 +262,7 @@ No segmentation benefit - execute entirely in main
       - Set completion_timestamp: "[ISO timestamp]"
 
    b. Clear current-agent-id.txt:
-      rm .ace/current-agent-id.txt
+      rm .renn/current-agent-id.txt
 
 6. Report completion to user
 ```
@@ -273,7 +273,7 @@ No segmentation benefit - execute entirely in main
 Execute segment-by-segment:
 
 For each autonomous segment:
-  Spawn subagent with prompt: "Execute tasks [X-Y] from run at .ace/stages/{stage}.{run}-run.md. Read the run for full context and drift rules. Do NOT create RECAP or commit - just execute these tasks and report results."
+  Spawn subagent with prompt: "Execute tasks [X-Y] from run at .renn/stages/{stage}.{run}-run.md. Read the run for full context and drift rules. Do NOT create RECAP or commit - just execute these tasks and report results."
 
   Wait for subagent completion
 
@@ -308,21 +308,21 @@ Before spawning any subagents, set up tracking infrastructure:
 
 ```bash
 # Create agent history file if doesn't exist
-if [ ! -f .ace/agent-history.json ]; then
-  echo '{"version":"1.0","max_entries":50,"entries":[]}' > .ace/agent-history.json
+if [ ! -f .renn/agent-history.json ]; then
+  echo '{"version":"1.0","max_entries":50,"entries":[]}' > .renn/agent-history.json
 fi
 
 # Clear any stale current-agent-id (from interrupted sessions)
 # Will be populated when subagent spawns
-rm -f .ace/current-agent-id.txt
+rm -f .renn/current-agent-id.txt
 ```
 
 **2. Check for interrupted agents (resume detection):**
 
 ```bash
 # Check if current-agent-id.txt exists from previous interrupted session
-if [ -f .ace/current-agent-id.txt ]; then
-  INTERRUPTED_ID=$(cat .ace/current-agent-id.txt)
+if [ -f .renn/current-agent-id.txt ]; then
+  INTERRUPTED_ID=$(cat .renn/current-agent-id.txt)
   echo "Found interrupted agent: $INTERRUPTED_ID"
 fi
 ```
@@ -377,7 +377,7 @@ For Pattern A (fully autonomous) and Pattern C (decision-dependent), skip this s
 
    B. If routing = Subagent:
       ```
-      Spawn Task tool with subagent_type="ace-runner" and model="{runner_model}":
+      Spawn Task tool with subagent_type="renn-runner" and model="{runner_model}":
 
       Prompt: "Execute tasks [task numbers/names] from run at [run path].
 
@@ -402,7 +402,7 @@ For Pattern A (fully autonomous) and Pattern C (decision-dependent), skip this s
       **After Task tool returns with agent_id:**
 
       1. Write agent_id to current-agent-id.txt:
-         echo "[agent_id]" > .ace/current-agent-id.txt
+         echo "[agent_id]" > .renn/current-agent-id.txt
 
       2. Append spawn entry to agent-history.json:
          {
@@ -427,7 +427,7 @@ For Pattern A (fully autonomous) and Pattern C (decision-dependent), skip this s
          - Set completion_timestamp: "[ISO timestamp]"
 
       2. Clear current-agent-id.txt:
-         rm .ace/current-agent-id.txt
+         rm .renn/current-agent-id.txt
 
       ```
 
@@ -527,7 +527,7 @@ Committing...
 <step name="load_prompt">
 Read the run prompt:
 ```bash
-cat .ace/stages/XX-name/{stage}.{run}-run.md
+cat .renn/stages/XX-name/{stage}.{run}-run.md
 ````
 
 This IS the execution instructions. Follow it exactly.
@@ -541,7 +541,7 @@ Before executing, check if previous stage had issues:
 
 ```bash
 # Find previous stage recap
-ls .ace/stages/*/recap.md 2>/dev/null | sort -r | head -2 | tail -1
+ls .renn/stages/*/recap.md 2>/dev/null | sort -r | head -2 | tail -1
 ```
 
 If previous stage recap.md has "Issues Encountered" != "None" or "Next Stage Readiness" mentions blockers:
@@ -958,7 +958,7 @@ After TDD run completion, ensure:
 - Standard runs: Multiple tasks, 1 commit per task, 2-4 commits total
 - TDD runs: Single feature, 2-3 commits for RED/GREEN/REFACTOR cycle
 
-See `~/.claude/ace/references/tdd.md` for TDD run structure.
+See `~/.claude/renn/references/tdd.md` for TDD run structure.
 </tdd_run_execution>
 
 <task_commit>
@@ -1126,7 +1126,7 @@ I'll verify after: [verification]
 - If verification passes or N/A: continue to next task
 - If verification fails: inform user, wait for resolution
 
-See ~/.claude/ace/references/gates.md for complete gate guidance.
+See ~/.claude/renn/references/gates.md for complete gate guidance.
 </step>
 
 <step name="gate_return_for_orchestrator">
@@ -1255,12 +1255,12 @@ Pass timing data to recap.md creation.
 Check run.md frontmatter for `user_setup` field:
 
 ```bash
-grep -A 50 "^user_setup:" .ace/stages/XX-name/{stage}.{run}-run.md | head -50
+grep -A 50 "^user_setup:" .renn/stages/XX-name/{stage}.{run}-run.md | head -50
 ```
 
 **If user_setup exists and is not empty:**
 
-Create `.ace/stages/XX-name/{stage}-USER-SETUP.md` using template from `~/.claude/ace/templates/user-setup.md`.
+Create `.renn/stages/XX-name/{stage}-USER-SETUP.md` using template from `~/.claude/renn/templates/user-setup.md`.
 
 **Content generation:**
 
@@ -1321,9 +1321,9 @@ Set `USER_SETUP_CREATED=true` if file was generated, for use in completion messa
 
 <step name="create_recap">
 Create `{stage}.{run}-recap.md` as specified in the prompt's `<output>` section.
-Use ~/.claude/ace/templates/recap.md for structure.
+Use ~/.claude/renn/templates/recap.md for structure.
 
-**File location:** `.ace/stages/XX-name/{stage}.{run}-recap.md`
+**File location:** `.renn/stages/XX-name/{stage}.{run}-recap.md`
 
 **Frontmatter population:**
 
@@ -1493,7 +1493,7 @@ Present issues and wait for acknowledgment before proceeding.
 Update the track file:
 
 ```bash
-TRACK_FILE=".ace/track.md"
+TRACK_FILE=".renn/track.md"
 ```
 
 **If more runs remain in this stage:**
@@ -1516,7 +1516,7 @@ run.md was already committed during plan-stage. This final commit captures execu
 **Check planning config:**
 
 If `COMMIT_PLANNING_DOCS=false` (set in load_project_state):
-- Skip all git operations for .ace/ files
+- Skip all git operations for .renn/ files
 - Planning docs exist locally but are gitignored
 - Log: "Skipping planning docs commit (commit_docs: false)"
 - Proceed to next step
@@ -1527,14 +1527,14 @@ If `COMMIT_PLANNING_DOCS=true` (default):
 **1. Stage execution artifacts:**
 
 ```bash
-git add .ace/stages/XX-name/{stage}.{run}-recap.md
-git add .ace/pulse.md
+git add .renn/stages/XX-name/{stage}.{run}-recap.md
+git add .renn/pulse.md
 ```
 
 **2. Stage track:**
 
 ```bash
-git add .ace/track.md
+git add .renn/track.md
 ```
 
 **3. Verify staging:**
@@ -1555,7 +1555,7 @@ Tasks completed: [N]/[N]
 - [Task 2 name]
 - [Task 3 name]
 
-RECAP: .ace/stages/XX-name/{stage}.{run}-recap.md
+RECAP: .renn/stages/XX-name/{stage}.{run}-recap.md
 EOF
 )"
 ```
@@ -1571,7 +1571,7 @@ Tasks completed: 3/3
 - Password hashing with bcrypt
 - Email confirmation flow
 
-RECAP: .ace/stages/08-user-auth/08.02-registration-recap.md
+RECAP: .renn/stages/08-user-auth/08.02-registration-recap.md
 EOF
 )"
 ```
@@ -1591,7 +1591,7 @@ See `git-integration.md` (loaded via required_reading) for commit message conven
 </step>
 
 <step name="update_codebase_map">
-**If .ace/codebase/ exists:**
+**If .renn/codebase/ exists:**
 
 Check what changed across all task commits in this run:
 
@@ -1623,11 +1623,11 @@ git diff --name-only ${FIRST_TASK}^..HEAD 2>/dev/null
 Make single targeted edits - add a bullet point, update a path, or remove a stale entry. Don't rewrite sections.
 
 ```bash
-git add .ace/codebase/*.md
+git add .renn/codebase/*.md
 git commit --amend --no-edit  # Include in metadata commit
 ```
 
-**If .ace/codebase/ doesn't exist:**
+**If .renn/codebase/ doesn't exist:**
 Skip this step.
 </step>
 
@@ -1645,7 +1645,7 @@ If `USER_SETUP_CREATED=true` (from generate_user_setup step), always include thi
 
 This stage introduced external services requiring manual configuration:
 
-📋 .ace/stages/{stage-dir}/{stage}-USER-SETUP.md
+📋 .renn/stages/{stage-dir}/{stage}-USER-SETUP.md
 
 Quick view:
 - [ ] {ENV_VAR_1}
@@ -1653,7 +1653,7 @@ Quick view:
 - [ ] {Dashboard config task}
 
 Complete this setup for the integration to function.
-Run `cat .ace/stages/{stage-dir}/{stage}-USER-SETUP.md` for full details.
+Run `cat .renn/stages/{stage-dir}/{stage}-USER-SETUP.md` for full details.
 
 ---
 ```
@@ -1665,8 +1665,8 @@ This warning appears BEFORE "Run complete" messaging. User sees setup requiremen
 List files in the stage directory:
 
 ```bash
-ls -1 .ace/stages/[current-stage-dir]/*-run.md 2>/dev/null | wc -l
-ls -1 .ace/stages/[current-stage-dir]/*-recap.md 2>/dev/null | wc -l
+ls -1 .renn/stages/[current-stage-dir]/*-run.md 2>/dev/null | wc -l
+ls -1 .renn/stages/[current-stage-dir]/*-recap.md 2>/dev/null | wc -l
 ```
 
 State the counts: "This stage has [X] runs and [Y] recaps."
@@ -1691,7 +1691,7 @@ Identify the next unexecuted run:
 <if style="turbo">
 ```
 Run {stage}.{run} complete.
-Recap: .ace/stages/{stage-dir}/{stage}.{run}-recap.md
+Recap: .renn/stages/{stage-dir}/{stage}.{run}-recap.md
 
 {Y} of {X} runs complete for Stage {Z}.
 
@@ -1704,7 +1704,7 @@ Loop back to identify_run step automatically.
 <if style="guided" OR="custom with gates.execute_next_run true">
 ```
 Run {stage}.{run} complete.
-Recap: .ace/stages/{stage-dir}/{stage}.{run}-recap.md
+Recap: .renn/stages/{stage-dir}/{stage}.{run}-recap.md
 
 {Y} of {X} runs complete for Stage {Z}.
 
@@ -1714,14 +1714,14 @@ Recap: .ace/stages/{stage-dir}/{stage}.{run}-recap.md
 
 **{stage}.{next-run}: [Run Name]** — [objective from next run.md]
 
-`/ace.run-stage {stage}`
+`/renn.run-stage {stage}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.audit {stage}.{run}` — manual acceptance testing before continuing
+- `/renn.audit {stage}.{run}` — manual acceptance testing before continuing
 - Review what was built before continuing
 
 ---
@@ -1763,7 +1763,7 @@ Read track.md to get the next stage's name and goal.
 
 ```
 Run {stage}.{run} complete.
-Recap: .ace/stages/{stage-dir}/{stage}.{run}-recap.md
+Recap: .renn/stages/{stage-dir}/{stage}.{run}-recap.md
 
 ## ✓ Stage {Z}: {Stage Name} Complete
 
@@ -1775,15 +1775,15 @@ All {Y} runs finished.
 
 **Stage {Z+1}: {Next Stage Name}** — {Goal from track.md}
 
-`/ace.plan-stage {Z+1}`
+`/renn.plan-stage {Z+1}`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.audit {Z}` — manual acceptance testing before continuing
-- `/ace.discuss-stage {Z+1}` — gather context first
+- `/renn.audit {Z}` — manual acceptance testing before continuing
+- `/renn.discuss-stage {Z+1}` — gather context first
 - Review stage accomplishments before continuing
 
 ---
@@ -1797,7 +1797,7 @@ All {Y} runs finished.
 🎉 MILESTONE COMPLETE!
 
 Run {stage}.{run} complete.
-Recap: .ace/stages/{stage-dir}/{stage}.{run}-recap.md
+Recap: .renn/stages/{stage-dir}/{stage}.{run}-recap.md
 
 ## ✓ Stage {Z}: {Stage Name} Complete
 
@@ -1813,15 +1813,15 @@ All {Y} runs finished.
 
 **Complete Milestone** — archive and prepare for next
 
-`/ace.complete-milestone`
+`/renn.complete-milestone`
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/ace.audit` — manual acceptance testing before completing milestone
-- `/ace.add-stage <description>` — add another stage before completing
+- `/renn.audit` — manual acceptance testing before completing milestone
+- `/renn.add-stage <description>` — add another stage before completing
 - Review accomplishments before archiving
 
 ---

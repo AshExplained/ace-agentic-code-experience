@@ -1,6 +1,6 @@
 ---
-name: ace.set-profile
-description: Switch horsepower profile for ACE agents (max/balanced/eco)
+name: renn.set-profile
+description: Switch horsepower profile for RENN agents (max/balanced/eco)
 allowed-tools:
   - Read
   - Write
@@ -12,7 +12,7 @@ arguments:
 ---
 
 <objective>
-Switch the horsepower profile used by ACE agents. This controls which Claude model each agent uses, balancing quality vs token spend.
+Switch the horsepower profile used by RENN agents. This controls which Claude model each agent uses, balancing quality vs token spend.
 </objective>
 
 <profiles>
@@ -37,20 +37,20 @@ if $ARGUMENTS.profile not in ["max", "balanced", "eco"]:
 ## 2. Check for project
 
 ```bash
-ls .ace/config.json 2>/dev/null
+ls .renn/config.json 2>/dev/null
 ```
 
-If no `.ace/` directory:
+If no `.renn/` directory:
 ```
-Error: No ACE project found.
-Run /ace.start first to initialize a project.
+Error: No RENN project found.
+Run /renn.start first to initialize a project.
 ```
 
 ## 3. Update config.json
 
 Read current config:
 ```bash
-cat .ace/config.json
+cat .renn/config.json
 ```
 
 Update `horsepower` field (or add if missing):
@@ -60,7 +60,7 @@ Update `horsepower` field (or add if missing):
 }
 ```
 
-Write updated config back to `.ace/config.json`.
+Write updated config back to `.renn/config.json`.
 
 ## 4. Confirm
 
@@ -79,31 +79,31 @@ Next spawned agents will use the new profile.
 
 **Switch to eco mode:**
 ```
-/ace.set-profile eco
+/renn.set-profile eco
 
 ✓ Horsepower profile set to: eco
 
 Agents will now use:
 | Agent | Model |
 |-------|-------|
-| ace-architect | sonnet |
-| ace-runner | sonnet |
-| ace-auditor | haiku |
+| renn-architect | sonnet |
+| renn-runner | sonnet |
+| renn-auditor | haiku |
 | ... | ... |
 ```
 
 **Switch to max mode:**
 ```
-/ace.set-profile max
+/renn.set-profile max
 
 ✓ Horsepower profile set to: max
 
 Agents will now use:
 | Agent | Model |
 |-------|-------|
-| ace-architect | opus |
-| ace-runner | opus |
-| ace-auditor | sonnet |
+| renn-architect | opus |
+| renn-runner | opus |
+| renn-auditor | sonnet |
 | ... | ... |
 ```
 

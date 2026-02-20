@@ -1,5 +1,5 @@
 ---
-name: ace.insert-stage
+name: renn.insert-stage
 description: Insert urgent work as decimal stage (e.g., 72.1) between existing stages
 argument-hint: <after> <description>
 allowed-tools:
@@ -17,8 +17,8 @@ Purpose: Handle urgent work discovered during execution without renumbering enti
 </objective>
 
 <execution_context>
-@.ace/track.md
-@.ace/pulse.md
+@.renn/track.md
+@.renn/pulse.md
 </execution_context>
 
 <context>
@@ -32,7 +32,7 @@ Parse the command arguments:
 - First argument: integer stage number to insert after
 - Remaining arguments: stage description
 
-Example: `/ace.insert-stage 72 Fix critical auth bug`
+Example: `/renn.insert-stage 72 Fix critical auth bug`
 → after = 72
 → description = "Fix critical auth bug"
 
@@ -41,8 +41,8 @@ Validation:
 ```bash
 if [ $# -lt 2 ]; then
   echo "ERROR: Both stage number and description required"
-  echo "Usage: /ace.insert-stage <after> <description>"
-  echo "Example: /ace.insert-stage 72 Fix critical auth bug"
+  echo "Usage: /renn.insert-stage <after> <description>"
+  echo "Example: /renn.insert-stage 72 Fix critical auth bug"
   exit 1
 fi
 ```
@@ -67,10 +67,10 @@ fi
 Load the track file:
 
 ```bash
-if [ -f .ace/track.md ]; then
-  TRACK=".ace/track.md"
+if [ -f .renn/track.md ]; then
+  TRACK=".renn/track.md"
 else
-  echo "ERROR: No track found (.ace/track.md)"
+  echo "ERROR: No track found (.renn/track.md)"
   exit 1
 fi
 ```
@@ -126,7 +126,7 @@ Example: `06.1-fix-critical-auth-bug` (stage 6 insertion)
 Create the stage directory structure:
 
 ```bash
-stage_dir=".ace/stages/${decimal_stage}-${slug}"
+stage_dir=".renn/stages/${decimal_stage}-${slug}"
 mkdir -p "$stage_dir"
 ```
 
@@ -147,7 +147,7 @@ Insert the new stage entry into the track:
    **Runs:** 0 runs
 
    Runs:
-   - [ ] TBD (run /ace.plan-stage {decimal_stage} to break down)
+   - [ ] TBD (run /renn.plan-stage {decimal_stage} to break down)
 
    **Details:**
    [To be added during planning]
@@ -163,7 +163,7 @@ Preserve all other content exactly (formatting, spacing, other stages).
 <step name="update_pulse">
 Update pulse.md to reflect the inserted stage:
 
-1. Read `.ace/pulse.md`
+1. Read `.renn/pulse.md`
 2. Under "## Accumulated Context" → "### Track Evolution" add entry:
    ```
    - Stage {decimal_stage} inserted after Stage {after_stage}: {description} (URGENT)
@@ -180,12 +180,12 @@ Present completion summary:
 ```
 Stage {decimal_stage} inserted after Stage {after_stage}:
 - Description: {description}
-- Directory: .ace/stages/{decimal-stage}-{slug}/
+- Directory: .renn/stages/{decimal-stage}-{slug}/
 - Status: Not planned yet
 - Marker: (INSERTED) - indicates urgent work
 
 Track updated: {track-path}
-Pulse updated: .ace/pulse.md
+Pulse updated: .renn/pulse.md
 
 ---
 
@@ -193,7 +193,7 @@ Pulse updated: .ace/pulse.md
 
 **Stage {decimal_stage}: {description}** — urgent insertion
 
-`/ace.plan-stage {decimal_stage}`
+`/renn.plan-stage {decimal_stage}`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -211,18 +211,18 @@ Pulse updated: .ace/pulse.md
 
 <anti_patterns>
 
-- Don't use this for planned work at end of milestone (use /ace.add-stage)
+- Don't use this for planned work at end of milestone (use /renn.add-stage)
 - Don't insert before Stage 1 (decimal 0.1 makes no sense)
 - Don't renumber existing stages
 - Don't modify the target stage content
-- Don't create runs yet (that's /ace.plan-stage)
+- Don't create runs yet (that's /renn.plan-stage)
 - Don't commit changes (user decides when to commit)
   </anti_patterns>
 
 <success_criteria>
 Stage insertion is complete when:
 
-- [ ] Stage directory created: `.ace/stages/{N.M}-{slug}/`
+- [ ] Stage directory created: `.renn/stages/{N.M}-{slug}/`
 - [ ] Track updated with new stage entry (includes "(INSERTED)" marker)
 - [ ] Stage inserted in correct position (after target stage, before next integer stage)
 - [ ] pulse.md updated with track evolution note

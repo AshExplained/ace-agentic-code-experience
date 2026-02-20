@@ -1,5 +1,5 @@
 ---
-name: ace.new-milestone
+name: renn.new-milestone
 description: Start a new milestone cycle — update brief.md and route to requirements
 argument-hint: "[milestone name, e.g., 'v1.1 Notifications']"
 allowed-tools:
@@ -13,39 +13,39 @@ allowed-tools:
 <objective>
 Start a new milestone through unified flow: questioning → research (optional) → requirements → track.
 
-This is the brownfield equivalent of ace.start. The project exists, brief.md has history. This command gathers "what's next", updates brief.md, then continues through the full requirements → track cycle.
+This is the brownfield equivalent of renn.start. The project exists, brief.md has history. This command gathers "what's next", updates brief.md, then continues through the full requirements → track cycle.
 
 **Creates/Updates:**
-- `.ace/brief.md` — updated with new milestone goals
-- `.ace/research/` — domain research (optional, focuses on NEW features)
-- `.ace/specs.md` — scoped requirements for this milestone
-- `.ace/track.md` — stage structure (continues numbering)
-- `.ace/pulse.md` — reset for new milestone
+- `.renn/brief.md` — updated with new milestone goals
+- `.renn/research/` — domain research (optional, focuses on NEW features)
+- `.renn/specs.md` — scoped requirements for this milestone
+- `.renn/track.md` — stage structure (continues numbering)
+- `.renn/pulse.md` — reset for new milestone
 
-**After this command:** Run `/ace.plan-stage [N]` to start execution.
+**After this command:** Run `/renn.plan-stage [N]` to start execution.
 </objective>
 
 <execution_context>
-@~/.claude/ace/references/questioning.md
-@~/.claude/ace/references/ui-brand.md
-@~/.claude/ace/templates/brief.md
-@~/.claude/ace/templates/specs.md
-@~/.claude/ace/workflows/new-milestone.md
+@~/.claude/renn/references/questioning.md
+@~/.claude/renn/references/ui-brand.md
+@~/.claude/renn/templates/brief.md
+@~/.claude/renn/templates/specs.md
+@~/.claude/renn/workflows/new-milestone.md
 </execution_context>
 
 <context>
 Milestone name: $ARGUMENTS (optional - will prompt if not provided)
 
 **Load project context:**
-@.ace/brief.md
-@.ace/pulse.md
-@.ace/milestones.md
-@.ace/config.json
+@.renn/brief.md
+@.renn/pulse.md
+@.renn/milestones.md
+@.renn/config.json
 
 </context>
 
 <process>
-**Follow the new-milestone workflow** from `@~/.claude/ace/workflows/new-milestone.md`.
+**Follow the new-milestone workflow** from `@~/.claude/renn/workflows/new-milestone.md`.
 
 The workflow handles all milestone initialization logic including:
 
@@ -69,12 +69,12 @@ The workflow handles all milestone initialization logic including:
 - [ ] Requirements gathered (from research or conversation)
 - [ ] User scoped each category
 - [ ] specs.md created with REQ-IDs
-- [ ] ace-navigator spawned with stage numbering context
+- [ ] renn-navigator spawned with stage numbering context
 - [ ] Track files written immediately (not draft)
 - [ ] User feedback incorporated (if any)
 - [ ] track.md created with stages continuing from previous milestone
 - [ ] All commits made (if planning docs committed)
-- [ ] User knows next step is `/ace.discuss-stage [N]`
+- [ ] User knows next step is `/renn.discuss-stage [N]`
 
 **Atomic commits:** Each stage commits its artifacts immediately. If context is lost, artifacts persist.
 </success_criteria>

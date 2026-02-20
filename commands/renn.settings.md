@@ -1,6 +1,6 @@
 ---
-name: ace.settings
-description: Configure ACE workflow toggles and horsepower profile
+name: renn.settings
+description: Configure RENN workflow toggles and horsepower profile
 allowed-tools:
   - Read
   - Write
@@ -10,7 +10,7 @@ allowed-tools:
 <objective>
 Allow users to toggle workflow agents on/off and select horsepower profile via interactive settings.
 
-Updates `.ace/config.json` with workflow preferences and horsepower profile selection.
+Updates `.renn/config.json` with workflow preferences and horsepower profile selection.
 </objective>
 
 <process>
@@ -18,15 +18,15 @@ Updates `.ace/config.json` with workflow preferences and horsepower profile sele
 ## 1. Validate Environment
 
 ```bash
-ls .ace/config.json 2>/dev/null
+ls .renn/config.json 2>/dev/null
 ```
 
-**If not found:** Error - run `/ace.start` first.
+**If not found:** Error - run `/renn.start` first.
 
 ## 2. Read Current Config
 
 ```bash
-cat .ace/config.json
+cat .renn/config.json
 ```
 
 Parse current values (default to `true` if not present):
@@ -113,7 +113,7 @@ Merge new settings into existing config.json:
 }
 ```
 
-Write updated config to `.ace/config.json`.
+Write updated config to `.renn/config.json`.
 
 ## 5. Confirm Changes
 
@@ -121,7 +121,7 @@ Display:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► SETTINGS UPDATED
+ RENN ► SETTINGS UPDATED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 | Setting              | Value |
@@ -132,13 +132,13 @@ Display:
 | Auditor              | {On/Off} |
 | Git Branching        | {None/Per Stage/Per Milestone} |
 
-These settings apply to future /ace.plan-stage and /ace.run-stage runs.
+These settings apply to future /renn.plan-stage and /renn.run-stage runs.
 
 Quick commands:
-- /ace.set-profile <profile> — switch horsepower profile
-- /ace.plan-stage --research — force research
-- /ace.plan-stage --skip-research — skip research
-- /ace.plan-stage --skip-verify — skip plan review
+- /renn.set-profile <profile> — switch horsepower profile
+- /renn.plan-stage --research — force research
+- /renn.plan-stage --skip-research — skip research
+- /renn.plan-stage --skip-verify — skip plan review
 ```
 
 </process>

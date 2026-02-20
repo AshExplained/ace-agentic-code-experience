@@ -1,5 +1,5 @@
 ---
-name: ace.start
+name: renn.start
 description: Initialize a new project with deep context gathering and brief.md
 allowed-tools:
   - Read
@@ -16,29 +16,29 @@ Initialize a new project through unified flow: questioning → research (optiona
 This is the most leveraged moment in any project. Deep questioning here means better runs, better execution, better outcomes. One command takes you from idea to ready-for-planning.
 
 **Creates:**
-- `.ace/brief.md` — project context
-- `.ace/config.json` — workflow preferences
-- `.ace/research/` — domain research (optional)
-- `.ace/specs.md` — scoped requirements
-- `.ace/track.md` — stage structure
-- `.ace/pulse.md` — project memory
+- `.renn/brief.md` — project context
+- `.renn/config.json` — workflow preferences
+- `.renn/research/` — domain research (optional)
+- `.renn/specs.md` — scoped requirements
+- `.renn/track.md` — stage structure
+- `.renn/pulse.md` — project memory
 
-**After this command:** Run `/ace.plan-stage 1` to start execution.
+**After this command:** Run `/renn.plan-stage 1` to start execution.
 
 </objective>
 
 <execution_context>
 
-@~/.claude/ace/references/questioning.md
-@~/.claude/ace/references/ui-brand.md
-@~/.claude/ace/templates/brief.md
-@~/.claude/ace/templates/specs.md
-@~/.claude/ace/workflows/initialize-project.md
+@~/.claude/renn/references/questioning.md
+@~/.claude/renn/references/ui-brand.md
+@~/.claude/renn/templates/brief.md
+@~/.claude/renn/templates/specs.md
+@~/.claude/renn/workflows/initialize-project.md
 
 </execution_context>
 
 <process>
-**Follow the initialize-project workflow** from `@~/.claude/ace/workflows/initialize-project.md`.
+**Follow the initialize-project workflow** from `@~/.claude/renn/workflows/initialize-project.md`.
 
 The workflow handles all initialization logic including:
 
@@ -56,23 +56,23 @@ The workflow handles all initialization logic including:
 
 <output>
 
-- `.ace/brief.md`
-- `.ace/config.json`
-- `.ace/research/` (if research selected)
+- `.renn/brief.md`
+- `.renn/config.json`
+- `.renn/research/` (if research selected)
   - `STACK.md`
   - `FEATURES.md`
   - `ARCHITECTURE.md`
   - `PITFALLS.md`
   - `recap.md`
-- `.ace/specs.md`
-- `.ace/track.md`
-- `.ace/pulse.md`
+- `.renn/specs.md`
+- `.renn/track.md`
+- `.renn/pulse.md`
 
 </output>
 
 <success_criteria>
 
-- [ ] .ace/ directory created
+- [ ] .renn/ directory created
 - [ ] Git repo initialized
 - [ ] Brownfield detection completed
 - [ ] Deep questioning completed (threads followed, not rushed)
@@ -82,13 +82,13 @@ The workflow handles all initialization logic including:
 - [ ] Requirements gathered (from research or conversation)
 - [ ] User scoped each category (v1/v2/out of scope)
 - [ ] specs.md created with REQ-IDs → **committed**
-- [ ] ace-navigator spawned with context
+- [ ] renn-navigator spawned with context
 - [ ] Track files written immediately (not draft)
 - [ ] User feedback incorporated (if any)
 - [ ] track.md created with stages, requirement mappings, success criteria
 - [ ] pulse.md initialized
 - [ ] specs.md traceability updated
-- [ ] User knows next step is `/ace.discuss-stage 1`
+- [ ] User knows next step is `/renn.discuss-stage 1`
 
 **Atomic commits:** Each stage commits its artifacts immediately. If context is lost, artifacts persist.
 

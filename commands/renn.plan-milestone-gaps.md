@@ -1,5 +1,5 @@
 ---
-name: ace.plan-milestone-gaps
+name: renn.plan-milestone-gaps
 description: Create stages to close all gaps identified by milestone audit
 allowed-tools:
   - Read
@@ -11,28 +11,28 @@ allowed-tools:
 ---
 
 <objective>
-Create all stages necessary to close gaps identified by `/ace.audit-milestone`.
+Create all stages necessary to close gaps identified by `/renn.audit-milestone`.
 
 Reads MILESTONE-AUDIT.md, groups gaps into logical stages, creates stage entries in track.md, and offers to plan each stage.
 
-One command creates all fix stages — no manual `/ace.add-stage` per gap.
+One command creates all fix stages — no manual `/renn.add-stage` per gap.
 </objective>
 
 <execution_context>
-<!-- Spawns ace-architect agent which has all planning expertise baked in -->
+<!-- Spawns renn-architect agent which has all planning expertise baked in -->
 </execution_context>
 
 <context>
 **Audit results:**
-Glob: .ace/v*-MILESTONE-AUDIT.md (use most recent)
+Glob: .renn/v*-MILESTONE-AUDIT.md (use most recent)
 
 **Original intent (for prioritization):**
-@.ace/brief.md
-@.ace/specs.md
+@.renn/brief.md
+@.renn/specs.md
 
 **Current state:**
-@.ace/track.md
-@.ace/pulse.md
+@.renn/track.md
+@.renn/pulse.md
 </context>
 
 <process>
@@ -41,7 +41,7 @@ Glob: .ace/v*-MILESTONE-AUDIT.md (use most recent)
 
 ```bash
 # Find the most recent audit file
-ls -t .ace/v*-MILESTONE-AUDIT.md 2>/dev/null | head -1
+ls -t .renn/v*-MILESTONE-AUDIT.md 2>/dev/null | head -1
 ```
 
 Parse YAML frontmatter to extract structured gaps:
@@ -52,7 +52,7 @@ Parse YAML frontmatter to extract structured gaps:
 
 If no audit file exists or has no gaps, error:
 ```
-No audit gaps found. Run `/ace.audit-milestone` first.
+No audit gaps found. Run `/renn.audit-milestone` first.
 ```
 
 ## 2. Prioritize Gaps
@@ -95,7 +95,7 @@ Gap: Flow "View dashboard" broken at data fetch
 
 Find highest existing stage:
 ```bash
-ls -d .ace/stages/*/ | sort -V | tail -1
+ls -d .renn/stages/*/ | sort -V | tail -1
 ```
 
 New stages continue from there:
@@ -155,7 +155,7 @@ Add new stages to current milestone:
 ## 7. Create Stage Directories
 
 ```bash
-mkdir -p ".ace/stages/{NN}-{name}"
+mkdir -p ".renn/stages/{NN}-{name}"
 ```
 
 ## 8. Commit Track Update
@@ -163,8 +163,8 @@ mkdir -p ".ace/stages/{NN}-{name}"
 **Check config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .renn 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 **If `COMMIT_PLANNING_DOCS=false`:** Skip git operations
@@ -172,7 +172,7 @@ git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
 **If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
-git add .ace/track.md
+git add .renn/track.md
 git commit -m "docs(track): add gap closure stages {N}-{M}"
 ```
 
@@ -190,22 +190,22 @@ git commit -m "docs(track): add gap closure stages {N}-{M}"
 
 **Plan first gap closure stage**
 
-/ace.plan-stage {N}
+/renn.plan-stage {N}
 
 <sub>/clear first — fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- /ace.run-stage {N} — if runs already exist
-- cat .ace/track.md — see updated track
+- /renn.run-stage {N} — if runs already exist
+- cat .renn/track.md — see updated track
 
 ───────────────────────────────────────────────────────────────
 
 **After all gap stages complete:**
 
-/ace.audit-milestone — re-audit to verify gaps closed
-/ace.complete-milestone {version} — archive when audit passes
+/renn.audit-milestone — re-audit to verify gaps closed
+/renn.complete-milestone {version} — archive when audit passes
 ```
 
 </process>
@@ -310,5 +310,5 @@ tasks:
 - [ ] track.md updated with new stages
 - [ ] Stage directories created
 - [ ] Changes committed
-- [ ] User knows to run `/ace.plan-stage` next
+- [ ] User knows to run `/renn.plan-stage` next
 </success_criteria>

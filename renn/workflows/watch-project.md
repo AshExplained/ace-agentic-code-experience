@@ -19,16 +19,16 @@ Context-aware recommendations, user decides scope. Detect the project stack and 
 Check for existing watch artifacts:
 
 ```bash
-[ -f .ace/watch-plan.md ] && echo "EXISTING_PLAN" || echo "NO_PLAN"
-[ -f .ace/watch-scope.md ] && echo "EXISTING_SCOPE" || echo "NO_SCOPE"
+[ -f .renn/watch-plan.md ] && echo "EXISTING_PLAN" || echo "NO_PLAN"
+[ -f .renn/watch-scope.md ] && echo "EXISTING_SCOPE" || echo "NO_SCOPE"
 ```
 
-**Case 1: `.ace/watch-plan.md` exists (plan already generated)**
+**Case 1: `.renn/watch-plan.md` exists (plan already generated)**
 
 Read the file to extract the previous scope and status:
 ```bash
-head -20 .ace/watch-plan.md
-cat .ace/watch-scope.md 2>/dev/null
+head -20 .renn/watch-plan.md
+cat .renn/watch-scope.md 2>/dev/null
 ```
 
 Present options via AskUserQuestion:
@@ -43,22 +43,22 @@ Present options via AskUserQuestion:
 
 **If "Start fresh":** Delete all watch artifacts and continue to phase_1_ask:
 ```bash
-rm -f .ace/watch-plan.md .ace/watch-scope.md .ace/watch-research.md
+rm -f .renn/watch-plan.md .renn/watch-scope.md .renn/watch-research.md
 ```
 
 **If "Add more tools":** Before deleting, capture existing monitoring tools from the plan so Phase 2 can exclude them from new research:
 
 ```bash
 # Extract tool names from checklist item descriptions
-EXISTING_TOOLS=$(grep -E '^\- \[.\] [0-9]+\.' .ace/watch-plan.md | sed 's/.*\] [0-9]*\. \[\(auto\|gate\)\] //' | head -15)
+EXISTING_TOOLS=$(grep -E '^\- \[.\] [0-9]+\.' .renn/watch-plan.md | sed 's/.*\] [0-9]*\. \[\(auto\|gate\)\] //' | head -15)
 ```
 
 Append existing tools to watch-scope.md and set Mode:
 
 ```bash
-echo "" >> .ace/watch-scope.md
-echo "**Existing tools:**" >> .ace/watch-scope.md
-echo "$EXISTING_TOOLS" >> .ace/watch-scope.md
+echo "" >> .renn/watch-scope.md
+echo "**Existing tools:**" >> .renn/watch-scope.md
+echo "$EXISTING_TOOLS" >> .renn/watch-scope.md
 ```
 
 Update watch-scope.md to set `**Mode:** add-more` (replacing any existing Mode line, or appending if none).
@@ -66,12 +66,12 @@ Update watch-scope.md to set `**Mode:** add-more` (replacing any existing Mode l
 Then delete the old plan and research files (PRESERVE watch-scope.md):
 
 ```bash
-rm -f .ace/watch-plan.md .ace/watch-research.md
+rm -f .renn/watch-plan.md .renn/watch-research.md
 ```
 
 Continue to `phase_2_research_plan` (Phase 2 reads the Mode flag and Existing tools field for additive research).
 
-**Case 2: `.ace/watch-scope.md` exists but `.ace/watch-plan.md` does NOT**
+**Case 2: `.renn/watch-scope.md` exists but `.renn/watch-plan.md` does NOT**
 
 Scope declared but plan not yet generated. Display: "Found existing scope declaration. Continuing to research and plan generation..." and skip to `phase_2_research_plan`.
 
@@ -85,26 +85,26 @@ Phase 1 has 4 sub-steps: detect project context, present summary, select monitor
 
 **Sub-step 1a: Detect project context (WATCH-01, WATCH-02)**
 
-Attempt to read project context from ACE state files:
+Attempt to read project context from RENN state files:
 ```bash
-PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
-PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .ace/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
-SHIP_TARGET=$(grep -m1 '^\*\*Target:\*\*' .ace/ship-target.md 2>/dev/null | sed 's/\*\*Target:\*\* //')
-STACK=$(grep -m1 '^\*\*Stack detected:\*\*' .ace/ship-target.md 2>/dev/null | sed 's/\*\*Stack detected:\*\* //')
-WHAT_THIS_IS=$(sed -n '/## What This Is/,/^##/p' .ace/brief.md 2>/dev/null | head -5 | tail -4)
+PROJECT_NAME=$(head -1 .renn/brief.md 2>/dev/null | sed 's/^# //')
+PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .renn/brief.md 2>/dev/null | sed 's/\*\*Platform:\*\* //')
+SHIP_TARGET=$(grep -m1 '^\*\*Target:\*\*' .renn/ship-target.md 2>/dev/null | sed 's/\*\*Target:\*\* //')
+STACK=$(grep -m1 '^\*\*Stack detected:\*\*' .renn/ship-target.md 2>/dev/null | sed 's/\*\*Stack detected:\*\* //')
+WHAT_THIS_IS=$(sed -n '/## What This Is/,/^##/p' .renn/brief.md 2>/dev/null | head -5 | tail -4)
 ```
 
-**If PROJECT_NAME is non-empty (ACE context exists):**
+**If PROJECT_NAME is non-empty (RENN context exists):**
 - Use extracted values for project summary
 - If SHIP_TARGET is non-empty: use it as the deployment platform
 - If SHIP_TARGET is empty but PLATFORM is non-empty: use PLATFORM
 - If neither: ask user where the project is deployed (single AskUserQuestion)
 
-**If PROJECT_NAME is empty (no ACE context -- WATCH-02 fallback):**
+**If PROJECT_NAME is empty (no RENN context -- WATCH-02 fallback):**
 
 Ask the user directly via AskUserQuestion (maximum 2 questions):
 
-1. header: "Project Info" / question: "No ACE project context found. What's your project's tech stack? (e.g., Next.js with Supabase, Django with PostgreSQL, Express with MongoDB)"
+1. header: "Project Info" / question: "No RENN project context found. What's your project's tech stack? (e.g., Next.js with Supabase, Django with PostgreSQL, Express with MongoDB)"
    Use the response as STACK. Set PROJECT_NAME to "Your project".
 
 2. header: "Deployment Platform" / question: "Where is your project deployed?"
@@ -148,7 +148,7 @@ Use the response as MONITORING_SCOPE. No monitoring tool names in Phase 1 -- the
 
 **Sub-step 1d: Persist scope to watch-scope.md**
 
-Write `.ace/watch-scope.md`:
+Write `.renn/watch-scope.md`:
 ```markdown
 # Watch Scope
 
@@ -160,7 +160,7 @@ Write `.ace/watch-scope.md`:
 **Status:** awaiting-plan
 ```
 
-Do NOT create `.ace/watch-plan.md` -- that is Phase 2's responsibility.
+Do NOT create `.renn/watch-plan.md` -- that is Phase 2's responsibility.
 
 Display Phase 1 completion:
 ```
@@ -173,37 +173,37 @@ Continuing to Phase 2 (Research & Plan)...
 
 <step name="phase_2_research_plan">
 
-Phase 2 reads the declared monitoring scope, researches tools via ace-stage-scout, and generates a monitoring checklist.
+Phase 2 reads the declared monitoring scope, researches tools via renn-stage-scout, and generates a monitoring checklist.
 
 ---
 
 **Sub-step 2a: Read scope and validate**
 
-Read `.ace/watch-scope.md` to extract monitoring scope and project context:
+Read `.renn/watch-scope.md` to extract monitoring scope and project context:
 
 ```bash
-PROJECT=$(grep -m1 '^\*\*Project:\*\*' .ace/watch-scope.md | sed 's/\*\*Project:\*\* //')
-PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .ace/watch-scope.md | sed 's/\*\*Platform:\*\* //')
-STACK=$(grep -m1 '^\*\*Stack:\*\*' .ace/watch-scope.md | sed 's/\*\*Stack:\*\* //')
-SCOPE=$(grep -m1 '^\*\*Monitoring scope:\*\*' .ace/watch-scope.md | sed 's/\*\*Monitoring scope:\*\* //')
-STATUS=$(grep -m1 '^\*\*Status:\*\*' .ace/watch-scope.md | sed 's/\*\*Status:\*\* //')
-MODE=$(grep -m1 '^\*\*Mode:\*\*' .ace/watch-scope.md 2>/dev/null | sed 's/\*\*Mode:\*\* //')
+PROJECT=$(grep -m1 '^\*\*Project:\*\*' .renn/watch-scope.md | sed 's/\*\*Project:\*\* //')
+PLATFORM=$(grep -m1 '^\*\*Platform:\*\*' .renn/watch-scope.md | sed 's/\*\*Platform:\*\* //')
+STACK=$(grep -m1 '^\*\*Stack:\*\*' .renn/watch-scope.md | sed 's/\*\*Stack:\*\* //')
+SCOPE=$(grep -m1 '^\*\*Monitoring scope:\*\*' .renn/watch-scope.md | sed 's/\*\*Monitoring scope:\*\* //')
+STATUS=$(grep -m1 '^\*\*Status:\*\*' .renn/watch-scope.md | sed 's/\*\*Status:\*\* //')
+MODE=$(grep -m1 '^\*\*Mode:\*\*' .renn/watch-scope.md 2>/dev/null | sed 's/\*\*Mode:\*\* //')
 ```
 
 **Status routing:**
 
-- **If STATUS is `plan-ready`:** `.ace/watch-plan.md` already exists. Skip Phase 2 entirely and continue to Phase 3.
+- **If STATUS is `plan-ready`:** `.renn/watch-plan.md` already exists. Skip Phase 2 entirely and continue to Phase 3.
 - **If STATUS is not `awaiting-plan` and not `plan-ready`:** Warn "Unexpected status '{STATUS}' in watch-scope.md, continuing anyway." and proceed.
-- **If SCOPE is empty:** Error "No monitoring scope found in watch-scope.md. Run /ace.watch again to declare a scope." and stop execution.
+- **If SCOPE is empty:** Error "No monitoring scope found in watch-scope.md. Run /renn.watch again to declare a scope." and stop execution.
 
 ---
 
 **Sub-step 2b: Gather context for research prompt**
 
 ```bash
-PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
-WHAT_THIS_IS=$(sed -n '/## What This Is/,/^##/p' .ace/brief.md 2>/dev/null | head -5 | tail -4)
-MODEL_PROFILE=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+PROJECT_NAME=$(head -1 .renn/brief.md 2>/dev/null | sed 's/^# //')
+WHAT_THIS_IS=$(sed -n '/## What This Is/,/^##/p' .renn/brief.md 2>/dev/null | head -5 | tail -4)
+MODEL_PROFILE=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Resolve scout model from horsepower profile:
@@ -258,7 +258,7 @@ For each tool:
 </research_focus>
 
 <output>
-Write findings to: .ace/watch-research.md
+Write findings to: .renn/watch-research.md
 
 Structure as numbered monitoring setup steps with:
 - Tool name and free tier details
@@ -283,7 +283,7 @@ Already configured:
 Read the `**Existing tools:**` field from watch-scope.md:
 
 ```bash
-EXISTING_TOOLS=$(sed -n '/^\*\*Existing tools:\*\*/,/^\*\*/p' .ace/watch-scope.md | head -20)
+EXISTING_TOOLS=$(sed -n '/^\*\*Existing tools:\*\*/,/^\*\*/p' .renn/watch-scope.md | head -20)
 ```
 
 **If MODE is not "add-more" (or absent):** Replace `{add_more_context}` with an empty string.
@@ -293,7 +293,7 @@ Spawn the scout:
 ```
 Task(
   prompt=research_prompt,
-  subagent_type="ace-stage-scout",
+  subagent_type="renn-stage-scout",
   model="{scout_model}",
   description="Research monitoring tools for {stack} on {platform}"
 )
@@ -317,20 +317,20 @@ Display the blocker message from the scout's return. Then offer recovery options
 - question: "The scout could not complete research for monitoring on {platform}. How would you like to proceed?"
 - options:
   - "Retry research" (description: "Spawn the scout again with the same prompt")
-  - "Enter plan manually" (description: "Create .ace/watch-plan.md yourself and resume")
+  - "Enter plan manually" (description: "Create .renn/watch-plan.md yourself and resume")
   - "Abort" (description: "Stop the watch workflow")
 
 **If "Retry research":** Return to sub-step 2c and spawn the scout again.
 
-**If "Enter plan manually":** Display instructions for the expected watch-plan.md format, then stop. User creates the file and runs /ace.watch again (detect_existing_watch will find it).
+**If "Enter plan manually":** Display instructions for the expected watch-plan.md format, then stop. User creates the file and runs /renn.watch again (detect_existing_watch will find it).
 
-**If "Abort":** Stop the workflow with message "Watch workflow aborted. Run /ace.watch to start again."
+**If "Abort":** Stop the workflow with message "Watch workflow aborted. Run /renn.watch to start again."
 
 ---
 
 **Sub-step 2e: Convert research to checklist**
 
-Read `.ace/watch-research.md` and convert the scout's monitoring research into a numbered, classified checklist. This is deterministic workflow logic performed by the orchestrator (Claude running the workflow), not another agent spawn.
+Read `.renn/watch-research.md` and convert the scout's monitoring research into a numbered, classified checklist. This is deterministic workflow logic performed by the orchestrator (Claude running the workflow), not another agent spawn.
 
 **Auto/gate classification table:**
 
@@ -356,7 +356,7 @@ Read `.ace/watch-research.md` and convert the scout's monitoring research into a
 
 **Conversion process:**
 
-1. Read `.ace/watch-research.md`
+1. Read `.renn/watch-research.md`
 2. Parse monitoring setup steps from the research
 3. Classify each step as `[auto]` or `[gate]` using the table above
 4. Number sequentially across all sections
@@ -364,7 +364,7 @@ Read `.ace/watch-research.md` and convert the scout's monitoring research into a
 6. For gate items, add an `Instructions:` sub-bullet with human-facing text explaining what the user must do
 7. Target 8-15 total checklist items. Group related micro-steps into single items. Each item should be one logical action.
 
-Write `.ace/watch-plan.md` with this format:
+Write `.renn/watch-plan.md` with this format:
 
 ```markdown
 # Watch Plan
@@ -394,8 +394,8 @@ Write `.ace/watch-plan.md` with this format:
   - Instructions: {what the user needs to verify}
 
 ---
-*Generated by /ace.watch Phase 2*
-*Research source: ace-stage-scout*
+*Generated by /renn.watch Phase 2*
+*Research source: renn-stage-scout*
 ```
 
 Gate items always include the `Instructions:` sub-bullet. Auto items do not need it (Claude will execute them directly).
@@ -407,21 +407,21 @@ Gate items always include the `Instructions:` sub-bullet. Auto items do not need
 Update watch-scope.md status:
 
 ```bash
-sed -i 's/^\*\*Status:\*\* awaiting-plan/\*\*Status:\*\* plan-ready/' .ace/watch-scope.md
+sed -i 's/^\*\*Status:\*\* awaiting-plan/\*\*Status:\*\* plan-ready/' .renn/watch-scope.md
 ```
 
 Count auto and gate items:
 
 ```bash
-AUTO_COUNT=$(grep -c '\[auto\]' .ace/watch-plan.md)
-GATE_COUNT=$(grep -c '\[gate\]' .ace/watch-plan.md)
+AUTO_COUNT=$(grep -c '\[auto\]' .renn/watch-plan.md)
+GATE_COUNT=$(grep -c '\[gate\]' .renn/watch-plan.md)
 TOTAL=$((AUTO_COUNT + GATE_COUNT))
 ```
 
 Display completion message:
 
 ```
-Plan generated: .ace/watch-plan.md
+Plan generated: .renn/watch-plan.md
 {TOTAL} total steps ({AUTO_COUNT} auto, {GATE_COUNT} gate)
 ```
 
@@ -445,15 +445,15 @@ Read watch-plan.md and prepare for execution:
 
 ```bash
 # Verify plan exists and read metadata
-SCOPE=$(grep -m1 '^\*\*Monitoring scope:\*\*' .ace/watch-plan.md | sed 's/\*\*Monitoring scope:\*\* //')
-STATUS=$(grep -m1 '^\*\*Status:\*\*' .ace/watch-plan.md | sed 's/\*\*Status:\*\* //')
+SCOPE=$(grep -m1 '^\*\*Monitoring scope:\*\*' .renn/watch-plan.md | sed 's/\*\*Monitoring scope:\*\* //')
+STATUS=$(grep -m1 '^\*\*Status:\*\*' .renn/watch-plan.md | sed 's/\*\*Status:\*\* //')
 
 # Read project name for display
-PROJECT_NAME=$(head -1 .ace/brief.md 2>/dev/null | sed 's/^# //')
+PROJECT_NAME=$(head -1 .renn/brief.md 2>/dev/null | sed 's/^# //')
 
 # Count items
-TOTAL=$(grep -c '^\- \[.\] [0-9]' .ace/watch-plan.md)
-COMPLETED=$(grep -c '^\- \[x\] [0-9]' .ace/watch-plan.md)
+TOTAL=$(grep -c '^\- \[.\] [0-9]' .renn/watch-plan.md)
+COMPLETED=$(grep -c '^\- \[x\] [0-9]' .renn/watch-plan.md)
 REMAINING=$((TOTAL - COMPLETED))
 ```
 
@@ -466,7 +466,7 @@ Display: "All items already complete!" and skip to sub-step 3g (completion summa
 Update status to in-progress:
 
 ```bash
-sed -i 's/^\*\*Status:\*\* .*/\*\*Status:\*\* in-progress/' .ace/watch-plan.md
+sed -i 's/^\*\*Status:\*\* .*/\*\*Status:\*\* in-progress/' .renn/watch-plan.md
 ```
 
 Display execution header:
@@ -486,7 +486,7 @@ For each unchecked item in watch-plan.md (in order):
 
 ```bash
 # Extract unchecked items from watch-plan.md
-grep -n '^\- \[ \] [0-9]' .ace/watch-plan.md
+grep -n '^\- \[ \] [0-9]' .renn/watch-plan.md
 ```
 
 Read each item line to extract:
@@ -506,8 +506,8 @@ Read each item line to extract:
    - Update checkbox and timestamp in watch-plan.md using sed:
      ```bash
      TIMESTAMP=$(date +%H:%M)
-     sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/watch-plan.md
-     sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .ace/watch-plan.md
+     sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .renn/watch-plan.md
+     sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .renn/watch-plan.md
      ```
    - If the auto item modified project files (SDK install, config file creation, code changes), stage and commit with a descriptive message:
      ```bash
@@ -535,14 +535,14 @@ Route based on response:
 - **"Done":** Update checkbox and timestamp in watch-plan.md, continue to next item:
   ```bash
   TIMESTAMP=$(date +%H:%M)
-  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/watch-plan.md
-  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .ace/watch-plan.md
+  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .renn/watch-plan.md
+  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (completed ${TIMESTAMP})/" .renn/watch-plan.md
   ```
 
 - **"Skip":** Mark as checked with "(skipped)" annotation, continue to next item:
   ```bash
-  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/watch-plan.md
-  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (skipped)/" .ace/watch-plan.md
+  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .renn/watch-plan.md
+  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (skipped)/" .renn/watch-plan.md
   ```
 
 - **"Come back later":** Go to sub-step 3e (pause and save position)
@@ -611,8 +611,8 @@ Route based on response:
 
 - **"Skip":** Mark the item as checked with "(skipped)" annotation, continue to next item:
   ```bash
-  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .ace/watch-plan.md
-  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (skipped)/" .ace/watch-plan.md
+  sed -i "s/^- \[ \] ${ITEM_NUM}\./- [x] ${ITEM_NUM}./" .renn/watch-plan.md
+  sed -i "/^\- \[x\] ${ITEM_NUM}\./s/$/ (skipped)/" .renn/watch-plan.md
   ```
 
 - **"Abort":** Go to sub-step 3f (abort handling)
@@ -627,14 +627,14 @@ When user selects "Come back later" on a gate item (for long-running operations 
 
 1. Update watch-plan.md Status from `in-progress` to `paused-at-{N}` where N is the current item number:
    ```bash
-   sed -i "s/^\*\*Status:\*\* in-progress/\*\*Status:\*\* paused-at-${ITEM_NUM}/" .ace/watch-plan.md
+   sed -i "s/^\*\*Status:\*\* in-progress/\*\*Status:\*\* paused-at-${ITEM_NUM}/" .renn/watch-plan.md
    ```
 
 2. Update pulse.md Session Continuity:
    ```
    Last activity: {date} -- Monitoring setup paused at step {N} of {TOTAL}
-   Resume file: .ace/watch-plan.md
-   Next action: Run /ace.watch to resume monitoring setup
+   Resume file: .renn/watch-plan.md
+   Next action: Run /renn.watch to resume monitoring setup
    ```
 
 3. Display exit message:
@@ -642,7 +642,7 @@ When user selects "Come back later" on a gate item (for long-running operations 
    Progress saved at step {N} of {TOTAL}.
    {COMPLETED} steps complete, {REMAINING} remaining.
 
-   Run /ace.watch to resume from step {N}.
+   Run /renn.watch to resume from step {N}.
    ```
 
 4. Stop execution (return from the workflow -- do NOT continue to the next item)
@@ -657,7 +657,7 @@ When user selects "Abort" from a gate item or error recovery:
 
 1. Update watch-plan.md Status to `aborted`:
    ```bash
-   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* aborted/' .ace/watch-plan.md
+   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* aborted/' .renn/watch-plan.md
    ```
 
 2. Update pulse.md with abort status:
@@ -670,7 +670,7 @@ When user selects "Abort" from a gate item or error recovery:
    Monitoring setup aborted at step {N}.
    {COMPLETED}/{TOTAL} steps were completed.
 
-   Run /ace.watch to resume or restart.
+   Run /renn.watch to resume or restart.
    ```
 
 4. Stop execution
@@ -683,14 +683,14 @@ After all items in watch-plan.md are processed (no unchecked items remain):
 
 1. Count results:
    ```bash
-   COMPLETED=$(grep -c '^\- \[x\] [0-9]' .ace/watch-plan.md)
-   SKIPPED=$(grep -c '(skipped)' .ace/watch-plan.md)
-   TOTAL=$(grep -c '^\- \[.\] [0-9]' .ace/watch-plan.md)
+   COMPLETED=$(grep -c '^\- \[x\] [0-9]' .renn/watch-plan.md)
+   SKIPPED=$(grep -c '(skipped)' .renn/watch-plan.md)
+   TOTAL=$(grep -c '^\- \[.\] [0-9]' .renn/watch-plan.md)
    ```
 
 2. Verify no unchecked items remain before declaring complete:
    ```bash
-   UNCHECKED=$(grep -c '^\- \[ \] [0-9]' .ace/watch-plan.md)
+   UNCHECKED=$(grep -c '^\- \[ \] [0-9]' .renn/watch-plan.md)
    if [ "$UNCHECKED" -gt 0 ]; then
      echo "ERROR: ${UNCHECKED} unchecked items remain -- do not declare complete"
      # Return to sub-step 3b to continue processing
@@ -699,12 +699,12 @@ After all items in watch-plan.md are processed (no unchecked items remain):
 
 3. Update watch-plan.md Status to `complete`:
    ```bash
-   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* complete/' .ace/watch-plan.md
+   sed -i 's/^\*\*Status:\*\* in-progress/\*\*Status:\*\* complete/' .renn/watch-plan.md
    ```
 
 4. Update watch-scope.md Status to `monitored`:
    ```bash
-   sed -i 's/^\*\*Status:\*\* plan-ready/\*\*Status:\*\* monitored/' .ace/watch-scope.md
+   sed -i 's/^\*\*Status:\*\* plan-ready/\*\*Status:\*\* monitored/' .renn/watch-scope.md
    ```
 
 5. Update pulse.md to reflect monitoring completion -- revert to standard format and note monitoring set up:
@@ -743,7 +743,7 @@ After all items in watch-plan.md are processed (no unchecked items remain):
 
    Ready to plan the next iteration? Start a new milestone:
 
-   `/ace.new-milestone` -- define what to build next, research, plan, and create a new track
+   `/renn.new-milestone` -- define what to build next, research, plan, and create a new track
 
    <sub>`/clear` first -- fresh context window</sub>
    ```
@@ -762,19 +762,19 @@ After all items in watch-plan.md are processed (no unchecked items remain):
 
 <success_criteria>
 Phase 1 (Ask):
-- [ ] Re-watch detection works when .ace/watch-plan.md exists (resume/start-fresh/add-more)
+- [ ] Re-watch detection works when .renn/watch-plan.md exists (resume/start-fresh/add-more)
 - [ ] Re-watch detection handles scope-only state (Phase 1 done, Phase 2 pending)
 - [ ] Project context extracted from brief.md and ship-target.md when available
 - [ ] No-context fallback asks user directly for stack and platform (WATCH-02)
 - [ ] Monitoring scope selected via AskUserQuestion with 4 options (WATCH-03)
-- [ ] Scope persisted to .ace/watch-scope.md with project metadata
-- [ ] .ace/watch-plan.md is NOT created by Phase 1
+- [ ] Scope persisted to .renn/watch-scope.md with project metadata
+- [ ] .renn/watch-plan.md is NOT created by Phase 1
 - [ ] No monitoring tool names appear in Phase 1
 
 Phase 2 (Research & Plan):
-- [ ] ace-stage-scout spawned with monitoring-specific research prompt
+- [ ] renn-stage-scout spawned with monitoring-specific research prompt
 - [ ] Scout research converted to numbered checklist with auto/gate classification
-- [ ] .ace/watch-plan.md created with project metadata, scope, and checklist items
+- [ ] .renn/watch-plan.md created with project metadata, scope, and checklist items
 - [ ] watch-scope.md status updated from awaiting-plan to plan-ready
 - [ ] Auto items prefer CLI commands over dashboard instructions
 - [ ] Add-more mode excludes existing tools from research
@@ -793,5 +793,5 @@ Phase 3 (Walk Checklist):
 - [ ] watch-plan.md Status transitions: ready -> in-progress -> complete/paused/aborted
 - [ ] watch-scope.md updated to monitored on completion
 - [ ] pulse.md reflects monitoring progress at section boundaries
-- [ ] Completion summary suggests /ace.new-milestone as the next action (WATCH-12)
+- [ ] Completion summary suggests /renn.new-milestone as the next action (WATCH-12)
 </success_criteria>

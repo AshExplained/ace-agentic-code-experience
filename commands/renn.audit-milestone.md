@@ -1,5 +1,5 @@
 ---
-name: ace.audit-milestone
+name: renn.audit-milestone
 description: Audit milestone completion against original intent before archiving
 argument-hint: "[version]"
 allowed-tools:
@@ -18,23 +18,23 @@ Verify milestone achieved its definition of done. Check requirements coverage, c
 </objective>
 
 <execution_context>
-<!-- Spawns ace-integration-checker agent which has all audit expertise baked in -->
+<!-- Spawns renn-integration-checker agent which has all audit expertise baked in -->
 </execution_context>
 
 <context>
 Version: $ARGUMENTS (optional — defaults to current milestone)
 
 **Original Intent:**
-@.ace/brief.md
-@.ace/specs.md
+@.renn/brief.md
+@.renn/specs.md
 
 **Planned Work:**
-@.ace/track.md
-@.ace/config.json (if exists)
+@.renn/track.md
+@.renn/config.json (if exists)
 
 **Completed Work:**
-Glob: .ace/stages/*/*-recap.md
-Glob: .ace/stages/*/*-proof.md
+Glob: .renn/stages/*/*-recap.md
+Glob: .renn/stages/*/*-proof.md
 </context>
 
 <process>
@@ -44,7 +44,7 @@ Glob: .ace/stages/*/*-proof.md
 Read horsepower profile for agent spawning:
 
 ```bash
-HORSEPOWER=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+HORSEPOWER=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -53,7 +53,7 @@ Default to "balanced" if not set.
 
 | Agent | max | balanced | eco |
 |-------|-----|----------|-----|
-| ace-integration-checker | sonnet | sonnet | haiku |
+| renn-integration-checker | sonnet | sonnet | haiku |
 
 Store resolved model for use in Task call below.
 
@@ -61,7 +61,7 @@ Store resolved model for use in Task call below.
 
 ```bash
 # Get stages in milestone
-ls -d .ace/stages/*/ | sort -V
+ls -d .renn/stages/*/ | sort -V
 ```
 
 - Parse version from arguments or detect current from track.md
@@ -74,8 +74,8 @@ ls -d .ace/stages/*/ | sort -V
 For each stage directory, read the proof.md:
 
 ```bash
-cat .ace/stages/01-*/*-proof.md
-cat .ace/stages/02-*/*-proof.md
+cat .renn/stages/01-*/*-proof.md
+cat .renn/stages/02-*/*-proof.md
 # etc.
 ```
 
@@ -101,7 +101,7 @@ Stage exports: {from RECAPs}
 API routes: {routes created}
 
 Verify cross-stage wiring and E2E user flows.",
-  subagent_type="ace-integration-checker",
+  subagent_type="renn-integration-checker",
   model="{integration_checker_model}"
 )
 ```
@@ -122,7 +122,7 @@ For each requirement in specs.md mapped to this milestone:
 
 ## 6. Aggregate into v{version}-MILESTONE-AUDIT.md
 
-Create `.ace/v{version}-MILESTONE-AUDIT.md` with:
+Create `.renn/v{version}-MILESTONE-AUDIT.md` with:
 
 ```yaml
 ---
@@ -174,7 +174,7 @@ Output this markdown directly (not as a code block). Route based on status:
 ## STAGE COMPLETE ✓ Milestone {version} — Audit Passed
 
 **Score:** {N}/{M} requirements satisfied
-**Report:** .ace/v{version}-MILESTONE-AUDIT.md
+**Report:** .renn/v{version}-MILESTONE-AUDIT.md
 
 All requirements covered. Cross-stage integration verified. E2E flows complete.
 
@@ -184,7 +184,7 @@ All requirements covered. Cross-stage integration verified. E2E flows complete.
 
 **Complete milestone** — archive and tag
 
-/ace.complete-milestone {version}
+/renn.complete-milestone {version}
 
 <sub>/clear first — fresh context window</sub>
 
@@ -197,7 +197,7 @@ All requirements covered. Cross-stage integration verified. E2E flows complete.
 ## GATE REACHED ⏸ Milestone {version} — Gaps Found
 
 **Score:** {N}/{M} requirements satisfied
-**Report:** .ace/v{version}-MILESTONE-AUDIT.md
+**Report:** .renn/v{version}-MILESTONE-AUDIT.md
 
 ### Unsatisfied Requirements
 
@@ -221,15 +221,15 @@ All requirements covered. Cross-stage integration verified. E2E flows complete.
 
 **Plan gap closure** — create stages to complete milestone
 
-/ace.plan-milestone-gaps
+/renn.plan-milestone-gaps
 
 <sub>/clear first — fresh context window</sub>
 
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- cat .ace/v{version}-MILESTONE-AUDIT.md — see full report
-- /ace.complete-milestone {version} — proceed anyway (accept tech debt)
+- cat .renn/v{version}-MILESTONE-AUDIT.md — see full report
+- /renn.complete-milestone {version} — proceed anyway (accept tech debt)
 
 ───────────────────────────────────────────────────────────────
 
@@ -240,7 +240,7 @@ All requirements covered. Cross-stage integration verified. E2E flows complete.
 ## GATE REACHED ⏸ Milestone {version} — Tech Debt Review
 
 **Score:** {N}/{M} requirements satisfied
-**Report:** .ace/v{version}-MILESTONE-AUDIT.md
+**Report:** .renn/v{version}-MILESTONE-AUDIT.md
 
 All requirements met. No critical blockers. Accumulated tech debt needs review.
 
@@ -259,11 +259,11 @@ All requirements met. No critical blockers. Accumulated tech debt needs review.
 
 **A. Complete milestone** — accept debt, track in backlog
 
-/ace.complete-milestone {version}
+/renn.complete-milestone {version}
 
 **B. Plan cleanup stage** — address debt before completing
 
-/ace.plan-milestone-gaps
+/renn.plan-milestone-gaps
 
 <sub>/clear first — fresh context window</sub>
 

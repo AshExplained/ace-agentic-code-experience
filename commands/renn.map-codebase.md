@@ -1,6 +1,6 @@
 ---
-name: ace.map-codebase
-description: Analyze codebase with parallel mapper agents to produce .ace/codebase/ documents
+name: renn.map-codebase
+description: Analyze codebase with parallel mapper agents to produce .renn/codebase/ documents
 argument-hint: "[optional: specific area to map, e.g., 'api' or 'auth']"
 allowed-tools:
   - Read
@@ -12,26 +12,26 @@ allowed-tools:
 ---
 
 <objective>
-Analyze existing codebase using parallel ace-codebase-mapper agents to produce structured codebase documents.
+Analyze existing codebase using parallel renn-codebase-mapper agents to produce structured codebase documents.
 
-Each mapper agent explores a focus area and **writes documents directly** to `.ace/codebase/`. The orchestrator only receives confirmations, keeping context usage minimal.
+Each mapper agent explores a focus area and **writes documents directly** to `.renn/codebase/`. The orchestrator only receives confirmations, keeping context usage minimal.
 
-Output: .ace/codebase/ folder with 7-8 structured documents about the codebase state.
+Output: .renn/codebase/ folder with 7-8 structured documents about the codebase state.
 </objective>
 
 <execution_context>
-@~/.claude/ace/workflows/map-codebase.md
+@~/.claude/renn/workflows/map-codebase.md
 </execution_context>
 
 <context>
 Focus area: $ARGUMENTS (optional - if provided, tells agents to focus on specific subsystem)
 
 **Load project state if exists:**
-Check for .ace/pulse.md - loads context if project already initialized
+Check for .renn/pulse.md - loads context if project already initialized
 
 **This command can run:**
-- Before ace.start (brownfield codebases) - creates codebase map first
-- After ace.start (greenfield codebases) - updates codebase map as code evolves
+- Before renn.start (brownfield codebases) - creates codebase map first
+- After renn.start (greenfield codebases) - updates codebase map as code evolves
 - Anytime to refresh codebase understanding
 </context>
 
@@ -49,9 +49,9 @@ Check for .ace/pulse.md - loads context if project already initialized
 </when_to_use>
 
 <process>
-1. Check if .ace/codebase/ already exists (offer to refresh or skip)
-2. Create .ace/codebase/ directory structure
-3. Spawn 4-5 parallel ace-codebase-mapper agents (5th conditional on UI detection):
+1. Check if .renn/codebase/ already exists (offer to refresh or skip)
+2. Create .renn/codebase/ directory structure
+3. Spawn 4-5 parallel renn-codebase-mapper agents (5th conditional on UI detection):
    - Agent 1: tech focus → writes STACK.md, INTEGRATIONS.md
    - Agent 2: arch focus → writes ARCHITECTURE.md, STRUCTURE.md
    - Agent 3: quality focus → writes CONVENTIONS.md, TESTING.md
@@ -60,11 +60,11 @@ Check for .ace/pulse.md - loads context if project already initialized
 4. Wait for agents to complete, collect confirmations (NOT document contents)
 5. Verify all expected documents exist with line counts (7 or 8)
 6. Commit codebase map
-7. Offer next steps (typically: ace.start or ace.plan-stage)
+7. Offer next steps (typically: renn.start or renn.plan-stage)
 </process>
 
 <success_criteria>
-- [ ] .ace/codebase/ directory created
+- [ ] .renn/codebase/ directory created
 - [ ] All expected codebase documents (7 or 8) written by mapper agents
 - [ ] Documents follow template structure
 - [ ] Parallel agents completed without errors

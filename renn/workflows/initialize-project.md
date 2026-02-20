@@ -15,7 +15,7 @@ This is the most leveraged moment in any project. Deep questioning here means be
 
 1. **Abort if project exists:**
    ```bash
-   [ -f .ace/brief.md ] && echo "ERROR: Project already initialized. Use /ace.status" && exit 1
+   [ -f .renn/brief.md ] && echo "ERROR: Project already initialized. Use /renn.status" && exit 1
    ```
 
 2. **Initialize git repo in THIS directory** (required even if inside a parent repo):
@@ -32,14 +32,14 @@ This is the most leveraged moment in any project. Deep questioning here means be
    ```bash
    CODE_FILES=$(find . -name "*.ts" -o -name "*.js" -o -name "*.py" -o -name "*.go" -o -name "*.rs" -o -name "*.swift" -o -name "*.java" 2>/dev/null | grep -v node_modules | grep -v .git | head -20)
    HAS_PACKAGE=$([ -f package.json ] || [ -f requirements.txt ] || [ -f Cargo.toml ] || [ -f go.mod ] || [ -f Package.swift ] && echo "yes")
-   HAS_CODEBASE_MAP=$([ -d .ace/codebase ] && echo "yes")
+   HAS_CODEBASE_MAP=$([ -d .renn/codebase ] && echo "yes")
    ```
 
    **You MUST run all bash commands above using the Bash tool before proceeding.**
 </step>
 
 <step name="brownfield_offer">
-**If existing code detected and .ace/codebase/ doesn't exist:**
+**If existing code detected and .renn/codebase/ doesn't exist:**
 
 Check the results from setup step:
 - If `CODE_FILES` is non-empty OR `HAS_PACKAGE` is "yes"
@@ -49,12 +49,12 @@ Use AskUserQuestion:
 - header: "Existing Code"
 - question: "I detected existing code in this directory. Would you like to map the codebase first?"
 - options:
-  - "Map codebase first" — Run /ace.map-codebase to understand existing architecture (Recommended)
+  - "Map codebase first" — Run /renn.map-codebase to understand existing architecture (Recommended)
   - "Skip mapping" — Proceed with project initialization
 
 **If "Map codebase first":**
 ```
-Run `/ace.map-codebase` first, then return to `/ace.start`
+Run `/renn.map-codebase` first, then return to `/renn.start`
 ```
 Exit command.
 
@@ -68,7 +68,7 @@ Exit command.
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► QUESTIONING
+ RENN ► QUESTIONING
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -146,7 +146,7 @@ Loop until "Create brief.md" selected.
 </step>
 
 <step name="write_brief">
-Synthesize all context into `.ace/brief.md` using the template from `templates/brief.md`.
+Synthesize all context into `.renn/brief.md` using the template from `templates/brief.md`.
 
 When populating the Context section, include:
 - **Platform:** [detected platform from questioning, defaults to "web"]
@@ -181,7 +181,7 @@ All Active requirements are hypotheses until shipped and validated.
 
 Infer Validated requirements from existing code:
 
-1. Read `.ace/codebase/ARCHITECTURE.md` and `STACK.md`
+1. Read `.renn/codebase/ARCHITECTURE.md` and `STACK.md`
 2. Identify what the codebase already does
 3. These become the initial Validated set
 
@@ -229,7 +229,7 @@ Do not compress. Capture everything gathered.
 
 ```bash
 mkdir -p .ace
-git add .ace/brief.md
+git add .renn/brief.md
 git commit -m "$(cat <<'EOF'
 docs: initialize project
 
@@ -278,7 +278,7 @@ questions: [
     multiSelect: false,
     options: [
       { label: "Yes (Recommended)", description: "Planning docs tracked in version control" },
-      { label: "No", description: "Keep .ace/ local-only (add to .gitignore)" }
+      { label: "No", description: "Keep .renn/ local-only (add to .gitignore)" }
     ]
   }
 ]
@@ -338,7 +338,7 @@ questions: [
 ]
 ```
 
-Create `.ace/config.json` with all settings:
+Create `.renn/config.json` with all settings:
 
 ```json
 {
@@ -357,7 +357,7 @@ Create `.ace/config.json` with all settings:
 
 **If commit_docs = No:**
 - Set `commit_docs: false` in config.json
-- Add `.ace/` to `.gitignore` (create if needed)
+- Add `.renn/` to `.gitignore` (create if needed)
 
 **If commit_docs = Yes:**
 - No additional gitignore entries needed
@@ -365,7 +365,7 @@ Create `.ace/config.json` with all settings:
 **Commit config.json:**
 
 ```bash
-git add .ace/config.json
+git add .renn/config.json
 git commit -m "$(cat <<'EOF'
 chore: add project config
 
@@ -377,14 +377,14 @@ EOF
 )"
 ```
 
-**Note:** Run `/ace.settings` anytime to update these preferences.
+**Note:** Run `/renn.settings` anytime to update these preferences.
 </step>
 
 <step name="resolve_horsepower">
 Read horsepower setting for agent spawning:
 
 ```bash
-HORSEPOWER=$(cat .ace/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
+HORSEPOWER=$(cat .renn/config.json 2>/dev/null | grep -o '"horsepower"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"' || echo "balanced")
 ```
 
 Default to "balanced" if not set.
@@ -393,9 +393,9 @@ Default to "balanced" if not set.
 
 | Agent | max | balanced | eco |
 |-------|-----|----------|-----|
-| ace-project-scout | opus | sonnet | haiku |
-| ace-synthesizer | sonnet | sonnet | haiku |
-| ace-navigator | opus | sonnet | sonnet |
+| renn-project-scout | opus | sonnet | haiku |
+| renn-synthesizer | sonnet | sonnet | haiku |
+| renn-navigator | opus | sonnet | sonnet |
 
 Store resolved models for use in Task calls below.
 </step>
@@ -413,7 +413,7 @@ Use AskUserQuestion:
 Display stage banner:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► RESEARCHING
+ RENN ► RESEARCHING
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Researching [domain] ecosystem...
@@ -421,7 +421,7 @@ Researching [domain] ecosystem...
 
 Create research directory:
 ```bash
-mkdir -p .ace/research
+mkdir -p .renn/research
 ```
 
 **Determine milestone context:**
@@ -440,7 +440,7 @@ Display spawning indicator:
   → UX/DX research
 ```
 
-Spawn 5 parallel ace-project-scout agents with rich context:
+Spawn 5 parallel renn-project-scout agents with rich context:
 
 ```
 Task(prompt="<research_type>
@@ -476,10 +476,10 @@ Your STACK.md feeds into track creation. Be prescriptive:
 </quality_gate>
 
 <output>
-Write to: .ace/research/stack.md
-Use template: ~/.claude/ace/templates/research/stack.md
+Write to: .renn/research/stack.md
+Use template: ~/.claude/renn/templates/research/stack.md
 </output>
-", subagent_type="ace-project-scout", model="{scout_model}", description="Stack research")
+", subagent_type="renn-project-scout", model="{scout_model}", description="Stack research")
 
 Task(prompt="<research_type>
 Project Research — Features dimension for [domain].
@@ -514,10 +514,10 @@ Your FEATURES.md feeds into requirements definition. Categorize clearly:
 </quality_gate>
 
 <output>
-Write to: .ace/research/features.md
-Use template: ~/.claude/ace/templates/research/features.md
+Write to: .renn/research/features.md
+Use template: ~/.claude/renn/templates/research/features.md
 </output>
-", subagent_type="ace-project-scout", model="{scout_model}", description="Features research")
+", subagent_type="renn-project-scout", model="{scout_model}", description="Features research")
 
 Task(prompt="<research_type>
 Project Research — Architecture dimension for [domain].
@@ -552,10 +552,10 @@ Your ARCHITECTURE.md informs stage structure in track. Include:
 </quality_gate>
 
 <output>
-Write to: .ace/research/architecture.md
-Use template: ~/.claude/ace/templates/research/architecture.md
+Write to: .renn/research/architecture.md
+Use template: ~/.claude/renn/templates/research/architecture.md
 </output>
-", subagent_type="ace-project-scout", model="{scout_model}", description="Architecture research")
+", subagent_type="renn-project-scout", model="{scout_model}", description="Architecture research")
 
 Task(prompt="<research_type>
 Project Research — Pitfalls dimension for [domain].
@@ -590,10 +590,10 @@ Your PITFALLS.md prevents mistakes in track/planning. For each pitfall:
 </quality_gate>
 
 <output>
-Write to: .ace/research/pitfalls.md
-Use template: ~/.claude/ace/templates/research/pitfalls.md
+Write to: .renn/research/pitfalls.md
+Use template: ~/.claude/renn/templates/research/pitfalls.md
 </output>
-", subagent_type="ace-project-scout", model="{scout_model}", description="Pitfalls research")
+", subagent_type="renn-project-scout", model="{scout_model}", description="Pitfalls research")
 
 Task(prompt="<research_type>
 Project Research — UX/DX dimension for [domain].
@@ -645,10 +645,10 @@ Structure matters — use the template headings exactly.
 </quality_gate>
 
 <output>
-Write to: .ace/research/UX.md
-Use template: ~/.claude/ace/templates/research/ux.md
+Write to: .renn/research/UX.md
+Use template: ~/.claude/renn/templates/research/ux.md
 </output>
-", subagent_type="ace-project-scout", model="{scout_model}", description="UX/DX research")
+", subagent_type="renn-project-scout", model="{scout_model}", description="UX/DX research")
 ```
 
 After all 5 agents complete, spawn synthesizer to create recap.md:
@@ -661,25 +661,25 @@ Synthesize research outputs into recap.md.
 
 <research_files>
 Read these files:
-- .ace/research/stack.md
-- .ace/research/features.md
-- .ace/research/architecture.md
-- .ace/research/pitfalls.md
-- .ace/research/UX.md
+- .renn/research/stack.md
+- .renn/research/features.md
+- .renn/research/architecture.md
+- .renn/research/pitfalls.md
+- .renn/research/UX.md
 </research_files>
 
 <output>
-Write to: .ace/research/recap.md
-Use template: ~/.claude/ace/templates/research/recap.md
+Write to: .renn/research/recap.md
+Use template: ~/.claude/renn/templates/research/recap.md
 Commit after writing.
 </output>
-", subagent_type="ace-synthesizer", model="{synthesizer_model}", description="Synthesize research")
+", subagent_type="renn-synthesizer", model="{synthesizer_model}", description="Synthesize research")
 ```
 
 Display research complete banner and key findings:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► RESEARCH COMPLETE ✓
+ RENN ► RESEARCH COMPLETE ✓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ## Key Findings
@@ -688,7 +688,7 @@ Display research complete banner and key findings:
 **Table Stakes:** [from recap.md]
 **Watch Out For:** [from recap.md]
 
-Files: `.ace/research/`
+Files: `.renn/research/`
 ```
 
 **If "Skip research":** Continue to define_requirements.
@@ -698,7 +698,7 @@ Files: `.ace/research/`
 Display stage banner:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► DEFINING REQUIREMENTS
+ RENN ► DEFINING REQUIREMENTS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -778,7 +778,7 @@ Cross-check requirements against Core Value from brief.md. If gaps detected, sur
 
 **Generate specs.md:**
 
-Create `.ace/specs.md` with:
+Create `.renn/specs.md` with:
 - v1 Requirements grouped by category (checkboxes, REQ-IDs)
 - v2 Requirements (deferred)
 - Out of Scope (explicit exclusions with reasoning)
@@ -826,7 +826,7 @@ If "adjust": Return to scoping.
 **Commit requirements:**
 
 ```bash
-git add .ace/specs.md
+git add .renn/specs.md
 git commit -m "$(cat <<'EOF'
 docs: define v1 requirements
 
@@ -841,29 +841,29 @@ EOF
 Display stage banner:
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► CREATING TRACK
+ RENN ► CREATING TRACK
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ◆ Spawning navigator...
 ```
 
-Spawn ace-navigator agent with context:
+Spawn renn-navigator agent with context:
 
 ```
 Task(prompt="
 <planning_context>
 
 **Project:**
-@.ace/brief.md
+@.renn/brief.md
 
 **Requirements:**
-@.ace/specs.md
+@.renn/specs.md
 
 **Research (if exists):**
-@.ace/research/recap.md
+@.renn/research/recap.md
 
 **Config:**
-@.ace/config.json
+@.renn/config.json
 
 </planning_context>
 
@@ -878,7 +878,7 @@ Create track:
 
 Write files first, then return. This ensures artifacts persist even if context is lost.
 </instructions>
-", subagent_type="ace-navigator", model="{navigator_model}", description="Create track")
+", subagent_type="renn-navigator", model="{navigator_model}", description="Create track")
 ```
 
 **Handle navigator return:**
@@ -949,22 +949,22 @@ Use AskUserQuestion:
   User feedback on track:
   [user's notes]
 
-  Current track.md: @.ace/track.md
+  Current track.md: @.renn/track.md
 
   Update the track based on feedback. Edit files in place.
   Return TRACK REVISED with changes made.
   </revision>
-  ", subagent_type="ace-navigator", model="{navigator_model}", description="Revise track")
+  ", subagent_type="renn-navigator", model="{navigator_model}", description="Revise track")
   ```
 - Present revised track
 - Loop until user approves
 
-**If "Review full file":** Display raw `cat .ace/track.md`, then re-ask.
+**If "Review full file":** Display raw `cat .renn/track.md`, then re-ask.
 
 **Commit track (after approval):**
 
 ```bash
-git add .ace/track.md .ace/pulse.md .ace/specs.md
+git add .renn/track.md .renn/pulse.md .renn/specs.md
 git commit -m "$(cat <<'EOF'
 docs: create track ([N] stages)
 
@@ -984,18 +984,18 @@ Present completion with next steps:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► PROJECT INITIALIZED ✓
+ RENN ► PROJECT INITIALIZED ✓
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **[Project Name]**
 
 | Artifact       | Location                    |
 |----------------|-----------------------------|
-| Project        | `.ace/brief.md`             |
-| Config         | `.ace/config.json`          |
-| Research          | `.ace/research/`               |
-| Requirements   | `.ace/specs.md`             |
-| Track          | `.ace/track.md`             |
+| Project        | `.renn/brief.md`             |
+| Config         | `.renn/config.json`          |
+| Research          | `.renn/research/`               |
+| Requirements   | `.renn/specs.md`             |
+| Track          | `.renn/track.md`             |
 
 **[N] stages** | **[X] requirements** | Ready to build ✓
 
@@ -1007,28 +1007,28 @@ Present completion with next steps:
 
 **Design System** — create your project's visual identity before planning stages
 
-/ace.design-system
+/renn.design-system
 
 <sub>/clear first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- /ace.discuss-stage 1 — gather context (non-design discussion)
-- /ace.plan-stage 1 — skip design and discussion
+- /renn.discuss-stage 1 — gather context (non-design discussion)
+- /renn.plan-stage 1 — skip design and discussion
 
 {ELSE (no [UI] stages):}
 
 **Stage 1: [Stage Name]** — [Goal from track.md]
 
-/ace.discuss-stage 1 — gather context and clarify approach
+/renn.discuss-stage 1 — gather context and clarify approach
 
 <sub>/clear first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- /ace.plan-stage 1 — skip discussion, plan directly
+- /renn.plan-stage 1 — skip discussion, plan directly
 
 {END IF}
 
