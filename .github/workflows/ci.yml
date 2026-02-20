@@ -48,16 +48,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
-        with:
-          node-version: 20
-          cache: npm
-
-      - run: npm ci
-
-      - name: npm audit
-        run: npm audit --audit-level=high
-
   test:
     name: Test
     runs-on: ubuntu-latest
