@@ -16,9 +16,9 @@ const BUILD_SCRIPT = path.join(ROOT, 'scripts', 'build-hooks.js');
 const CHECK_SCRIPT = path.join(ROOT, 'scripts', 'check-dist-sync.js');
 const HOOKS_DIR = path.join(ROOT, 'hooks');
 const DIST_DIR = path.join(HOOKS_DIR, 'dist');
-const DIST_FILE = path.join(DIST_DIR, 'ace-statusline.js');
-const SOURCE_FILE = path.join(HOOKS_DIR, 'ace-statusline.js');
-const EXPECTED_HOOKS = ['ace-check-update.js', 'ace-statusline.js'];
+const DIST_FILE = path.join(DIST_DIR, 'renn-statusline.js');
+const SOURCE_FILE = path.join(HOOKS_DIR, 'renn-statusline.js');
+const EXPECTED_HOOKS = ['renn-check-update.js', 'renn-statusline.js'];
 
 // ─── build-hooks ───
 

@@ -50,13 +50,13 @@ describe('expandTilde', () => {
 
 describe('buildHookCommand', () => {
   it('builds a node command with forward slashes', () => {
-    const result = buildHookCommand('/home/user/.claude', 'ace-statusline.js');
-    assert.equal(result, 'node "/home/user/.claude/hooks/ace-statusline.js"');
+    const result = buildHookCommand('/home/user/.claude', 'renn-statusline.js');
+    assert.equal(result, 'node "/home/user/.claude/hooks/renn-statusline.js"');
   });
 
   it('converts Windows backslashes to forward slashes', () => {
-    const result = buildHookCommand('C:\\Users\\user\\.claude', 'ace-statusline.js');
-    assert.equal(result, 'node "C:/Users/user/.claude/hooks/ace-statusline.js"');
+    const result = buildHookCommand('C:\\Users\\user\\.claude', 'renn-statusline.js');
+    assert.equal(result, 'node "C:/Users/user/.claude/hooks/renn-statusline.js"');
   });
 });
 
@@ -186,14 +186,14 @@ describe('convertClaudeToGeminiToml', () => {
   });
 
   it('extracts description from frontmatter', () => {
-    const content = '---\nname: ace.test\ndescription: A test command\n---\nDo the thing';
+    const content = '---\nname: renn.test\ndescription: A test command\n---\nDo the thing';
     const result = convertClaudeToGeminiToml(content);
     assert.ok(result.includes('description = "A test command"'));
     assert.ok(result.includes('prompt = "Do the thing"'));
   });
 
   it('handles frontmatter without description', () => {
-    const content = '---\nname: ace.test\n---\nDo the thing';
+    const content = '---\nname: renn.test\n---\nDo the thing';
     const result = convertClaudeToGeminiToml(content);
     assert.ok(!result.includes('description'));
     assert.ok(result.includes('prompt = "Do the thing"'));
@@ -210,22 +210,22 @@ describe('convertClaudeToOpencodeFrontmatter', () => {
     assert.ok(!result.includes('AskUserQuestion'));
   });
 
-  it('replaces /ace. with /ace- for flat command structure', () => {
-    const content = 'Run /ace.run-stage to start';
+  it('replaces /renn. with /renn- for flat command structure', () => {
+    const content = 'Run /renn.run-stage to start';
     const result = convertClaudeToOpencodeFrontmatter(content);
-    assert.ok(result.includes('/ace-run-stage'));
-    assert.ok(!result.includes('/ace.run-stage'));
+    assert.ok(result.includes('/renn-run-stage'));
+    assert.ok(!result.includes('/renn.run-stage'));
   });
 
   it('replaces ~/.claude with ~/.config/opencode', () => {
-    const content = 'Files are in ~/.claude/ace/workflows/';
+    const content = 'Files are in ~/.claude/renn/workflows/';
     const result = convertClaudeToOpencodeFrontmatter(content);
-    assert.ok(result.includes('~/.config/opencode/ace/workflows/'));
+    assert.ok(result.includes('~/.config/opencode/renn/workflows/'));
     assert.ok(!result.includes('~/.claude'));
   });
 
   it('removes name field from frontmatter', () => {
-    const content = '---\nname: ace-test\ndescription: Test agent\ntools: Read, Write\n---\nBody';
+    const content = '---\nname: renn-test\ndescription: Test agent\ntools: Read, Write\n---\nBody';
     const result = convertClaudeToOpencodeFrontmatter(content);
     assert.ok(!result.match(/^name:/m));
     assert.ok(result.includes('description'));
@@ -256,7 +256,7 @@ describe('convertClaudeToOpencodeFrontmatter', () => {
 describe('convertClaudeToGeminiAgent', () => {
   it('converts tools to Gemini format', () => {
     const content =
-      '---\nname: ace-test\ndescription: Test\ntools: Read, Write, Bash\ncolor: yellow\n---\nBody text';
+      '---\nname: renn-test\ndescription: Test\ntools: Read, Write, Bash\ncolor: yellow\n---\nBody text';
     const result = convertClaudeToGeminiAgent(content);
     assert.ok(result.includes('read_file'));
     assert.ok(result.includes('write_file'));
@@ -264,14 +264,14 @@ describe('convertClaudeToGeminiAgent', () => {
   });
 
   it('removes color field', () => {
-    const content = '---\nname: ace-test\ndescription: Test\ncolor: yellow\n---\nBody';
+    const content = '---\nname: renn-test\ndescription: Test\ncolor: yellow\n---\nBody';
     const result = convertClaudeToGeminiAgent(content);
     assert.ok(!result.includes('color:'));
   });
 
   it('filters out unsupported tools (MCP, Task)', () => {
     const content =
-      '---\nname: ace-test\ndescription: Test\ntools: Read, Task, mcp__github__test\n---\nBody';
+      '---\nname: renn-test\ndescription: Test\ntools: Read, Task, mcp__github__test\n---\nBody';
     const result = convertClaudeToGeminiAgent(content);
     assert.ok(result.includes('read_file'));
     assert.ok(!result.includes('task'));

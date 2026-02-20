@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Claude Code Statusline - ACE Edition
+// Claude Code Statusline - RENN Edition
 // Shows: model | current task | directory | context usage
 
 const fs = require('fs');
@@ -65,14 +65,14 @@ process.stdin.on('end', () => {
       }
     }
 
-    // ACE update available?
-    let aceUpdate = '';
-    const cacheFile = path.join(homeDir, '.claude', 'cache', 'ace-update-check.json');
+    // RENN update available?
+    let rennUpdate = '';
+    const cacheFile = path.join(homeDir, '.claude', 'cache', 'renn-update-check.json');
     if (fs.existsSync(cacheFile)) {
       try {
         const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
         if (cache.update_available) {
-          aceUpdate = '\x1b[33m\u2b06 ACE update\x1b[0m \u2502 ';
+          rennUpdate = '\x1b[33m\u2b06 RENN update\x1b[0m \u2502 ';
         }
       } catch (_e) {
         /* ignore parse errors */
@@ -83,11 +83,11 @@ process.stdin.on('end', () => {
     const dirname = path.basename(dir);
     if (task) {
       process.stdout.write(
-        `${aceUpdate}\x1b[2m${model}\x1b[0m \u2502 \x1b[1m${task}\x1b[0m \u2502 \x1b[2m${dirname}\x1b[0m${ctx}`
+        `${rennUpdate}\x1b[2m${model}\x1b[0m \u2502 \x1b[1m${task}\x1b[0m \u2502 \x1b[2m${dirname}\x1b[0m${ctx}`
       );
     } else {
       process.stdout.write(
-        `${aceUpdate}\x1b[2m${model}\x1b[0m \u2502 \x1b[2m${dirname}\x1b[0m${ctx}`
+        `${rennUpdate}\x1b[2m${model}\x1b[0m \u2502 \x1b[2m${dirname}\x1b[0m${ctx}`
       );
     }
   } catch (_e) {
