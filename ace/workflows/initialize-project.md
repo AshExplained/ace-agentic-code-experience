@@ -1003,6 +1003,22 @@ Present completion with next steps:
 
 ## ▶ Next Up
 
+{IF track.md contains any [UI] stages:}
+
+**Design System** — create your project's visual identity before planning stages
+
+/ace.design-system
+
+<sub>/clear first → fresh context window</sub>
+
+---
+
+**Also available:**
+- /ace.discuss-stage 1 — gather context (non-design discussion)
+- /ace.plan-stage 1 — skip design and discussion
+
+{ELSE (no [UI] stages):}
+
 **Stage 1: [Stage Name]** — [Goal from track.md]
 
 /ace.discuss-stage 1 — gather context and clarify approach
@@ -1012,8 +1028,9 @@ Present completion with next steps:
 ---
 
 **Also available:**
-- /ace.design-system — create design system (if UI stage)
 - /ace.plan-stage 1 — skip discussion, plan directly
+
+{END IF}
 
 ───────────────────────────────────────────────────────────────
 ```

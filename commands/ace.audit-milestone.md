@@ -111,6 +111,7 @@ Verify cross-stage wiring and E2E user flows.",
 Combine:
 - Stage-level gaps and tech debt (from step 2)
 - Integration checker's report (wiring gaps, broken flows)
+- Integration checker's security sweep findings (Step 4.5) -- extract into `gaps.security` with severity, finding, files, and remediation for each Blocker-severity issue
 
 ## 5. Check Requirements Coverage
 
@@ -133,10 +134,12 @@ scores:
   stages: N/M
   integration: N/M
   flows: N/M
+  security: N/M    # From integration checker Step 4.5
 gaps:  # Critical blockers
   requirements: [...]
   integration: [...]
   flows: [...]
+  security: [...]    # From integration checker Step 4.5 (auth gaps, vulnerable deps, leaked secrets, CORS issues, supply chain)
 tech_debt:  # Non-critical, deferred
   - stage: 01-auth
     items:
@@ -151,9 +154,9 @@ tech_debt:  # Non-critical, deferred
 Plus full markdown report with tables for requirements, stages, integration, tech debt.
 
 **Status values:**
-- `passed` — all requirements met, no critical gaps, minimal tech debt
-- `gaps_found` — critical blockers exist
-- `tech_debt` — no blockers but accumulated deferred items need review
+- `passed` — all requirements met, no critical gaps, no security Blockers, minimal tech debt
+- `gaps_found` — critical blockers exist (including Blocker-severity security findings from Step 4.5: unprotected auth routes, Critical/High dependency vulns, leaked secrets, wildcard CORS with credentials)
+- `tech_debt` — no blockers but accumulated deferred items need review (Warning-severity security findings contribute here: missing headers, unpinned Actions, missing lockfile)
 
 ## 7. Present Results
 

@@ -9,6 +9,15 @@
 .DS_Store
 Thumbs.db
 
+# Secrets / Credentials
+.env
+.env.*
+*.pem
+*.key
+*.p12
+credentials.json
+serviceAccountKey.json
+
 # Temporary / Generated
 *.tmp
 *.log

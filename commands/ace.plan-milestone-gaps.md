@@ -48,6 +48,7 @@ Parse YAML frontmatter to extract structured gaps:
 - `gaps.requirements` — unsatisfied requirements
 - `gaps.integration` — missing cross-stage connections
 - `gaps.flows` — broken E2E flows
+- `gaps.security` — cross-cutting security issues (auth gaps, vulnerable deps, leaked secrets, missing headers, CORS issues, supply chain)
 
 If no audit file exists or has no gaps, error:
 ```
@@ -75,6 +76,7 @@ Cluster related gaps into logical stages:
 - Same subsystem (auth, API, UI) → combine
 - Dependency order (fix stubs before wiring)
 - Keep stages focused: 2-4 tasks each
+- Security gaps: group by sub-check type (auth gaps with auth stages, dependency/supply-chain as infrastructure, headers/CORS as configuration)
 
 **Example grouping:**
 ```
@@ -279,6 +281,23 @@ becomes:
 
 # Usually same stage as requirement/integration gap
 # Flow gaps often overlap with other gap types
+```
+
+**Security gap → Tasks:**
+```yaml
+gap:
+  type: security
+  subcheck: "4.5.1 Auth Route Completeness"
+  finding: "/api/admin/users has no auth check"
+  severity: Blocker
+
+becomes:
+
+stage: "Close Security Gaps"
+tasks:
+  - name: "Add auth middleware to admin API routes"
+    files: [src/app/api/admin/users/route.ts]
+    action: "Add getServerSession check, return 401 if unauthenticated"
 ```
 
 </gap_to_stage_mapping>

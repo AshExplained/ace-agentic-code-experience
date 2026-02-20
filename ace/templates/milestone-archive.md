@@ -1,6 +1,6 @@
 # Milestone Archive Template
 
-This template is used by the ship-milestone workflow to create archive files in `.ace/milestones/`.
+This template is used by the complete-milestone workflow to create archive files in `.ace/milestones/`.
 
 ---
 
@@ -98,7 +98,7 @@ _For current project status, see .ace/track.md_
 <guidelines>
 **When to create milestone archives:**
 - After completing all stages in a milestone (v1.0, v1.1, v2.0, etc.)
-- Triggered by ship-milestone workflow
+- Triggered by complete-milestone workflow
 - Before planning next milestone work
 
 **How to fill template:**

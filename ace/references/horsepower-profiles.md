@@ -79,3 +79,6 @@ Design requires aesthetic judgment, visual reasoning, and creative problem-solvi
 
 **Why Sonnet for ace-design-reviewer?**
 Reviewer checks structured criteria (schema compliance, token references, checklist items), not subjective aesthetics. Sonnet handles systematic verification well. In eco mode, haiku handles the formulaic checks (field presence, value comparison) adequately.
+
+**Why no profile change for the security step?**
+Step 7.6 (Security Conformance) is part of the ace-auditor agent, which already uses Sonnet in balanced mode. Security review requires the same reasoning capability as goal-backward verification -- analyzing code for vulnerabilities, not just pattern matching. Sonnet handles this well; no profile adjustment needed.

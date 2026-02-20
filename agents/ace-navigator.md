@@ -212,6 +212,14 @@ Stage 4: Social (sharing, following)
 Stage 5: Polish (performance, edge cases)
 ```
 
+**UI-Heavy Projects (Landing Page, Dashboard, SPA)**
+```
+Stage 1: Navigation and Hero [UI]
+Stage 2: Content Sections [UI]
+Stage 3: Contact and Polish [UI]
+```
+Note: No separate foundation stage for design work. `/ace.design-system` runs before Stage 1 planning and creates the design token system (colors, typography, spacing).
+
 **Vertical Slices (Independent Features)**
 ```
 Stage 1: Setup
@@ -260,6 +268,18 @@ The `[UI]` tag enables downstream design pipeline routing. It must appear at the
 - CLI tool implementation
 - Authentication backend logic
 - Performance optimization
+
+## Foundation Stages for UI Projects
+
+When the project is UI-heavy (majority of stages are `[UI]`):
+
+**DO NOT** put design work in a foundation stage: color system, typography, CSS tokens, design scaffolding, spacing scale, icon system styling. These are handled by `/ace.design-system` which runs before any stage planning.
+
+**DO** include in a foundation stage (if needed): HTML boilerplate, build tooling setup, CDN links, folder structure, linting config, deployment config — pure scaffolding with no design decisions.
+
+**If the only foundation work is design-related:** Do not create a foundation stage. The first `[UI]` stage implements the design system tokens as part of its Run 01.
+
+**If foundation work mixes design and scaffolding:** Include only the non-design scaffolding in the foundation stage (no `[UI]` tag). The design pipeline handles the rest.
 
 </ui_stage_tagging>
 
