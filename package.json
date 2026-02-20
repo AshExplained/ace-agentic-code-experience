@@ -1,6 +1,6 @@
 {
   "name": "renn",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Grow ideas into shipped software",
   "bin": {
     "renn": "bin/install.js"
