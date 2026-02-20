@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Copy ACE hooks to dist for installation.
+ * Copy RENN hooks to dist for installation.
  */
 
 const fs = require('fs');
@@ -10,7 +10,7 @@ const HOOKS_DIR = path.join(__dirname, '..', 'hooks');
 const DIST_DIR = path.join(HOOKS_DIR, 'dist');
 
 // Hooks to copy (pure Node.js, no bundling needed)
-const HOOKS_TO_COPY = ['ace-check-update.js', 'ace-statusline.js'];
+const HOOKS_TO_COPY = ['renn-check-update.js', 'renn-statusline.js'];
 
 function build() {
   // Ensure dist directory exists

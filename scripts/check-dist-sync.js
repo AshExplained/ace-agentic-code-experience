@@ -10,8 +10,8 @@ const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const HOOK_PAIRS = [
-  ['hooks/ace-check-update.js', 'hooks/dist/ace-check-update.js'],
-  ['hooks/ace-statusline.js', 'hooks/dist/ace-statusline.js'],
+  ['hooks/renn-check-update.js', 'hooks/dist/renn-check-update.js'],
+  ['hooks/renn-statusline.js', 'hooks/dist/renn-statusline.js'],
 ];
 
 const errors = [];

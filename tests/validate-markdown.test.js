@@ -34,7 +34,7 @@ const {
 /** Build a minimal valid command file */
 function validCommand(overrides = '') {
   return `---
-name: ace.test-cmd
+name: renn.test-cmd
 description: A test command
 allowed-tools:
   - Read
@@ -58,7 +58,7 @@ ${overrides}`;
 /** Build a minimal valid agent file */
 function validAgent(overrides = '') {
   return `---
-name: ace-test-agent
+name: renn-test-agent
 description: A test agent
 tools: Read, Write, Bash
 color: yellow
@@ -88,23 +88,23 @@ ${overrides}`;
 
 describe('getFileType', () => {
   it('detects command files', () => {
-    assert.equal(getFileType('commands/ace.help.md'), 'command');
+    assert.equal(getFileType('commands/renn.help.md'), 'command');
   });
 
   it('detects agent files', () => {
-    assert.equal(getFileType('agents/ace-runner.md'), 'agent');
+    assert.equal(getFileType('agents/renn-runner.md'), 'agent');
   });
 
   it('detects workflow files', () => {
-    assert.equal(getFileType('ace/workflows/run-stage.md'), 'workflow');
+    assert.equal(getFileType('renn/workflows/run-stage.md'), 'workflow');
   });
 
   it('detects reference files', () => {
-    assert.equal(getFileType('ace/references/drift-rules.md'), 'reference');
+    assert.equal(getFileType('renn/references/drift-rules.md'), 'reference');
   });
 
   it('detects template files', () => {
-    assert.equal(getFileType('ace/templates/pulse.md'), 'template');
+    assert.equal(getFileType('renn/templates/pulse.md'), 'template');
   });
 
   it('returns null for unknown paths', () => {
@@ -113,21 +113,21 @@ describe('getFileType', () => {
   });
 
   it('normalizes Windows backslashes', () => {
-    assert.equal(getFileType('commands\\ace.help.md'), 'command');
-    assert.equal(getFileType('agents\\ace-runner.md'), 'agent');
+    assert.equal(getFileType('commands\\renn.help.md'), 'command');
+    assert.equal(getFileType('agents\\renn-runner.md'), 'agent');
   });
 });
 
 describe('extractFrontmatter', () => {
   it('parses key-value fields', () => {
-    const fm = extractFrontmatter('---\nname: ace.test\ndescription: Hello\n---\nBody');
-    assert.equal(fm.name, 'ace.test');
+    const fm = extractFrontmatter('---\nname: renn.test\ndescription: Hello\n---\nBody');
+    assert.equal(fm.name, 'renn.test');
     assert.equal(fm.description, 'Hello');
   });
 
   it('parses list fields', () => {
     const fm = extractFrontmatter(
-      '---\nname: ace.test\nallowed-tools:\n  - Read\n  - Write\n---\nBody'
+      '---\nname: renn.test\nallowed-tools:\n  - Read\n  - Write\n---\nBody'
     );
     assert.deepEqual(fm['allowed-tools'], ['Read', 'Write']);
   });
@@ -137,8 +137,8 @@ describe('extractFrontmatter', () => {
   });
 
   it('handles CRLF line endings', () => {
-    const fm = extractFrontmatter('---\r\nname: ace.test\r\n---\r\nBody');
-    assert.equal(fm.name, 'ace.test');
+    const fm = extractFrontmatter('---\r\nname: renn.test\r\n---\r\nBody');
+    assert.equal(fm.name, 'renn.test');
   });
 
   it('handles comma-separated tools field', () => {
@@ -169,35 +169,35 @@ describe('validateCommand', () => {
   beforeEach(() => _resetState());
 
   it('accepts a valid command', () => {
-    validateCommand('commands/ace.test.md', validCommand());
+    validateCommand('commands/renn.test.md', validCommand());
     assert.equal(errors.length, 0);
   });
 
   it('errors on missing frontmatter', () => {
-    validateCommand('commands/ace.test.md', '# No frontmatter\n<objective>X</objective>');
+    validateCommand('commands/renn.test.md', '# No frontmatter\n<objective>X</objective>');
     assert.equal(errors.length, 1);
     assert.match(errors[0], /missing YAML frontmatter/i);
   });
 
   it('errors on missing required fields', () => {
     validateCommand(
-      'commands/ace.test.md',
-      '---\nname: ace.test\n---\n<objective>X</objective>\n<process>X</process>\n<success_criteria>X</success_criteria>'
+      'commands/renn.test.md',
+      '---\nname: renn.test\n---\n<objective>X</objective>\n<process>X</process>\n<success_criteria>X</success_criteria>'
     );
     assert.ok(errors.some((e) => e.includes('description')));
     assert.ok(errors.some((e) => e.includes('allowed-tools')));
   });
 
   it('errors on bad name format', () => {
-    const content = validCommand().replace('name: ace.test-cmd', 'name: bad_name');
-    validateCommand('commands/ace.test.md', content);
-    assert.ok(errors.some((e) => e.includes('must match ace.kebab-case')));
+    const content = validCommand().replace('name: renn.test-cmd', 'name: bad_name');
+    validateCommand('commands/renn.test.md', content);
+    assert.ok(errors.some((e) => e.includes('must match renn.kebab-case')));
   });
 
   it('errors on missing required sections', () => {
     validateCommand(
-      'commands/ace.test.md',
-      '---\nname: ace.test\ndescription: X\nallowed-tools:\n  - Read\n---\nJust some text'
+      'commands/renn.test.md',
+      '---\nname: renn.test\ndescription: X\nallowed-tools:\n  - Read\n---\nJust some text'
     );
     assert.ok(errors.some((e) => e.includes('<objective>')));
     assert.ok(errors.some((e) => e.includes('<process>')));
@@ -209,20 +209,20 @@ describe('validateAgent', () => {
   beforeEach(() => _resetState());
 
   it('accepts a valid agent', () => {
-    validateAgent('agents/ace-test.md', validAgent());
+    validateAgent('agents/renn-test.md', validAgent());
     assert.equal(errors.length, 0);
   });
 
   it('errors on missing frontmatter', () => {
-    validateAgent('agents/ace-test.md', '# No frontmatter');
+    validateAgent('agents/renn-test.md', '# No frontmatter');
     assert.equal(errors.length, 1);
     assert.match(errors[0], /missing YAML frontmatter/i);
   });
 
   it('errors on bad name format', () => {
-    const content = validAgent().replace('name: ace-test-agent', 'name: BadAgent');
-    validateAgent('agents/ace-test.md', content);
-    assert.ok(errors.some((e) => e.includes('must match ace-kebab')));
+    const content = validAgent().replace('name: renn-test-agent', 'name: BadAgent');
+    validateAgent('agents/renn-test.md', content);
+    assert.ok(errors.some((e) => e.includes('must match renn-kebab')));
   });
 
   it('accepts alternative sections (verification_process)', () => {
@@ -230,7 +230,7 @@ describe('validateAgent', () => {
     const content = validAgent()
       .replace('<execution_flow>', '<verification_process>')
       .replace('</execution_flow>', '</verification_process>');
-    validateAgent('agents/ace-test.md', content);
+    validateAgent('agents/renn-test.md', content);
     const execFlowErrors = errors.filter((e) => e.includes('execution_flow'));
     assert.equal(execFlowErrors.length, 0);
   });
@@ -239,7 +239,7 @@ describe('validateAgent', () => {
     const content = validAgent()
       .replace('<execution_flow>', '<process>')
       .replace('</execution_flow>', '</process>');
-    validateAgent('agents/ace-test.md', content);
+    validateAgent('agents/renn-test.md', content);
     const execFlowErrors = errors.filter((e) => e.includes('execution_flow'));
     assert.equal(execFlowErrors.length, 0);
   });
@@ -249,18 +249,18 @@ describe('validateWorkflow', () => {
   beforeEach(() => _resetState());
 
   it('accepts a valid workflow', () => {
-    validateWorkflow('ace/workflows/test.md', '<purpose>\nDo stuff\n</purpose>');
+    validateWorkflow('renn/workflows/test.md', '<purpose>\nDo stuff\n</purpose>');
     assert.equal(errors.length, 0);
     assert.equal(warnings.length, 0);
   });
 
   it('errors when workflow has frontmatter', () => {
-    validateWorkflow('ace/workflows/test.md', '---\nname: bad\n---\n<purpose>X</purpose>');
+    validateWorkflow('renn/workflows/test.md', '---\nname: bad\n---\n<purpose>X</purpose>');
     assert.ok(errors.some((e) => e.includes('must NOT have YAML frontmatter')));
   });
 
   it('warns when missing <purpose>', () => {
-    validateWorkflow('ace/workflows/test.md', '# Just a heading\nSome content');
+    validateWorkflow('renn/workflows/test.md', '# Just a heading\nSome content');
     assert.ok(warnings.some((w) => w.includes('<purpose>')));
   });
 });
@@ -269,12 +269,12 @@ describe('validateReference', () => {
   beforeEach(() => _resetState());
 
   it('accepts a reference without frontmatter', () => {
-    validateReference('ace/references/test.md', '# Test Reference\nContent here');
+    validateReference('renn/references/test.md', '# Test Reference\nContent here');
     assert.equal(errors.length, 0);
   });
 
   it('errors when reference has frontmatter', () => {
-    validateReference('ace/references/test.md', '---\nname: bad\n---\nContent');
+    validateReference('renn/references/test.md', '---\nname: bad\n---\nContent');
     assert.ok(errors.some((e) => e.includes('must NOT have YAML frontmatter')));
   });
 });
@@ -283,12 +283,12 @@ describe('validateTemplate', () => {
   beforeEach(() => _resetState());
 
   it('accepts a template without frontmatter', () => {
-    validateTemplate('ace/templates/test.md', '# Test Template\nContent');
+    validateTemplate('renn/templates/test.md', '# Test Template\nContent');
     assert.equal(errors.length, 0);
   });
 
   it('errors when template has frontmatter', () => {
-    validateTemplate('ace/templates/test.md', '---\nname: bad\n---\nContent');
+    validateTemplate('renn/templates/test.md', '---\nname: bad\n---\nContent');
     assert.ok(errors.some((e) => e.includes('must NOT have YAML frontmatter')));
   });
 });
@@ -352,17 +352,17 @@ describe('validateReferenceFormat', () => {
   beforeEach(() => _resetState());
 
   it('accepts proper @~/.claude/ references', () => {
-    validateReferenceFormat('test.md', '@~/.claude/ace/workflows/run-stage.md');
+    validateReferenceFormat('test.md', '@~/.claude/renn/workflows/run-stage.md');
     assert.equal(errors.length, 0);
   });
 
-  it('errors on bare relative @-references to ace paths', () => {
-    validateReferenceFormat('test.md', '@ace/workflows/run-stage.md');
-    assert.ok(errors.some((e) => e.includes('must use @~/.claude/ace/')));
+  it('errors on bare relative @-references to renn paths', () => {
+    validateReferenceFormat('test.md', '@renn/workflows/run-stage.md');
+    assert.ok(errors.some((e) => e.includes('must use @~/.claude/renn/')));
   });
 
   it('ignores references inside code blocks', () => {
-    validateReferenceFormat('test.md', '```\n@ace/workflows/run-stage.md\n```');
+    validateReferenceFormat('test.md', '```\n@renn/workflows/run-stage.md\n```');
     assert.equal(errors.length, 0);
   });
 });
@@ -372,7 +372,7 @@ describe('validateArgumentsUsage', () => {
 
   it('passes when command has argument-hint and $ARGUMENTS in context', () => {
     const content = `---
-name: ace.test
+name: renn.test
 description: Test
 argument-hint: "<stage>"
 allowed-tools:
@@ -387,7 +387,7 @@ $ARGUMENTS
 
   it('errors when argument-hint present but no $ARGUMENTS in context', () => {
     const content = `---
-name: ace.test
+name: renn.test
 description: Test
 argument-hint: "<stage>"
 allowed-tools:
@@ -402,7 +402,7 @@ Something else
 
   it('errors when argument-hint present but no context section', () => {
     const content = `---
-name: ace.test
+name: renn.test
 description: Test
 argument-hint: "<stage>"
 allowed-tools:
@@ -420,7 +420,7 @@ No context section here`;
 
   it('skips commands without argument-hint', () => {
     const content = `---
-name: ace.test
+name: renn.test
 description: Test
 allowed-tools:
   - Read
@@ -598,7 +598,7 @@ describe('validateCommandDelegation', () => {
   });
 
   it('passes for long commands with workflow reference', () => {
-    const content = 'Line\n'.repeat(501) + '@~/.claude/ace/workflows/run-stage.md';
+    const content = 'Line\n'.repeat(501) + '@~/.claude/renn/workflows/run-stage.md';
     validateCommandDelegation('test.md', content, 'command');
     assert.equal(warnings.length, 0);
   });
