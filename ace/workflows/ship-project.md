@@ -802,6 +802,19 @@ After all items in ship-plan.md are processed (no unchecked items remain):
    These steps were skipped and may need manual attention.
    ```
 
+   Display next action:
+   ```
+   ---
+
+   ## What's Next
+
+   Set up monitoring for your deployed project:
+
+   `/ace.watch` -- error tracking, uptime monitoring, and more
+
+   <sub>`/clear` first -- fresh context window</sub>
+   ```
+
 **Critical details:**
 - Status field transitions: `ready` -> `in-progress` -> `paused-at-N` / `complete` / `aborted`
 - "Come back later" and "Abort" both STOP execution -- they do not continue the loop
@@ -842,4 +855,5 @@ After all items in ship-plan.md are processed (no unchecked items remain):
 - [ ] ship-target.md updated to shipped on completion
 - [ ] pulse.md reflects shipping progress
 - [ ] Phase 3 walks checklist with auto/gate execution, progress tracking, and error recovery
+- [ ] Completion summary suggests /ace.watch as the next action (WATCH-11)
 </success_criteria>
