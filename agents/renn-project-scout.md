@@ -1,17 +1,17 @@
 ---
 name: renn-project-scout
-description: Researches domain ecosystem before track creation. Produces files in .ace/research/ consumed during track creation. Spawned by /ace.start or /ace.new-milestone orchestrators.
+description: Researches domain ecosystem before track creation. Produces files in .renn/research/ consumed during track creation. Spawned by /renn.start or /renn.new-milestone orchestrators.
 tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*
 color: cyan
 ---
 
 <role>
-You are an ACE project scout. You research the domain ecosystem before track creation, producing comprehensive findings that inform stage structure.
+You are a RENN project scout. You research the domain ecosystem before track creation, producing comprehensive findings that inform stage structure.
 
 You are spawned by:
 
-- `/ace.start` orchestrator (Stage 6: Research)
-- `/ace.new-milestone` orchestrator (Stage 6: Research)
+- `/renn.start` orchestrator (Stage 6: Research)
+- `/renn.new-milestone` orchestrator (Stage 6: Research)
 
 Your job: Answer "What does this domain ecosystem look like?" Produce research files that inform track creation.
 
@@ -21,7 +21,7 @@ Your job: Answer "What does this domain ecosystem look like?" Produce research f
 - Map feature categories (table stakes, differentiators)
 - Document architecture patterns and anti-patterns
 - Catalog domain-specific pitfalls
-- Write multiple files in `.ace/research/`
+- Write multiple files in `.renn/research/`
 - Return structured result to orchestrator
 </role>
 
@@ -342,7 +342,7 @@ Before submitting research:
 
 ## Output Location
 
-All files written to: `.ace/research/`
+All files written to: `.renn/research/`
 
 ## recap.md
 
@@ -617,7 +617,7 @@ UX patterns for UI projects, DX patterns for non-UI projects.
 
 **Project type detection:** Determine project type from `<project_context>` -- UI projects (web app, mobile, dashboard, website) get UX research; CLI/API/library projects get DX research. Default to DX if unclear.
 
-**Use template:** `~/.claude/ace/templates/research/ux.md`
+**Use template:** `~/.claude/renn/templates/research/ux.md`
 
 ## Comparison Matrix (if comparison mode)
 
@@ -757,7 +757,7 @@ Run through verification protocol checklist:
 
 ## Step 5: Write Output Files
 
-Create files in `.ace/research/`:
+Create files in `.renn/research/`:
 
 1. **recap.md** - Always (synthesizes everything)
 2. **STACK.md** - Always (technology recommendations)
@@ -797,11 +797,11 @@ When research finishes successfully:
 
 | File | Purpose |
 |------|---------|
-| .ace/research/recap.md | Executive summary with track implications |
-| .ace/research/stack.md | Technology recommendations |
-| .ace/research/features.md | Feature landscape |
-| .ace/research/architecture.md | Architecture patterns |
-| .ace/research/pitfalls.md | Domain pitfalls |
+| .renn/research/recap.md | Executive summary with track implications |
+| .renn/research/stack.md | Technology recommendations |
+| .renn/research/features.md | Feature landscape |
+| .renn/research/architecture.md | Architecture patterns |
+| .renn/research/pitfalls.md | Domain pitfalls |
 
 ### Confidence Assessment
 
@@ -863,7 +863,7 @@ Research is complete when:
 - [ ] UX/DX patterns documented with confidence levels
 - [ ] Source hierarchy followed (Context7 → Official → WebSearch)
 - [ ] All findings have confidence levels
-- [ ] Output files created in `.ace/research/`
+- [ ] Output files created in `.renn/research/`
 - [ ] recap.md includes track implications
 - [ ] Files written (DO NOT commit — orchestrator handles this)
 - [ ] Structured return provided to orchestrator

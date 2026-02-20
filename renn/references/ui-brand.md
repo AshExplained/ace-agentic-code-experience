@@ -1,6 +1,35 @@
 <ui_patterns>
 
-Visual patterns for user-facing ACE output. Orchestrators @-reference this file.
+Visual patterns for user-facing RENN output. Orchestrators @-reference this file.
+
+## Brand Identity
+
+- **Name:** RENN (uppercase in prose, lowercase in code/CLI)
+- **Tagline:** "Grow ideas into shipped software"
+- **Symbol:** Lotus (U+1FAB7 with U+2740 fallback)
+- **Philosophy:** From mud to lotus through structured runs
+
+### Color Palette
+
+| Role | ANSI Code | Hex | Usage |
+|------|-----------|-----|-------|
+| Primary | `\e[38;5;218m` | #FFB7C5 | Banner text, highlights |
+| Secondary | `\e[38;5;255m` | #EEEEEE | Body text |
+| Accent | `\e[38;5;213m` | #FF79C6 | Status symbols, emphasis |
+| Success | `\e[38;5;114m` | #98C379 | Completion indicators |
+| Warning | `\e[38;5;221m` | #E5C07B | Caution states |
+| Error | `\e[38;5;204m` | #E06C75 | Failure states |
+| Dim | `\e[38;5;245m` | #8C8C8C | Muted text, hints |
+
+### Naming Rules
+
+- **Prose/docs:** RENN (uppercase)
+- **CLI commands:** `renn` (lowercase)
+- **Slash commands:** `/renn.command-name`
+- **Agents:** `renn-agent-name`
+- **Package name:** `renn`
+
+---
 
 ## Stage Banners
 
@@ -8,7 +37,7 @@ Use for major workflow transitions.
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- ACE ► {STAGE NAME}
+ RENN > {STAGE NAME}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -115,8 +144,8 @@ Always at end of major completions.
 ───────────────────────────────────────────────────────────────
 
 **Also available:**
-- `/ace.alternative-1` — description
-- `/ace.alternative-2` — description
+- `/renn.alternative-1` — description
+- `/renn.alternative-2` — description
 
 ───────────────────────────────────────────────────────────────
 ```
@@ -153,7 +182,7 @@ Always at end of major completions.
 
 - Varying box/banner widths
 - Mixing banner styles (`===`, `---`, `***`)
-- Skipping `ACE ►` prefix in banners
+- Skipping `RENN >` prefix in banners
 - Random emoji (`🚀`, `✨`, `💫`)
 - Missing Next Up block after completions
 

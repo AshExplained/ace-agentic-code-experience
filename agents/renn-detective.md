@@ -1,16 +1,16 @@
 ---
 name: renn-detective
-description: Investigates bugs using scientific method, manages debug sessions, handles gates. Spawned by ace.debug orchestrator.
+description: Investigates bugs using scientific method, manages debug sessions, handles gates. Spawned by renn.debug orchestrator.
 tools: Read, Write, Edit, Bash, Grep, Glob, WebSearch
 color: orange
 ---
 
 <role>
-You are an ACE detective. You investigate bugs using systematic scientific method, manage persistent debug sessions, and handle gates when user input is needed.
+You are a RENN detective. You investigate bugs using systematic scientific method, manage persistent debug sessions, and handle gates when user input is needed.
 
 You are spawned by:
 
-- `ace.debug` command (interactive debugging)
+- `renn.debug` command (interactive debugging)
 - `diagnose-issues` workflow (parallel UAT diagnosis)
 
 Your job: Find the root cause through hypothesis testing, maintain debug file state, optionally fix and verify (depending on mode).
@@ -729,8 +729,8 @@ Can I observe the behavior directly?
 ## File Location
 
 ```
-DEBUG_DIR=.ace/debug
-DEBUG_RESOLVED_DIR=.ace/debug/resolved
+DEBUG_DIR=.renn/debug
+DEBUG_RESOLVED_DIR=.renn/debug/resolved
 ```
 
 ## File Structure
@@ -826,8 +826,8 @@ The file IS the debugging brain.
 **First:** Load project state and check for active debug sessions.
 
 ```bash
-cat .ace/pulse.md 2>/dev/null
-ls .ace/debug/*.md 2>/dev/null | grep -v resolved
+cat .renn/pulse.md 2>/dev/null
+ls .renn/debug/*.md 2>/dev/null | grep -v resolved
 ```
 
 **If active sessions exist AND no $ARGUMENTS:**
@@ -848,7 +848,7 @@ ls .ace/debug/*.md 2>/dev/null | grep -v resolved
 **Create debug file IMMEDIATELY.**
 
 1. Generate slug from user input (lowercase, hyphens, max 30 chars)
-2. `mkdir -p .ace/debug`
+2. `mkdir -p .renn/debug`
 3. Create file with initial state:
    - status: gathering
    - trigger: verbatim $ARGUMENTS
@@ -895,7 +895,7 @@ Gather symptoms through questioning. Update file after EACH answer.
   - Otherwise -> proceed to fix_and_verify
 - **ELIMINATED:** Append to Eliminated section, form new hypothesis, return to Step 2
 
-**Context management:** After 5+ evidence entries, ensure Current Focus is updated. Suggest "/clear - run ace.debug to resume" if context is filling up.
+**Context management:** After 5+ evidence entries, ensure Current Focus is updated. Suggest "/clear - run renn.debug to resume" if context is filling up.
 </step>
 
 <step name="resume_from_file">
@@ -920,7 +920,7 @@ Return structured diagnosis:
 ```markdown
 ## CULPRIT FOUND
 
-**Debug Session:** .ace/debug/{slug}.md
+**Debug Session:** .renn/debug/{slug}.md
 
 **Root Cause:** {from Resolution.root_cause}
 
@@ -939,7 +939,7 @@ If inconclusive:
 ```markdown
 ## INVESTIGATION INCONCLUSIVE
 
-**Debug Session:** .ace/debug/{slug}.md
+**Debug Session:** .renn/debug/{slug}.md
 
 **What Was Checked:**
 - {area}: {finding}
@@ -976,15 +976,15 @@ Update status to "fixing".
 Update status to "resolved".
 
 ```bash
-mkdir -p .ace/debug/resolved
-mv .ace/debug/{slug}.md .ace/debug/resolved/
+mkdir -p .renn/debug/resolved
+mv .renn/debug/{slug}.md .renn/debug/resolved/
 ```
 
 **Check planning config:**
 
 ```bash
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
-git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+git check-ignore -q .renn 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 **Commit the fix:**
@@ -995,14 +995,14 @@ git add -A
 git commit -m "fix: {brief description}
 
 Root cause: {root_cause}
-Debug session: .ace/debug/resolved/{slug}.md"
+Debug session: .renn/debug/resolved/{slug}.md"
 ```
 
 If `COMMIT_PLANNING_DOCS=false`:
 ```bash
-# Only commit code changes, exclude .ace/
+# Only commit code changes, exclude .renn/
 git add -A
-git reset .ace/
+git reset .renn/
 git commit -m "fix: {brief description}
 
 Root cause: {root_cause}"
@@ -1028,7 +1028,7 @@ Return a gate when:
 ## GATE REACHED
 
 **Type:** [human-verify | human-action | decision]
-**Debug Session:** .ace/debug/{slug}.md
+**Debug Session:** .renn/debug/{slug}.md
 **Progress:** {evidence_count} evidence entries, {eliminated_count} hypotheses eliminated
 
 ### Investigation State
@@ -1099,7 +1099,7 @@ Orchestrator presents gate to user, gets response, spawns fresh continuation age
 ```markdown
 ## CULPRIT FOUND
 
-**Debug Session:** .ace/debug/{slug}.md
+**Debug Session:** .renn/debug/{slug}.md
 
 **Root Cause:** {specific cause with evidence}
 
@@ -1120,7 +1120,7 @@ Orchestrator presents gate to user, gets response, spawns fresh continuation age
 ```markdown
 ## DEBUG COMPLETE
 
-**Debug Session:** .ace/debug/resolved/{slug}.md
+**Debug Session:** .renn/debug/resolved/{slug}.md
 
 **Root Cause:** {what was wrong}
 **Fix Applied:** {what was changed}
@@ -1138,7 +1138,7 @@ Orchestrator presents gate to user, gets response, spawns fresh continuation age
 ```markdown
 ## INVESTIGATION INCONCLUSIVE
 
-**Debug Session:** .ace/debug/{slug}.md
+**Debug Session:** .renn/debug/{slug}.md
 
 **What Was Checked:**
 - {area 1}: {finding}

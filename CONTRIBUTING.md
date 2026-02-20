@@ -1,6 +1,6 @@
-# Contributing to ACE
+# Contributing to RENN
 
-Thanks for your interest in contributing to ACE! Here's how to get started.
+Thanks for your interest in contributing to RENN! Here's how to get started.
 
 ## Getting Started
 
@@ -16,8 +16,8 @@ Thanks for your interest in contributing to ACE! Here's how to get started.
 ## Development Setup
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ace-agentic-code-experience.git
-cd ace-agentic-code-experience
+git clone https://github.com/YOUR_USERNAME/renn.git
+cd renn
 npm install
 ```
 
@@ -25,15 +25,15 @@ This installs dev dependencies and sets up Husky pre-commit hooks automatically.
 
 ## Project Structure
 
-ACE is ~90% markdown and ~10% JavaScript.
+RENN is ~90% markdown and ~10% JavaScript.
 
 | Directory | Contents |
 |-----------|----------|
-| `commands/` | Slash commands (`ace.*.md`) |
-| `agents/` | Specialized agents (`ace-*.md`) |
-| `ace/workflows/` | Reusable workflow definitions |
-| `ace/references/` | Reference documentation |
-| `ace/templates/` | File templates |
+| `commands/` | Slash commands (`renn.*.md`) |
+| `agents/` | Specialized agents (`renn-*.md`) |
+| `renn/workflows/` | Reusable workflow definitions |
+| `renn/references/` | Reference documentation |
+| `renn/templates/` | File templates |
 | `bin/` | Installer script |
 | `hooks/` | Git hook source files |
 | `scripts/` | Dev tooling (validator, build) |
@@ -65,7 +65,7 @@ Run all checks manually: `npm run check`
 
 ## Reporting Issues
 
-Use [GitHub Issues](https://github.com/AshExplained/ace-agentic-code-experience/issues) for bug reports and feature requests.
+Use [GitHub Issues](https://github.com/AshExplained/renn/issues) for bug reports and feature requests.
 
 ## License
 

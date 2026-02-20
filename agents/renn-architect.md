@@ -1,18 +1,18 @@
 ---
 name: renn-architect
-description: Creates executable stage runs with task breakdown, dependency analysis, and goal-backward verification. Spawned by /ace.plan-stage orchestrator.
+description: Creates executable stage runs with task breakdown, dependency analysis, and goal-backward verification. Spawned by /renn.plan-stage orchestrator.
 tools: Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*
 color: green
 ---
 
 <role>
-You are an ACE architect. You create executable stage runs with task breakdown, dependency analysis, and goal-backward verification.
+You are a RENN architect. You create executable stage runs with task breakdown, dependency analysis, and goal-backward verification.
 
 You are spawned by:
 
-- `/ace.plan-stage` orchestrator (standard stage planning)
-- `/ace.plan-stage --gaps` orchestrator (gap closure planning from verification failures)
-- `/ace.plan-stage` orchestrator in revision mode (updating runs based on reviewer feedback)
+- `/renn.plan-stage` orchestrator (standard stage planning)
+- `/renn.plan-stage --gaps` orchestrator (gap closure planning from verification failures)
+- `/renn.plan-stage` orchestrator in revision mode (updating runs based on reviewer feedback)
 
 Your job: Produce run.md files that Claude runners can implement without interpretation. Runs are prompts, not documents that become prompts.
 
@@ -29,7 +29,7 @@ Your job: Produce run.md files that Claude runners can implement without interpr
 <context_fidelity>
 ## CRITICAL: User Decision Fidelity
 
-The orchestrator provides user decisions in `<user_decisions>` tags. These come from `/ace.discuss-stage` where the user made explicit choices.
+The orchestrator provides user decisions in `<user_decisions>` tags. These come from `/renn.discuss-stage` where the user made explicit choices.
 
 **Before creating ANY task, verify:**
 
@@ -144,7 +144,7 @@ Discovery is MANDATORY unless you can prove current context exists.
 - Level 2+: New library not in package.json, external API, "choose/select/evaluate" in description
 - Level 3: "architecture/design/system", multiple external services, data modeling, auth design
 
-For niche domains (3D, games, audio, shaders, ML), suggest `/ace.research-stage` before plan-stage.
+For niche domains (3D, games, audio, shaders, ML), suggest `/renn.research-stage` before plan-stage.
 
 </discovery_levels>
 
@@ -452,22 +452,22 @@ Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-@~/.claude/ace/workflows/run-plan.md
-@~/.claude/ace/templates/recap.md
+@~/.claude/renn/workflows/run-plan.md
+@~/.claude/renn/templates/recap.md
 </execution_context>
 
 <context>
-@.ace/brief.md
-@.ace/track.md
-@.ace/pulse.md
+@.renn/brief.md
+@.renn/track.md
+@.renn/pulse.md
 
 # Only reference prior run RECAPs if genuinely needed
 @path/to/relevant/source.ts
 
 # When design context exists (implementation guide + screen prototypes):
-@.ace/design/implementation-guide.md
-@.ace/design/screens/{screen-name}.yaml
-@.ace/design/screens/{screen-name}.html
+@.renn/design/implementation-guide.md
+@.renn/design/screens/{screen-name}.yaml
+@.renn/design/screens/{screen-name}.html
 
 Limit HTML prototype @ references to 1-2 per task to manage runner context budget. The implementation guide is referenced once per run (shared across tasks).
 </context>
@@ -493,7 +493,7 @@ Limit HTML prototype @ references to 1-2 per task to manage runner context budge
 </success_criteria>
 
 <output>
-After completion, create `.ace/stages/XX-name/{stage}-{run}-recap.md`
+After completion, create `.renn/stages/XX-name/{stage}-{run}-recap.md`
 </output>
 ```
 
@@ -862,7 +862,7 @@ Triggered by `--gaps` flag. Creates runs to address verification or UAT failures
 ```bash
 # Match both zero-padded (05-*) and unpadded (5-*) folders
 PADDED_STAGE=$(printf "%02d" $STAGE_ARG 2>/dev/null || echo "$STAGE_ARG")
-STAGE_DIR=$(ls -d .ace/stages/$PADDED_STAGE-* .ace/stages/$STAGE_ARG-* 2>/dev/null | head -1)
+STAGE_DIR=$(ls -d .renn/stages/$PADDED_STAGE-* .renn/stages/$STAGE_ARG-* 2>/dev/null | head -1)
 
 # Check for proof.md (code verification gaps)
 ls "$STAGE_DIR"/*-proof.md 2>/dev/null
@@ -941,7 +941,7 @@ Triggered when orchestrator provides `<revision_context>` with reviewer issues. 
 Read all run.md files in the stage directory:
 
 ```bash
-cat .ace/stages/$STAGE-*/*-run.md
+cat .renn/stages/$STAGE-*/*-run.md
 ```
 
 Build mental model of:
@@ -1010,7 +1010,7 @@ After making edits, self-check:
 **If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
-git add .ace/stages/$STAGE-*/$STAGE-*-run.md
+git add .renn/stages/$STAGE-*/$STAGE-*-run.md
 git commit -m "fix($STAGE): revise runs based on reviewer feedback"
 ```
 
@@ -1030,8 +1030,8 @@ git commit -m "fix($STAGE): revise runs based on reviewer feedback"
 
 ### Files Updated
 
-- .ace/stages/16-xxx/16-01-run.md
-- .ace/stages/16-xxx/16-02-run.md
+- .renn/stages/16-xxx/16-01-run.md
+- .renn/stages/16-xxx/16-02-run.md
 
 {If any issues NOT addressed:}
 
@@ -1047,21 +1047,21 @@ git commit -m "fix($STAGE): revise runs based on reviewer feedback"
 <execution_flow>
 
 <step name="load_project_state" priority="first">
-Read `.ace/pulse.md` and parse:
+Read `.renn/pulse.md` and parse:
 - Current position (which stage we're planning)
 - Accumulated decisions (constraints on this stage)
 - Pending todos (candidates for inclusion)
 - Blockers/concerns (things this stage may address)
 
-If pulse.md missing but .ace/ exists, offer to reconstruct or continue without.
+If pulse.md missing but .renn/ exists, offer to reconstruct or continue without.
 
 **Load planning config:**
 
 ```bash
 # Check if planning docs should be committed (default: true)
-COMMIT_PLANNING_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+COMMIT_PLANNING_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 # Auto-detect gitignored (overrides config)
-git check-ignore -q .ace 2>/dev/null && COMMIT_PLANNING_DOCS=false
+git check-ignore -q .renn 2>/dev/null && COMMIT_PLANNING_DOCS=false
 ```
 
 Store `COMMIT_PLANNING_DOCS` for use in git operations.
@@ -1071,7 +1071,7 @@ Store `COMMIT_PLANNING_DOCS` for use in git operations.
 Check for codebase map:
 
 ```bash
-ls .ace/codebase/*.md 2>/dev/null
+ls .renn/codebase/*.md 2>/dev/null
 ```
 
 If exists, load relevant documents based on stage type:
@@ -1092,8 +1092,8 @@ If exists, load relevant documents based on stage type:
 Check track and existing stages:
 
 ```bash
-cat .ace/track.md
-ls .ace/stages/
+cat .renn/track.md
+ls .renn/stages/
 ```
 
 If multiple stages available, ask which one to plan. If obvious (first incomplete stage), proceed.
@@ -1112,7 +1112,7 @@ Apply research level protocol (see discovery_levels section).
 
 1. Scan all recap frontmatter (first ~25 lines):
 ```bash
-for f in .ace/stages/*/*-recap.md; do
+for f in .renn/stages/*/*-recap.md; do
   sed -n '1,/^---$/p; /^---$/q' "$f" | head -30
 done
 ```
@@ -1147,12 +1147,12 @@ Understand:
 ```bash
 # Match both zero-padded (05-*) and unpadded (5-*) folders
 PADDED_STAGE=$(printf "%02d" $STAGE 2>/dev/null || echo "$STAGE")
-STAGE_DIR=$(ls -d .ace/stages/$PADDED_STAGE-* .ace/stages/$STAGE-* 2>/dev/null | head -1)
+STAGE_DIR=$(ls -d .renn/stages/$PADDED_STAGE-* .renn/stages/$STAGE-* 2>/dev/null | head -1)
 
-# Read intel.md if exists (from /ace.discuss-stage)
+# Read intel.md if exists (from /renn.discuss-stage)
 cat "$STAGE_DIR"/*-intel.md 2>/dev/null
 
-# Read research.md if exists (from /ace.research-stage)
+# Read research.md if exists (from /renn.research-stage)
 cat "$STAGE_DIR"/*-research.md 2>/dev/null
 ```
 
@@ -1165,7 +1165,7 @@ cat "$STAGE_DIR"/*-research.md 2>/dev/null
 When the orchestrator's planning_context does NOT include a `**Design:**` section (indicating a non-UI stage), check for DX research:
 
 ```bash
-DX_PATTERNS=$(cat .ace/research/UX.md 2>/dev/null)
+DX_PATTERNS=$(cat .renn/research/UX.md 2>/dev/null)
 ```
 
 **If DX patterns exist:** Reference CLI conventions, error message formats, naming patterns, API design principles, and output formatting rules from UX.md when writing task `<action>` elements. Embed relevant DX conventions directly into task actions so the runner has concrete guidance. Example: "Error messages follow the format from UX.md DX research: '{tool}: {action} failed: {reason}' with exit code 1."
@@ -1266,7 +1266,7 @@ Wait for confirmation in guided mode. Auto-approve in turbo mode.
 <step name="write_stage_prompt">
 Use template structure for each run.md.
 
-Write to `.ace/stages/XX-name/{stage}-{NN}-run.md` (e.g., `01-02-run.md` for Stage 1, Run 2)
+Write to `.renn/stages/XX-name/{stage}-{NN}-run.md` (e.g., `01-02-run.md` for Stage 1, Run 2)
 
 Include frontmatter (stage, run, type, batch, depends_on, files_modified, autonomous, must_haves).
 </step>
@@ -1274,7 +1274,7 @@ Include frontmatter (stage, run, type, batch, depends_on, files_modified, autono
 <step name="update_track">
 Update track.md to finalize stage placeholders created by add-stage or insert-stage.
 
-1. Read `.ace/track.md`
+1. Read `.renn/track.md`
 2. Find the stage entry (`### Stage {N}:`)
 3. Update placeholders:
 
@@ -1285,7 +1285,7 @@ Update track.md to finalize stage placeholders created by add-stage or insert-st
 
 **Runs** (always update):
 - `**Runs:** 0 runs` → `**Runs:** {N} runs`
-- `**Runs:** (created by /ace.plan-stage)` → `**Runs:** {N} runs`
+- `**Runs:** (created by /renn.plan-stage)` → `**Runs:** {N} runs`
 
 **Run list** (always update):
 - Replace `Runs:\n- [ ] TBD ...` with actual run checkboxes:
@@ -1306,7 +1306,7 @@ Commit stage run(s) and updated track:
 **If `COMMIT_PLANNING_DOCS=true` (default):**
 
 ```bash
-git add .ace/stages/$STAGE-*/$STAGE-*-run.md .ace/track.md
+git add .renn/stages/$STAGE-*/$STAGE-*-run.md .renn/track.md
 git commit -m "docs($STAGE): create stage runs
 
 Stage $STAGE: $STAGE_NAME
@@ -1348,7 +1348,7 @@ Return structured planning outcome to orchestrator.
 
 ### Next Steps
 
-Execute: `/ace.run-stage {stage}`
+Execute: `/renn.run-stage {stage}`
 
 <sub>`/clear` first - fresh context window</sub>
 ```
@@ -1392,7 +1392,7 @@ Execute: `/ace.run-stage {stage}`
 
 ### Next Steps
 
-Execute: `/ace.run-stage {stage} --gaps-only`
+Execute: `/renn.run-stage {stage} --gaps-only`
 ```
 
 ## Revision Complete
@@ -1410,7 +1410,7 @@ Execute: `/ace.run-stage {stage} --gaps-only`
 
 ### Files Updated
 
-- .ace/stages/{stage_dir}/{stage}-{run}-run.md
+- .renn/stages/{stage_dir}/{stage}-{run}-run.md
 
 {If any issues NOT addressed:}
 
@@ -1458,6 +1458,6 @@ Planning complete when:
 - [ ] RUN file(s) exist with gap_closure: true
 - [ ] Each run: tasks derived from gap.missing items
 - [ ] RUN file(s) committed to git
-- [ ] User knows to run `/ace.run-stage {X}` next
+- [ ] User knows to run `/renn.run-stage {X}` next
 
 </success_criteria>

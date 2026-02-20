@@ -2,11 +2,11 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in ACE, please report it responsibly.
+If you discover a security vulnerability in RENN, please report it responsibly.
 
 **Do not open a public GitHub issue for security vulnerabilities.**
 
-Instead, use [GitHub's private vulnerability reporting](https://github.com/AshExplained/ace-agentic-code-experience/security/advisories/new).
+Instead, use [GitHub's private vulnerability reporting](https://github.com/AshExplained/renn/security/advisories/new).
 
 ### What to include
 
@@ -29,7 +29,7 @@ Instead, use [GitHub's private vulnerability reporting](https://github.com/AshEx
 
 ## Security Measures
 
-ACE includes:
+RENN includes:
 - **Gitleaks** pre-commit hook to prevent accidental secret commits
 - **npm `files` field + `.npmignore`** to prevent publishing sensitive files
 - **Dependency auditing** via `npm audit` and Dependabot (once CI is live)

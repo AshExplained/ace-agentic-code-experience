@@ -57,7 +57,7 @@ For each stage, extract what it provides and what it should consume.
 
 ```bash
 # Key exports from each stage
-for recap in .ace/stages/*/*-recap.md; do
+for recap in .renn/stages/*/*-recap.md; do
   echo "=== $recap ==="
   grep -A 10 "Key Files\|Exports\|Provides" "$recap" 2>/dev/null
 done
@@ -203,7 +203,7 @@ check_auth_protection() {
 
 Milestone-scope security checks that per-run audits miss. These verify cross-cutting security properties across the entire codebase, using bash commands and pattern matching (not LLM-based code reasoning -- that is the auditor's Step 7.6).
 
-@~/.claude/ace/references/security-checklist.md
+@~/.claude/renn/references/security-checklist.md
 
 ### 4.5.1 Auth Route Completeness (INTG-02)
 
