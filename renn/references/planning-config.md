@@ -1,6 +1,6 @@
 <planning_config>
 
-Configuration options for `.ace/` directory behavior.
+Configuration options for `.renn/` directory behavior.
 
 <config_schema>
 ```json
@@ -32,27 +32,27 @@ Configuration options for `.ace/` directory behavior.
 - Full history of planning decisions preserved
 
 **When `commit_docs: false`:**
-- Skip all `git add`/`git commit` for `.ace/` files
-- User must add `.ace/` to `.gitignore`
+- Skip all `git add`/`git commit` for `.renn/` files
+- User must add `.renn/` to `.gitignore`
 - Useful for: OSS contributions, client projects, keeping planning private
 
 **Checking the config:**
 
 ```bash
 # Check config.json first
-COMMIT_DOCS=$(cat .ace/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
+COMMIT_DOCS=$(cat .renn/config.json 2>/dev/null | grep -o '"commit_docs"[[:space:]]*:[[:space:]]*[^,}]*' | grep -o 'true\|false' || echo "true")
 
 # Auto-detect gitignored (overrides config)
 git check-ignore -q .ace 2>/dev/null && COMMIT_DOCS=false
 ```
 
-**Auto-detection:** If `.ace/` is gitignored, `commit_docs` is automatically `false` regardless of config.json. This prevents git errors when users have `.ace/` in `.gitignore`.
+**Auto-detection:** If `.renn/` is gitignored, `commit_docs` is automatically `false` regardless of config.json. This prevents git errors when users have `.renn/` in `.gitignore`.
 
 **Conditional git operations:**
 
 ```bash
 if [ "$COMMIT_DOCS" = "true" ]; then
-  git add .ace/pulse.md
+  git add .renn/pulse.md
   git commit -m "docs: update state"
 fi
 ```
@@ -63,14 +63,14 @@ fi
 
 **When `search_gitignored: false` (default):**
 - Standard rg behavior (respects .gitignore)
-- Direct path searches work: `rg "pattern" .ace/` finds files
-- Broad searches skip gitignored: `rg "pattern"` skips `.ace/`
+- Direct path searches work: `rg "pattern" .renn/` finds files
+- Broad searches skip gitignored: `rg "pattern"` skips `.renn/`
 
 **When `search_gitignored: true`:**
-- Add `--no-ignore` to broad rg searches that should include `.ace/`
-- Only needed when searching entire repo and expecting `.ace/` matches
+- Add `--no-ignore` to broad rg searches that should include `.renn/`
+- Only needed when searching entire repo and expecting `.renn/` matches
 
-**Note:** Most ACE operations use direct file reads or explicit paths, which work regardless of gitignore status.
+**Note:** Most RENN operations use direct file reads or explicit paths, which work regardless of gitignore status.
 
 </search_behavior>
 
@@ -88,12 +88,12 @@ To use uncommitted mode:
 
 2. **Add to .gitignore:**
    ```
-   .ace/
+   .renn/
    ```
 
-3. **Existing tracked files:** If `.ace/` is currently tracked by git:
+3. **Existing tracked files:** If `.renn/` is currently tracked by git:
    ```bash
-   git rm -r --cached .ace/
+   git rm -r --cached .renn/
    git commit -m "chore: stop tracking planning docs"
    ```
 
@@ -111,7 +111,7 @@ To use uncommitted mode:
 
 **When `git.branching_strategy: "none"` (default):**
 - All work commits to current branch
-- Standard ACE behavior
+- Standard RENN behavior
 
 **When `git.branching_strategy: "stage"`:**
 - `ace.run-stage` creates/switches to a branch before execution
@@ -138,13 +138,13 @@ To use uncommitted mode:
 
 ```bash
 # Get branching strategy (default: none)
-BRANCHING_STRATEGY=$(cat .ace/config.json 2>/dev/null | grep -o '"branching_strategy"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "none")
+BRANCHING_STRATEGY=$(cat .renn/config.json 2>/dev/null | grep -o '"branching_strategy"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "none")
 
 # Get stage branch template
-STAGE_BRANCH_TEMPLATE=$(cat .ace/config.json 2>/dev/null | grep -o '"stage_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "ace/stage-{stage}-{slug}")
+STAGE_BRANCH_TEMPLATE=$(cat .renn/config.json 2>/dev/null | grep -o '"stage_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "ace/stage-{stage}-{slug}")
 
 # Get milestone branch template
-MILESTONE_BRANCH_TEMPLATE=$(cat .ace/config.json 2>/dev/null | grep -o '"milestone_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "ace/{milestone}-{slug}")
+MILESTONE_BRANCH_TEMPLATE=$(cat .renn/config.json 2>/dev/null | grep -o '"milestone_branch_template"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*:.*"\([^"]*\)"/\1/' || echo "ace/{milestone}-{slug}")
 ```
 
 **Branch creation:**

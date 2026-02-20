@@ -1,7 +1,7 @@
 # Architect Subagent Prompt Template
 
 <purpose>
-Template for spawning ace-architect agent. The agent contains all planning expertise — this template provides planning context only.
+Template for spawning renn-architect agent. The agent contains all planning expertise — this template provides planning context only.
 </purpose>
 
 ---
@@ -15,28 +15,28 @@ Template for spawning ace-architect agent. The agent contains all planning exper
 **Mode:** {standard | gap_closure}
 
 **Project State:**
-@.ace/pulse.md
+@.renn/pulse.md
 
 **Track:**
-@.ace/track.md
+@.renn/track.md
 
 **Specs (if exists):**
-@.ace/specs.md
+@.renn/specs.md
 
 **Stage Context (if exists):**
-@.ace/stages/{stage_dir}/{stage}-intel.md
+@.renn/stages/{stage_dir}/{stage}-intel.md
 
 **Research (if exists):**
-@.ace/stages/{stage_dir}/{stage}-research.md
+@.renn/stages/{stage_dir}/{stage}-research.md
 
 **Gap Closure (if --gaps mode):**
-@.ace/stages/{stage_dir}/{stage}-proof.md
-@.ace/stages/{stage_dir}/{stage}-uat.md
+@.renn/stages/{stage_dir}/{stage}-proof.md
+@.renn/stages/{stage_dir}/{stage}-uat.md
 
 </planning_context>
 
 <downstream_consumer>
-Output consumed by /ace.run-stage
+Output consumed by /renn.run-stage
 Runs must be executable prompts with:
 - Frontmatter (batch, depends_on, files_modified, autonomous)
 - Tasks in XML format
@@ -70,20 +70,20 @@ Before returning PLANNING COMPLETE:
 
 ## Usage
 
-**From /ace.plan-stage (standard mode):**
+**From /renn.plan-stage (standard mode):**
 ```python
 Task(
   prompt=filled_template,
-  subagent_type="ace-architect",
+  subagent_type="renn-architect",
   description="Plan Stage {stage}"
 )
 ```
 
-**From /ace.plan-stage --gaps (gap closure mode):**
+**From /renn.plan-stage --gaps (gap closure mode):**
 ```python
 Task(
   prompt=filled_template,  # with mode: gap_closure
-  subagent_type="ace-architect",
+  subagent_type="renn-architect",
   description="Plan gaps for Stage {stage}"
 )
 ```
@@ -100,8 +100,8 @@ Continue planning for Stage {stage_number}: {stage_name}
 </objective>
 
 <prior_state>
-Stage directory: @.ace/stages/{stage_dir}/
-Existing runs: @.ace/stages/{stage_dir}/*-run.md
+Stage directory: @.renn/stages/{stage_dir}/
+Existing runs: @.renn/stages/{stage_dir}/*-run.md
 </prior_state>
 
 <checkpoint_response>
@@ -116,4 +116,4 @@ Continue: {standard | gap_closure}
 
 ---
 
-**Note:** Planning methodology, task breakdown, dependency analysis, batch assignment, TDD detection, and goal-backward derivation are baked into the ace-architect agent. This template only passes context.
+**Note:** Planning methodology, task breakdown, dependency analysis, batch assignment, TDD detection, and goal-backward derivation are baked into the renn-architect agent. This template only passes context.

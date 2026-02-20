@@ -1,6 +1,6 @@
 # Structure Template
 
-Template for `.ace/codebase/STRUCTURE.md` - captures physical file organization.
+Template for `.renn/codebase/STRUCTURE.md` - captures physical file organization.
 
 **Purpose:** Document where things physically live in the codebase. Answers "where do I put X?"
 
@@ -123,10 +123,10 @@ Template for `.ace/codebase/STRUCTURE.md` - captures physical file organization.
 ## Directory Layout
 
 ```
-ace/
+renn/
 ├── bin/                # Executable entry points
-├── commands/           # Slash command definitions (ace.*.md)
-├── ace/               # Skill resources
+├── commands/           # Slash command definitions (renn.*.md)
+├── renn/               # Skill resources
 │   ├── references/    # Principle documents
 │   ├── templates/     # File templates
 │   └── workflows/     # Multi-step procedures
@@ -147,23 +147,23 @@ ace/
 
 **commands/**
 - Purpose: Slash command definitions for Claude Code
-- Contains: ace.*.md files (one per command)
-- Key files: ace.start.md, ace.plan-stage.md, ace.run-stage.md
+- Contains: renn.*.md files (one per command)
+- Key files: renn.start.md, renn.plan-stage.md, renn.run-stage.md
 - Subdirectories: None (flat structure)
 
-**ace/references/**
+**renn/references/**
 - Purpose: Core philosophy and guidance documents
 - Contains: gates.md, questioning.md, tdd.md
 - Key files: gates.md - gate system definitions
 - Subdirectories: None
 
-**ace/templates/**
-- Purpose: Document templates for .ace/ files
+**renn/templates/**
+- Purpose: Document templates for .renn/ files
 - Contains: Template definitions with frontmatter
 - Key files: brief.md, pulse.md, track.md, recap.md
 - Subdirectories: codebase/ (stack/architecture/structure), research/ (research templates)
 
-**ace/workflows/**
+**renn/workflows/**
 - Purpose: Reusable multi-step procedures
 - Contains: Workflow definitions called by commands
 - Key files: run-stage.md, run-plan.md, audit-work.md
@@ -171,8 +171,8 @@ ace/
 
 **agents/**
 - Purpose: Agent definitions spawned via Task tool
-- Contains: ace-*.md files (one per agent)
-- Key files: ace-runner.md, ace-architect.md, ace-detective.md
+- Contains: renn-*.md files (one per agent)
+- Key files: renn-runner.md, renn-architect.md, renn-detective.md
 - Subdirectories: None
 
 ## Key File Locations
@@ -207,29 +207,29 @@ ace/
 
 **Special Patterns:**
 - {command-name}.md: Slash command definition
-- ace-{name}.md: Agent definition
+- renn-{name}.md: Agent definition
 
 ## Where to Add New Code
 
 **New Slash Command:**
-- Primary code: `commands/ace.{command-name}.md`
+- Primary code: `commands/renn.{command-name}.md`
 - Tests: `tests/commands/{command-name}.test.js` (if testing implemented)
 - Documentation: Update `README.md` with new command
 
 **New Template:**
-- Implementation: `ace/templates/{name}.md`
+- Implementation: `renn/templates/{name}.md`
 - Documentation: Template is self-documenting (includes guidelines)
 
 **New Workflow:**
-- Implementation: `ace/workflows/{name}.md`
-- Usage: Reference from command with `@~/.claude/ace/workflows/{name}.md`
+- Implementation: `renn/workflows/{name}.md`
+- Usage: Reference from command with `@~/.claude/renn/workflows/{name}.md`
 
 **New Reference Document:**
-- Implementation: `ace/references/{name}.md`
+- Implementation: `renn/references/{name}.md`
 - Usage: Reference from commands/workflows as needed
 
 **New Agent:**
-- Implementation: `agents/ace-{name}.md`
+- Implementation: `agents/renn-{name}.md`
 - Usage: Spawned via Task tool from workflows/commands
 
 **Utilities:**
@@ -238,7 +238,7 @@ ace/
 
 ## Special Directories
 
-**ace/**
+**renn/**
 - Purpose: Resources installed to ~/.claude/
 - Source: Copied by bin/install.js during installation
 - Committed: Yes (source of truth)

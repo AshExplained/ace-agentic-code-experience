@@ -1,6 +1,6 @@
 # Milestone Entry Template
 
-Add this entry to `.ace/milestones.md` when completing a milestone:
+Add this entry to `.renn/milestones.md` when completing a milestone:
 
 ## File Template
 

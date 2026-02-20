@@ -1,6 +1,6 @@
 # Continue-Here Template
 
-Copy and fill this structure for `.ace/stages/XX-name/.continue-here.md`:
+Copy and fill this structure for `.renn/stages/XX-name/.continue-here.md`:
 
 ## File Template
 

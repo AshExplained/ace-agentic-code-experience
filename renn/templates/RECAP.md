@@ -1,6 +1,6 @@
 # Recap Template
 
-Template for `.ace/stages/XX-name/{stage}-{run}-recap.md` - stage completion documentation.
+Template for `.renn/stages/XX-name/{stage}-{run}-recap.md` - stage completion documentation.
 
 ---
 

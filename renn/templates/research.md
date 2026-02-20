@@ -1,6 +1,6 @@
 # Research Template
 
-Template for `.ace/stages/XX-name/{stage}-research.md` - comprehensive ecosystem research before planning.
+Template for `.renn/stages/XX-name/{stage}-research.md` - comprehensive ecosystem research before planning.
 
 **Purpose:** Document what Claude needs to know to implement a stage well - not just "which library" but "how do experts build this."
 
@@ -18,7 +18,7 @@ Template for `.ace/stages/XX-name/{stage}-research.md` - comprehensive ecosystem
 <user_constraints>
 ## User Constraints (from intel.md)
 
-**CRITICAL:** If intel.md exists from /ace.discuss-stage, copy locked decisions here verbatim. These MUST be honored by the architect.
+**CRITICAL:** If intel.md exists from /renn.discuss-stage, copy locked decisions here verbatim. These MUST be honored by the architect.
 
 ### Locked Decisions
 [Copy from intel.md `## Decisions` section - these are NON-NEGOTIABLE]
@@ -556,7 +556,7 @@ function useVehicleControls(rigidBodyRef) {
 - When "how do experts do this" matters more than "which library"
 
 **Structure:**
-- Use XML tags for section markers (matches ACE templates)
+- Use XML tags for section markers (matches RENN templates)
 - Seven core sections: summary, standard_stack, architecture_patterns, dont_hand_roll, common_pitfalls, code_examples, sources. Optional eighth section: stage_ux_patterns / Stage UX Patterns (conditional on UX.md availability)
 - All core sections required (drives comprehensive research)
 
@@ -575,7 +575,7 @@ function useVehicleControls(rigidBodyRef) {
 - Code examples can be referenced in task actions
 
 **After creation:**
-- File lives in stage directory: `.ace/stages/XX-name/{stage}-research.md`
+- File lives in stage directory: `.renn/stages/XX-name/{stage}-research.md`
 - Referenced during planning workflow
 - plan-stage loads it automatically when present
 

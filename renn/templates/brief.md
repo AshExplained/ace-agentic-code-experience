@@ -1,6 +1,6 @@
 # brief.md Template
 
-Template for `.ace/brief.md` — the living project context document.
+Template for `.renn/brief.md` — the living project context document.
 
 ## File Template
 
@@ -153,7 +153,7 @@ brief.md evolves throughout the project lifecycle.
 
 For existing codebases:
 
-1. **Map codebase first** via `/ace.map-codebase`
+1. **Map codebase first** via `/renn.map-codebase`
 
 2. **Infer Validated requirements** from existing code:
    - What does the codebase actually do?
@@ -179,7 +179,7 @@ pulse.md references brief.md:
 ```markdown
 ## Project Reference
 
-See: .ace/brief.md (updated [date])
+See: .renn/brief.md (updated [date])
 
 **Core value:** [One-liner from Core Value section]
 **Current focus:** [Current stage name]

@@ -1,6 +1,6 @@
 # Codebase Concerns Template
 
-Template for `.ace/codebase/CONCERNS.md` - captures known issues and areas requiring care.
+Template for `.renn/codebase/CONCERNS.md` - captures known issues and areas requiring care.
 
 **Purpose:** Surface actionable warnings about the codebase. Focused on "what to watch out for when making changes."
 

@@ -1,6 +1,6 @@
 # Proof Report Template
 
-Template for `.ace/stages/XX-name/{stage}-proof.md` — stage goal verification results.
+Template for `.renn/stages/XX-name/{stage}-proof.md` — stage goal verification results.
 
 ---
 

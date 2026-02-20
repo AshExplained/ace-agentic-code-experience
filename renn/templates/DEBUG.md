@@ -1,6 +1,6 @@
 # Debug Template
 
-Template for `.ace/debug/[slug].md` — active debug session tracking.
+Template for `.renn/debug/[slug].md` — active debug session tracking.
 
 ---
 
@@ -129,7 +129,7 @@ files_changed: []
 
 **On resolution:**
 - status → "resolved"
-- Move file to .ace/debug/resolved/
+- Move file to .renn/debug/resolved/
 
 </lifecycle>
 

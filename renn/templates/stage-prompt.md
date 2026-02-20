@@ -1,9 +1,9 @@
 # Stage Prompt Template
 
-> **Note:** Planning methodology is in `agents/ace-architect.md`.
+> **Note:** Planning methodology is in `agents/renn-architect.md`.
 > This template defines the run.md output format that the agent produces.
 
-Template for `.ace/stages/XX-name/{stage}-{run}-run.md` - executable stage runs optimized for parallel execution.
+Template for `.renn/stages/XX-name/{stage}-{run}-run.md` - executable stage runs optimized for parallel execution.
 
 **Naming:** Use `{stage}-{run}-run.md` format (e.g., `01-02-run.md` for Stage 1, Run 2)
 
@@ -37,16 +37,16 @@ Output: [What artifacts will be created]
 </objective>
 
 <execution_context>
-@~/.claude/ace/workflows/run-plan.md
-@~/.claude/ace/templates/recap.md
+@~/.claude/renn/workflows/run-plan.md
+@~/.claude/renn/templates/recap.md
 [If run contains gate tasks (type="checkpoint:*"), add:]
-@~/.claude/ace/references/gates.md
+@~/.claude/renn/references/gates.md
 </execution_context>
 
 <context>
-@.ace/brief.md
-@.ace/track.md
-@.ace/pulse.md
+@.renn/brief.md
+@.renn/track.md
+@.renn/pulse.md
 
 # Only reference prior run RECAPs if genuinely needed:
 # - This run uses types/exports from prior run
@@ -75,7 +75,7 @@ Output: [What artifacts will be created]
   <done>[Acceptance criteria]</done>
 </task>
 
-<!-- For gate task examples and patterns, see @~/.claude/ace/references/gates.md -->
+<!-- For gate task examples and patterns, see @~/.claude/renn/references/gates.md -->
 <!-- Key rule: Claude starts dev server BEFORE human-verify gates. User only visits URLs. -->
 
 <task type="checkpoint:decision" gate="blocking">
@@ -112,7 +112,7 @@ Before declaring run complete:
   </success_criteria>
 
 <output>
-After completion, create `.ace/stages/XX-name/{stage}-{run}-recap.md`
+After completion, create `.renn/stages/XX-name/{stage}-{run}-recap.md`
 </output>
 ```
 
@@ -132,7 +132,7 @@ After completion, create `.ace/stages/XX-name/{stage}-{run}-recap.md`
 | `user_setup` | No | Array of human-required setup items (external services) |
 | `must_haves` | Yes | Goal-backward verification criteria (see below) |
 
-**Batch is pre-computed:** Batch numbers are assigned during `/ace.plan-stage`. Run-stage reads `batch` directly from frontmatter and groups runs by batch number. No runtime dependency analysis needed.
+**Batch is pre-computed:** Batch numbers are assigned during `/renn.plan-stage`. Run-stage reads `batch` directly from frontmatter and groups runs by batch number. No runtime dependency analysis needed.
 
 **Must-haves enable verification:** The `must_haves` field carries goal-backward requirements from planning to execution. After all runs complete, run-stage spawns a verification subagent that checks these criteria against the actual codebase.
 
@@ -206,9 +206,9 @@ Batch 3 runs after Batches 1 and 2. Pauses at gate, orchestrator presents to use
 
 ```markdown
 <context>
-@.ace/brief.md
-@.ace/track.md
-@.ace/pulse.md
+@.renn/brief.md
+@.renn/track.md
+@.renn/pulse.md
 
 # Only include RECAP refs if genuinely needed:
 # - This run imports types from prior run
@@ -225,8 +225,8 @@ Batch 3 runs after Batches 1 and 2. Pauses at gate, orchestrator presents to use
 **Bad pattern (creates false dependencies):**
 ```markdown
 <context>
-@.ace/stages/03-features/03-01-recap.md  # Just because it's earlier
-@.ace/stages/03-features/03-02-recap.md  # Reflexive chaining
+@.renn/stages/03-features/03-01-recap.md  # Just because it's earlier
+@.renn/stages/03-features/03-02-recap.md  # Reflexive chaining
 </context>
 ```
 
@@ -268,7 +268,7 @@ TDD features get dedicated runs with `type: tdd`.
 → Yes: Create a TDD run
 → No: Standard task in standard run
 
-See `~/.claude/ace/references/tdd.md` for TDD run structure.
+See `~/.claude/renn/references/tdd.md` for TDD run structure.
 
 ---
 
@@ -313,9 +313,9 @@ Output: User model, API endpoints, and UI components.
 </objective>
 
 <context>
-@.ace/brief.md
-@.ace/track.md
-@.ace/pulse.md
+@.renn/brief.md
+@.renn/track.md
+@.renn/pulse.md
 </context>
 
 <tasks>
@@ -347,7 +347,7 @@ Output: User model, API endpoints, and UI components.
 </success_criteria>
 
 <output>
-After completion, create `.ace/stages/03-features/03-01-recap.md`
+After completion, create `.renn/stages/03-features/03-01-recap.md`
 </output>
 ```
 
@@ -372,16 +372,16 @@ Output: Working dashboard component.
 </objective>
 
 <execution_context>
-@~/.claude/ace/workflows/run-plan.md
-@~/.claude/ace/templates/recap.md
-@~/.claude/ace/references/gates.md
+@~/.claude/renn/workflows/run-plan.md
+@~/.claude/renn/templates/recap.md
+@~/.claude/renn/references/gates.md
 </execution_context>
 
 <context>
-@.ace/brief.md
-@.ace/track.md
-@.ace/stages/03-features/03-01-recap.md
-@.ace/stages/03-features/03-02-recap.md
+@.renn/brief.md
+@.renn/track.md
+@.renn/stages/03-features/03-01-recap.md
+@.renn/stages/03-features/03-02-recap.md
 </context>
 
 <tasks>
@@ -418,7 +418,7 @@ Output: Working dashboard component.
 </success_criteria>
 
 <output>
-After completion, create `.ace/stages/03-features/03-03-recap.md`
+After completion, create `.renn/stages/03-features/03-03-recap.md`
 </output>
 ```
 
@@ -501,7 +501,7 @@ user_setup:
 
 **Result:** Run-stage generates `{stage}-USER-SETUP.md` with checklist for the user.
 
-See `~/.claude/ace/templates/user-setup.md` for full schema and examples
+See `~/.claude/renn/templates/user-setup.md` for full schema and examples
 
 ---
 
@@ -568,4 +568,4 @@ Task completion ≠ Goal achievement. A task "create chat component" can complet
 5. Gaps found → fix runs created → execute → re-verify
 6. All must_haves pass → stage complete
 
-See `~/.claude/ace/workflows/audit-stage.md` for verification logic.
+See `~/.claude/renn/workflows/audit-stage.md` for verification logic.

@@ -1,6 +1,6 @@
 # Architecture Template
 
-Template for `.ace/codebase/ARCHITECTURE.md` - captures conceptual code organization.
+Template for `.renn/codebase/ARCHITECTURE.md` - captures conceptual code organization.
 
 **Purpose:** Document how the code is organized at a conceptual level. Complements STRUCTURE.md (which shows physical file locations).
 
@@ -124,14 +124,14 @@ Template for `.ace/codebase/ARCHITECTURE.md` - captures conceptual code organiza
 **Command Layer:**
 - Purpose: Parse user input and route to appropriate handler
 - Contains: Command definitions, argument parsing, help text
-- Location: `commands/ace.*.md`
+- Location: `commands/renn.*.md`
 - Depends on: Workflow layer for execution logic
 - Used by: CLI entry point
 
 **Workflow Layer:**
 - Purpose: Multi-step execution procedures
 - Contains: Workflow definitions called by commands
-- Location: `ace/workflows/*.md`
+- Location: `renn/workflows/*.md`
 - Depends on: Agent layer, template layer
 - Used by: Command handlers
 
@@ -144,15 +144,15 @@ Template for `.ace/codebase/ARCHITECTURE.md` - captures conceptual code organiza
 
 **Template Layer:**
 - Purpose: Document structure definitions
-- Contains: File templates for .ace/ state files
-- Location: `ace/templates/*.md`
+- Contains: File templates for .renn/ state files
+- Location: `renn/templates/*.md`
 - Depends on: Nothing (leaf layer)
 - Used by: Commands, agents
 
 **Reference Layer:**
 - Purpose: Core philosophy and guidance documents
 - Contains: Pattern documentation, verification rules
-- Location: `ace/references/*.md`
+- Location: `renn/references/*.md`
 - Depends on: Nothing (leaf layer)
 - Used by: Commands, workflows, agents
 
@@ -160,16 +160,16 @@ Template for `.ace/codebase/ARCHITECTURE.md` - captures conceptual code organiza
 
 **Stage Execution:**
 
-1. User runs: `ace.run-stage`
+1. User runs: `renn.run-stage`
 2. Command loads pulse.md and track.md for context
 3. Command delegates to run-stage workflow
-4. Workflow spawns ace-runner agent via Task tool
+4. Workflow spawns renn-runner agent via Task tool
 5. Agent executes tasks, updates state files
 6. Agent produces recap.md on completion
 7. pulse.md updated with results
 
 **State Management:**
-- File-based: All state lives in `.ace/` directory
+- File-based: All state lives in `.renn/` directory
 - No persistent in-memory state
 - Each command execution is independent
 
@@ -177,17 +177,17 @@ Template for `.ace/codebase/ARCHITECTURE.md` - captures conceptual code organiza
 
 **Command:**
 - Purpose: CLI slash command definition
-- Examples: `commands/ace.run-stage.md`, `commands/ace.plan-stage.md`
+- Examples: `commands/renn.run-stage.md`, `commands/renn.plan-stage.md`
 - Pattern: Thin wrapper delegating to workflows
 
 **Workflow:**
 - Purpose: Reusable multi-step procedure
-- Examples: `ace/workflows/run-stage.md`, `ace/workflows/audit-work.md`
+- Examples: `renn/workflows/run-stage.md`, `renn/workflows/audit-work.md`
 - Pattern: Step-by-step execution with gates
 
 **Agent:**
 - Purpose: Specialized subagent with fresh context
-- Examples: `agents/ace-runner.md`, `agents/ace-architect.md`
+- Examples: `agents/renn-runner.md`, `agents/renn-architect.md`
 - Pattern: Spawned via Task tool with full 200k context
 
 **Template:**
@@ -198,7 +198,7 @@ Template for `.ace/codebase/ARCHITECTURE.md` - captures conceptual code organiza
 ## Entry Points
 
 **Commands:**
-- Location: `commands/ace.*.md`
+- Location: `commands/renn.*.md`
 - Triggers: User invokes slash command
 - Responsibilities: Load context, delegate to workflow, report results
 

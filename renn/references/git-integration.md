@@ -1,5 +1,5 @@
 <overview>
-Git integration for ACE framework.
+Git integration for RENN framework.
 </overview>
 
 <core_principle>
@@ -29,7 +29,7 @@ The git log should read like a changelog of what shipped, not a diary of plannin
 [ -d .git ] && echo "GIT_EXISTS" || echo "NO_GIT"
 ```
 
-If NO_GIT: Run `git init` silently. ACE projects always get their own repo.
+If NO_GIT: Run `git init` silently. RENN projects always get their own repo.
 </git_check>
 
 <commit_formats>
@@ -51,7 +51,7 @@ Stages:
 What to commit:
 
 ```bash
-git add .ace/
+git add .renn/
 git commit
 ```
 
@@ -124,16 +124,16 @@ Tasks completed: [N]/[N]
 - [Task 2 name]
 - [Task 3 name]
 
-RECAP: .ace/stages/XX-name/{stage}.{run}-recap.md
+RECAP: .renn/stages/XX-name/{stage}.{run}-recap.md
 ```
 
 What to commit:
 
 ```bash
-git add .ace/stages/XX-name/{stage}.{run}-run.md
-git add .ace/stages/XX-name/{stage}.{run}-recap.md
-git add .ace/pulse.md
-git add .ace/track.md
+git add .renn/stages/XX-name/{stage}.{run}-run.md
+git add .renn/stages/XX-name/{stage}.{run}-recap.md
+git add .renn/pulse.md
+git add .renn/track.md
 git commit
 ```
 
@@ -154,7 +154,7 @@ Current: [task name]
 What to commit:
 
 ```bash
-git add .ace/
+git add .renn/
 git commit
 ```
 

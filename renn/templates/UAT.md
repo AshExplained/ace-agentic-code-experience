@@ -1,6 +1,6 @@
 # UAT Template
 
-Template for `.ace/stages/XX-name/{stage}-uat.md` — persistent UAT session tracking.
+Template for `.renn/stages/XX-name/{stage}-uat.md` — persistent UAT session tracking.
 
 ---
 
@@ -98,7 +98,7 @@ skipped: [N]
 **Gaps:**
 - APPEND only when issue found (YAML format)
 - After diagnosis: fill `root_cause`, `artifacts`, `missing`, `debug_session`
-- This section feeds directly into /ace.plan-stage --gaps
+- This section feeds directly into /renn.plan-stage --gaps
 
 </section_rules>
 
@@ -112,7 +112,7 @@ skipped: [N]
 4. uat.md Gaps section updated with diagnosis:
    - Each gap gets `root_cause`, `artifacts`, `missing`, `debug_session` filled
 5. status -> "diagnosed"
-6. Ready for /ace.plan-stage --gaps with root causes
+6. Ready for /renn.plan-stage --gaps with root causes
 
 **After diagnosis:**
 ```yaml
@@ -129,14 +129,14 @@ skipped: [N]
       issue: "useEffect missing dependency"
   missing:
     - "Add commentCount to useEffect dependency array"
-  debug_session: ".ace/debug/comment-not-refreshing.md"
+  debug_session: ".renn/debug/comment-not-refreshing.md"
 ```
 
 </diagnosis_lifecycle>
 
 <lifecycle>
 
-**Creation:** When /ace.audit starts new session
+**Creation:** When /renn.audit starts new session
 - Extract tests from recap.md files
 - Set status to "testing"
 - Current Test points to test 1
@@ -242,6 +242,6 @@ skipped: 0
       issue: "useEffect missing dependency"
   missing:
     - "Add commentCount to useEffect dependency array"
-  debug_session: ".ace/debug/comment-not-refreshing.md"
+  debug_session: ".renn/debug/comment-not-refreshing.md"
 ```
 </good_example>

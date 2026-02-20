@@ -1,6 +1,6 @@
 # Architecture Research Template
 
-Template for `.ace/research/architecture.md` — system structure patterns for the project domain.
+Template for `.renn/research/architecture.md` — system structure patterns for the project domain.
 
 ## File Template
 

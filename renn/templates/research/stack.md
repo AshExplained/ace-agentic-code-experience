@@ -1,6 +1,6 @@
 # Stack Research Template
 
-Template for `.ace/research/stack.md` — recommended technologies for the project domain.
+Template for `.renn/research/stack.md` — recommended technologies for the project domain.
 
 ## File Template
 

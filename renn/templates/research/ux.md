@@ -1,6 +1,6 @@
 # UX/DX Research Template
 
-Template for `.ace/research/UX.md` -- UX patterns for UI projects, DX patterns for non-UI projects.
+Template for `.renn/research/UX.md` -- UX patterns for UI projects, DX patterns for non-UI projects.
 
 ## File Template
 

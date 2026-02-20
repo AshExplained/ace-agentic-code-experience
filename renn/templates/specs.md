@@ -1,6 +1,6 @@
 # Specs Template
 
-Template for `.ace/specs.md` — checkable requirements that define "done."
+Template for `.renn/specs.md` — checkable requirements that define "done."
 
 ## File Template
 

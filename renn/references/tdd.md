@@ -50,8 +50,8 @@ Output: [Working, tested feature]
 </objective>
 
 <context>
-@.ace/brief.md
-@.ace/track.md
+@.renn/brief.md
+@.renn/track.md
 @relevant/source/files.ts
 </context>
 

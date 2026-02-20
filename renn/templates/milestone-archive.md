@@ -1,6 +1,6 @@
 # Milestone Archive Template
 
-This template is used by the complete-milestone workflow to create archive files in `.ace/milestones/`.
+This template is used by the complete-milestone workflow to create archive files in `.renn/milestones/`.
 
 ---
 
@@ -89,7 +89,7 @@ Runs:
 
 ---
 
-_For current project status, see .ace/track.md_
+_For current project status, see .renn/track.md_
 
 ---
 
@@ -112,8 +112,8 @@ _For current project status, see .ace/track.md_
 
 **Archive location:**
 
-- Save to `.ace/milestones/{MILESTONE_ID}-track.md`
-- Example: `.ace/milestones/M01-track.md`
+- Save to `.renn/milestones/{MILESTONE_ID}-track.md`
+- Example: `.renn/milestones/M01-track.md`
 
 **After archiving:**
 

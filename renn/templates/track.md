@@ -1,6 +1,6 @@
 # Track Template
 
-Template for `.ace/track.md`.
+Template for `.renn/track.md`.
 
 ## File Template
 

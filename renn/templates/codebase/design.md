@@ -1,8 +1,8 @@
 # Design Patterns Template
 
-Template for `.ace/codebase/DESIGN.md` - captures existing visual design patterns and component inventory.
+Template for `.renn/codebase/DESIGN.md` - captures existing visual design patterns and component inventory.
 
-**Purpose:** Surface the existing visual design system so brownfield projects can translate their patterns into ACE's design workflow rather than starting from scratch.
+**Purpose:** Surface the existing visual design system so brownfield projects can translate their patterns into RENN's design workflow rather than starting from scratch.
 
 ---
 
@@ -332,5 +332,5 @@ Template for `.ace/codebase/DESIGN.md` - captures existing visual design pattern
 - Reviewer calibration (knows what the existing design looks like for comparison)
 
 **How this gets populated:**
-Design mapper agent during `ace.map-codebase` (conditional -- only spawned when 2+ UI indicators detected). The mapper explores CSS/config files, component directories, and theme providers, then writes this document directly to `.ace/codebase/DESIGN.md`.
+Design mapper agent during `ace.map-codebase` (conditional -- only spawned when 2+ UI indicators detected). The mapper explores CSS/config files, component directories, and theme providers, then writes this document directly to `.renn/codebase/DESIGN.md`.
 </guidelines>

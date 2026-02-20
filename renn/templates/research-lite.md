@@ -1,10 +1,10 @@
 # Research Template
 
-Template for `.ace/stages/XX-name/research.md` - shallow research for library/option decisions.
+Template for `.renn/stages/XX-name/research.md` - shallow research for library/option decisions.
 
 **Purpose:** Answer "which library/option should we use" questions during mandatory research in plan-stage.
 
-For deep ecosystem research ("how do experts build this"), use `/ace.research-stage` which produces RESEARCH.md.
+For deep ecosystem research ("how do experts build this"), use `/renn.research-stage` which produces RESEARCH.md.
 
 ---
 
@@ -71,7 +71,7 @@ Before completing research, verify:
 
 
 <output_structure>
-Create `.ace/stages/XX-name/research.md`:
+Create `.renn/stages/XX-name/research.md`:
 
 ```markdown
 # [Topic] Research
@@ -142,5 +142,5 @@ Create `.ace/stages/XX-name/research.md`:
 - Niche/complex domains (3D, games, audio, shaders)
 - Need ecosystem knowledge, not just library choice
 - "How do experts build this" questions
-- Use `/ace.research-stage` for these
+- Use `/renn.research-stage` for these
 </guidelines>

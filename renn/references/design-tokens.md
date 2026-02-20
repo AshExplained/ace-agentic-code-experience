@@ -1,5 +1,5 @@
 <overview>
-Token schema reference for the three-layer W3C DTCG design token system used by ace-designer and ace-design-reviewer agents. Consulted during stylekit creation (full mode), stylekit validation (reviewer), and token-to-CSS generation.
+Token schema reference for the three-layer W3C DTCG design token system used by renn-designer and renn-design-reviewer agents. Consulted during stylekit creation (full mode), stylekit validation (reviewer), and token-to-CSS generation.
 </overview>
 
 ## DTCG $type Reference Table

@@ -1,6 +1,6 @@
 # Security Checklist
 
-Comprehensive security reference for ACE-managed projects. Consumed by ace-auditor (Step 7.6) and ace-integration-checker (Step 4.5) via @-reference.
+Comprehensive security reference for RENN-managed projects. Consumed by renn-auditor (Step 7.6) and renn-integration-checker (Step 4.5) via @-reference.
 
 <overview>
 This checklist contains 41 items organized across 10 groups. Each item includes a severity classification, provenance markers tracing to OWASP/CWE/API standards, vulnerable and secure code examples, and grep-based detection patterns.

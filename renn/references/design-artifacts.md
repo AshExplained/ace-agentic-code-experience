@@ -1,7 +1,7 @@
 # Design Artifacts
 
 <overview>
-Design artifacts are the structured files that define a project's visual system: the component inventory (reusable UI elements) and screen specs (full-page layouts composing those components). This reference is consulted during design agent creation and review. It defines the YAML schemas, state vocabulary, content zone conventions, preview rules, and HTML boilerplate that the ace-designer and ace-design-reviewer agents follow.
+Design artifacts are the structured files that define a project's visual system: the component inventory (reusable UI elements) and screen specs (full-page layouts composing those components). This reference is consulted during design agent creation and review. It defines the YAML schemas, state vocabulary, content zone conventions, preview rules, and HTML boilerplate that the renn-designer and renn-design-reviewer agents follow.
 </overview>
 
 ## Component YAML Schema
@@ -140,7 +140,7 @@ Common device dimensions for the designer to reference. The `ID` column value is
 
 ## Viewport Wrapper Pattern
 
-Screen prototypes constrain their content when a non-desktop viewport exists. The stylekit preview (`stylekit-preview.html`) is ALWAYS full-width regardless of viewport settings. The preview is a documentation artifact, not a screen prototype. Only screen prototypes at `.ace/design/screens/` use viewport wrapping.
+Screen prototypes constrain their content when a non-desktop viewport exists. The stylekit preview (`stylekit-preview.html`) is ALWAYS full-width regardless of viewport settings. The preview is a documentation artifact, not a screen prototype. Only screen prototypes at `.renn/design/screens/` use viewport wrapping.
 
 **Viewport cascade:** Screen prototypes inherit viewport from `stylekit.yaml`. If a screen spec YAML has its own `viewport` field, the screen spec viewport overrides the stylekit viewport for that screen only. Absent viewport in screen spec = inherit from stylekit. Present viewport = complete override (not merge).
 
@@ -308,11 +308,11 @@ All prototype files (component previews and screen prototypes) use this template
 </html>
 ```
 
-**Notes:** The inline `tailwind.config` maps stylekit.yaml token values to Tailwind theme extensions, enabling standard utility classes (bg-primary, text-neutral-900, font-display). The `stylekit.css` link provides CSS custom properties for dark mode overrides and any values not covered by the inline config. Font families in the Google Fonts link match `primitive.typography.family` tokens. No build system -- files open directly in any browser. MUST use Tailwind v3 CDN (`cdn.tailwindcss.com` without version suffix), NOT v4. For screen prototypes at `.ace/design/screens/`, the relative path is `../stylekit.css`. For the stylekit preview at `.ace/design/`, the path is `stylekit.css` (same directory).
+**Notes:** The inline `tailwind.config` maps stylekit.yaml token values to Tailwind theme extensions, enabling standard utility classes (bg-primary, text-neutral-900, font-display). The `stylekit.css` link provides CSS custom properties for dark mode overrides and any values not covered by the inline config. Font families in the Google Fonts link match `primitive.typography.family` tokens. No build system -- files open directly in any browser. MUST use Tailwind v3 CDN (`cdn.tailwindcss.com` without version suffix), NOT v4. For screen prototypes at `.renn/design/screens/`, the relative path is `../stylekit.css`. For the stylekit preview at `.renn/design/`, the path is `stylekit.css` (same directory).
 
 ## Stylekit Preview (Composed Design System View)
 
-The stylekit preview is a single HTML page at `.ace/design/stylekit-preview.html` that presents the entire design system on one page. It is the primary artifact users review during the design approval gate.
+The stylekit preview is a single HTML page at `.renn/design/stylekit-preview.html` that presents the entire design system on one page. It is the primary artifact users review during the design approval gate.
 
 **Generated:** Full mode only (first UI stage). Not generated in screens-only mode.
 **Regenerated:** During revisions in full mode (always reflects current token/component state).
@@ -343,7 +343,7 @@ The 5+2 sections are the floor. The designer may add 1-2 project-specific sectio
 
 | Aspect | Screen Prototypes | Stylekit Preview |
 |--------|-------------------|------------------|
-| Location | `.ace/design/screens/{screen}.html` | `.ace/design/stylekit-preview.html` |
+| Location | `.renn/design/screens/{screen}.html` | `.renn/design/stylekit-preview.html` |
 | CSS path | One level up (`../stylekit.css`) | Same directory (`stylekit.css`) |
 | Content | Page layouts with real content | Token documentation + component gallery |
 | Anti-generic checks | Yes (reviewed for design quality) | No (documentation artifact) |
@@ -380,25 +380,25 @@ For each component, render states side-by-side. Simulate non-interactive states 
 The approval gate lists only these HTML files for user review:
 
 **Full mode:**
-- `.ace/design/stylekit-preview.html` (design system overview)
-- `.ace/design/screens/{screen-name}.html` (screen prototypes -- new and modified only)
+- `.renn/design/stylekit-preview.html` (design system overview)
+- `.renn/design/screens/{screen-name}.html` (screen prototypes -- new and modified only)
 
 **Screens-only mode:**
-- `.ace/design/screens/{screen-name}.html` (screen prototypes -- new and modified only)
+- `.renn/design/screens/{screen-name}.html` (screen prototypes -- new and modified only)
 
-Individual component HTMLs at `.ace/design/components/{name}/{name}.html` exist on disk for agent use but are NOT listed in the approval gate.
+Individual component HTMLs at `.renn/design/components/{name}/{name}.html` exist on disk for agent use but are NOT listed in the approval gate.
 
 ## Implementation Guide Schema
 
 The implementation guide bridges the designer's Tailwind v3 CDN prototypes to the project's actual CSS framework. It is a summary translation document (target: 100-200 lines) that maps design patterns to framework-specific equivalents. The runner consults it alongside HTML prototypes to produce framework-native code that matches the approved visual design.
 
-**File location:** `.ace/design/implementation-guide.md`
+**File location:** `.renn/design/implementation-guide.md`
 
 **Generated:** After Phase 2 design approval, before architect spawn (see `generate_implementation_guide` step in plan-stage). Not generated when `HAS_DESIGN=false`.
 
-**Regenerated:** When design artifacts change after the guide was last generated (timestamp comparison against `.ace/design/screens/*.html`, `stylekit.yaml`, `stylekit.css`).
+**Regenerated:** When design artifacts change after the guide was last generated (timestamp comparison against `.renn/design/screens/*.html`, `stylekit.yaml`, `stylekit.css`).
 
-**Consumed by:** Architect (inlined in planning_context via `IMPLEMENTATION_GUIDE` variable), runner (via `@.ace/design/implementation-guide.md` reference in task context).
+**Consumed by:** Architect (inlined in planning_context via `IMPLEMENTATION_GUIDE` variable), runner (via `@.renn/design/implementation-guide.md` reference in task context).
 
 ### Required Sections
 
@@ -474,7 +474,7 @@ The designer produces pixel-perfect HTML prototypes as the visual source of trut
 
 ### What to Read from Prototypes
 
-When a task references an HTML prototype (`@.ace/design/screens/{screen}.html`), the runner extracts:
+When a task references an HTML prototype (`@.renn/design/screens/{screen}.html`), the runner extracts:
 
 - **Exact spacing relationships** between elements (padding, margin, gap patterns)
 - **Animation and transition details** (timing, easing, what triggers them)

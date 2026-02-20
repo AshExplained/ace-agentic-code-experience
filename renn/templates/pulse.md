@@ -1,6 +1,6 @@
 # Pulse Template
 
-Template for `.ace/pulse.md` — the project's living memory.
+Template for `.renn/pulse.md` — the project's living memory.
 
 ---
 
@@ -11,7 +11,7 @@ Template for `.ace/pulse.md` — the project's living memory.
 
 ## Project Reference
 
-See: .ace/brief.md (updated [date])
+See: .renn/brief.md (updated [date])
 
 **Core value:** [One-liner from brief.md Core Value section]
 **Current focus:** [Current stage name]
@@ -56,7 +56,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-[From .ace/todos/pending/ — ideas captured during sessions]
+[From .renn/todos/pending/ — ideas captured during sessions]
 
 None yet.
 
@@ -145,10 +145,10 @@ Updated after each run completion.
 
 **Decisions:** Reference to brief.md Key Decisions table, plus recent decisions summary for quick access. Full decision log lives in brief.md.
 
-**Pending Todos:** Ideas captured via /ace.add-todo
+**Pending Todos:** Ideas captured via /renn.add-todo
 - Count of pending todos
-- Reference to .ace/todos/pending/
-- Brief list if few, count if many (e.g., "5 pending todos — see /ace.check-todos")
+- Reference to .renn/todos/pending/
+- Brief list if few, count if many (e.g., "5 pending todos — see /renn.check-todos")
 
 **Blockers/Concerns:** From "Next Stage Readiness" sections
 - Issues that affect future work

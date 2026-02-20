@@ -1,7 +1,7 @@
 # Detective Prompt Template
 
 <purpose>
-Template for spawning ace-detective agent. The agent contains all debugging expertise — this template provides problem context only.
+Template for spawning renn-detective agent. The agent contains all debugging expertise — this template provides problem context only.
 </purpose>
 
 ---
@@ -29,7 +29,7 @@ goal: {find_root_cause_only | find_and_fix}
 </mode>
 
 <debug_file>
-Create: .ace/debug/{slug}.md
+Create: .renn/debug/{slug}.md
 </debug_file>
 ```
 
@@ -57,14 +57,14 @@ Create: .ace/debug/{slug}.md
 ```python
 Task(
   prompt=filled_template,
-  subagent_type="ace-detective",
+  subagent_type="renn-detective",
   description="Debug {slug}"
 )
 ```
 
 **From diagnose-issues (UAT):**
 ```python
-Task(prompt=template, subagent_type="ace-detective", description="Debug UAT-001")
+Task(prompt=template, subagent_type="renn-detective", description="Debug UAT-001")
 ```
 
 ---
@@ -79,7 +79,7 @@ Continue debugging {slug}. Evidence is in the debug file.
 </objective>
 
 <prior_state>
-Debug file: @.ace/debug/{slug}.md
+Debug file: @.renn/debug/{slug}.md
 </prior_state>
 
 <checkpoint_response>

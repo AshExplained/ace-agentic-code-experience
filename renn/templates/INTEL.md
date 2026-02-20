@@ -1,14 +1,14 @@
 # Stage Intel Template
 
-Template for `.ace/stages/XX-name/{stage}-intel.md` - captures implementation decisions for a stage.
+Template for `.renn/stages/XX-name/{stage}-intel.md` - captures implementation decisions for a stage.
 
 **Purpose:** Document decisions that downstream agents need. Scout uses this to know WHAT to investigate. Architect uses this to know WHAT choices are locked vs flexible.
 
 **Key principle:** Categories are NOT predefined. They emerge from what was actually discussed for THIS stage. A CLI stage has CLI-relevant sections, a UI stage has UI-relevant sections.
 
 **Downstream consumers:**
-- `ace-stage-scout` — Reads decisions to focus research (e.g., "card layout" → research card component patterns)
-- `ace-architect` — Reads decisions to create specific tasks (e.g., "infinite scroll" → task includes virtualization)
+- `renn-stage-scout` — Reads decisions to focus research (e.g., "card layout" → research card component patterns)
+- `renn-architect` — Reads decisions to create specific tasks (e.g., "infinite scroll" → task includes virtualization)
 
 ---
 
@@ -276,8 +276,8 @@ The output should answer: "What does the scout need to investigate? What choices
 - "Easy to use"
 
 **After creation:**
-- File lives in stage directory: `.ace/stages/XX-name/{stage}-intel.md`
-- `ace-stage-scout` uses decisions to focus investigation
-- `ace-architect` uses decisions + research to create executable tasks
+- File lives in stage directory: `.renn/stages/XX-name/{stage}-intel.md`
+- `renn-stage-scout` uses decisions to focus investigation
+- `renn-architect` uses decisions + research to create executable tasks
 - Downstream agents should NOT need to ask the user again about captured decisions
 </guidelines>
