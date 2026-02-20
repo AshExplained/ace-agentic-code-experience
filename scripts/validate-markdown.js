@@ -134,7 +134,8 @@ function validateCommand(filePath, content) {
     }
   }
 
-  if (fm.name && !/^renn\.[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(fm.name)) {
+  // TRANSITIONAL: Accept both ace.* and renn.* during atomic rename (Run 02-04)
+  if (fm.name && !/^(?:ace|renn)\.[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(fm.name)) {
     errors.push(`${filePath}: Command name "${fm.name}" must match renn.kebab-case`);
   }
 
@@ -159,7 +160,8 @@ function validateAgent(filePath, content) {
     }
   }
 
-  if (fm.name && !/^renn-[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(fm.name)) {
+  // TRANSITIONAL: Accept both ace-* and renn-* during atomic rename (Run 02-04)
+  if (fm.name && !/^(?:ace|renn)-[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(fm.name)) {
     errors.push(`${filePath}: Agent name "${fm.name}" must match renn-kebab`);
   }
 
