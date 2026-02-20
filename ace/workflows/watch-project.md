@@ -46,7 +46,30 @@ Present options via AskUserQuestion:
 rm -f .ace/watch-plan.md .ace/watch-scope.md .ace/watch-research.md
 ```
 
-**If "Add more tools":** Delete watch-plan.md and watch-research.md but PRESERVE watch-scope.md. Update watch-scope.md to set `**Mode:** add-more` (replacing any existing Mode line, or appending if none). Continue to `phase_2_research_plan` (Phase 2 reads the mode flag and does additive research).
+**If "Add more tools":** Before deleting, capture existing monitoring tools from the plan so Phase 2 can exclude them from new research:
+
+```bash
+# Extract tool names from checklist item descriptions
+EXISTING_TOOLS=$(grep -E '^\- \[.\] [0-9]+\.' .ace/watch-plan.md | sed 's/.*\] [0-9]*\. \[\(auto\|gate\)\] //' | head -15)
+```
+
+Append existing tools to watch-scope.md and set Mode:
+
+```bash
+echo "" >> .ace/watch-scope.md
+echo "**Existing tools:**" >> .ace/watch-scope.md
+echo "$EXISTING_TOOLS" >> .ace/watch-scope.md
+```
+
+Update watch-scope.md to set `**Mode:** add-more` (replacing any existing Mode line, or appending if none).
+
+Then delete the old plan and research files (PRESERVE watch-scope.md):
+
+```bash
+rm -f .ace/watch-plan.md .ace/watch-research.md
+```
+
+Continue to `phase_2_research_plan` (Phase 2 reads the Mode flag and Existing tools field for additive research).
 
 **Case 2: `.ace/watch-scope.md` exists but `.ace/watch-plan.md` does NOT**
 
