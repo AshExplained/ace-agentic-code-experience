@@ -7,7 +7,7 @@ RENN gives your AI coding assistant a structured workflow: stages, tasks, state 
 ## Install
 
 ```bash
-npx renn
+npx renn-studio
 ```
 
 The installer walks you through setup — pick global or local install, choose your AI tool (Claude Code, OpenCode, Gemini, or all), and RENN copies the commands, agents, and workflows into the right place.
