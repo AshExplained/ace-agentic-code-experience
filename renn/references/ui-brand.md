@@ -6,7 +6,7 @@ Visual patterns for user-facing RENN output. Orchestrators @-reference this file
 
 - **Name:** RENN (uppercase in prose, lowercase in code/CLI)
 - **Tagline:** "Grow ideas into shipped software"
-- **Symbol:** Lotus (U+1FAB7 with U+2740 fallback)
+- **Symbol:** Cherry Blossom 🌸 (U+1F338)
 - **Philosophy:** From mud to lotus through structured runs
 
 ### Color Palette
@@ -50,30 +50,30 @@ Use for major workflow transitions.
 - `EXECUTING BATCH {N}`
 - `VERIFYING`
 - `STAGE {N} COMPLETE ✓`
-- `MILESTONE COMPLETE 🎉`
+- `🌸 MILESTONE COMPLETE`
 
 ---
 
 ## Gate Boxes
 
-User action required. 62-character width.
+User action required.
 
 ```
-╔══════════════════════════════════════════════════════════════╗
-║  GATE: {Type}                                                ║
-╚══════════════════════════════════════════════════════════════╝
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⚠️  GATE: {Type}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 {Content}
 
-──────────────────────────────────────────────────────────────
+──────────────────────────────────────────────────────
 → {ACTION PROMPT}
-──────────────────────────────────────────────────────────────
+──────────────────────────────────────────────────────
 ```
 
 **Types:**
-- `GATE: Verification Required` → `→ Type "approved" or describe issues`
-- `GATE: Decision Required` → `→ Select: option-a / option-b`
-- `GATE: Action Required` → `→ Type "done" when complete`
+- `⚠️  GATE: Verification Required` → `→ Type "approved" or describe issues`
+- `⚠️  GATE: Decision Required` → `→ Select: option-a / option-b`
+- `⚠️  GATE: Action Required` → `→ Type "done" when complete`
 
 ---
 
@@ -86,7 +86,9 @@ User action required. 62-character width.
 ○  Pending
 ⚡ Auto-approved
 ⚠  Warning
-🎉 Milestone complete (only in banner)
+🌸 Milestone complete (only in banner)
+⚠️  Gate (only in gate banner)
+❌ Error (only in error banner)
 ```
 
 ---
@@ -155,9 +157,9 @@ Always at end of major completions.
 ## Error Box
 
 ```
-╔══════════════════════════════════════════════════════════════╗
-║  ERROR                                                       ║
-╚══════════════════════════════════════════════════════════════╝
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ❌ ERROR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 {Error description}
 
@@ -183,7 +185,8 @@ Always at end of major completions.
 - Varying box/banner widths
 - Mixing banner styles (`===`, `---`, `***`)
 - Skipping `RENN >` prefix in banners
-- Random emoji (`🚀`, `✨`, `💫`)
+- Random emoji (`🚀`, `✨`, `💫`) — only 🌸, ⚠️, ❌ are allowed
+- Using emoji in stage banners other than milestone complete
 - Missing Next Up block after completions
 
 </ui_patterns>
