@@ -19,7 +19,7 @@ Output ONLY the reference content below. Do NOT add:
 <reference>
 # RENN Command Reference
 
-**RENN** (Agentic Code Engine) creates hierarchical project plans optimized for solo agentic development with Claude Code.
+**RENN** creates hierarchical project plans optimized for solo agentic development with Claude Code.
 
 ## Quick Start
 
