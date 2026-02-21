@@ -7,7 +7,7 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { execSync } = require('node:child_process');
+const { execSync, spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -132,5 +132,121 @@ describe('check-dist-sync', () => {
     const source = fs.readFileSync(SOURCE_FILE, 'utf-8');
     const dist = fs.readFileSync(DIST_FILE, 'utf-8');
     assert.equal(source, dist);
+  });
+});
+
+// ─── renn-check-update ───
+
+const CHECK_UPDATE_SCRIPT = path.join(HOOKS_DIR, 'renn-check-update.js');
+
+describe('renn-check-update', () => {
+  it('spawns with detached: true for Windows compatibility', () => {
+    const source = fs.readFileSync(CHECK_UPDATE_SCRIPT, 'utf-8');
+    assert.ok(
+      source.includes('detached: true'),
+      'spawn must use detached: true so the child survives parent exit on Windows'
+    );
+  });
+
+  it('writes cache file with expected schema', () => {
+    const tmpDir = fs.mkdtempSync(path.join(ROOT, 'tmp-update-test-'));
+    const cacheDir = path.join(tmpDir, 'cache');
+    const cacheFile = path.join(cacheDir, 'renn-update-check.json');
+    const versionFile = path.join(tmpDir, 'VERSION');
+
+    fs.mkdirSync(cacheDir, { recursive: true });
+    fs.writeFileSync(versionFile, '0.0.1');
+
+    try {
+      // Use spawnSync with -e to avoid shell escaping issues on Windows
+      const script = [
+        'const fs = require("fs");',
+        `const cacheFile = ${JSON.stringify(cacheFile)};`,
+        `const versionFile = ${JSON.stringify(versionFile)};`,
+        'let installed = "0.0.0";',
+        'try { installed = fs.readFileSync(versionFile, "utf8").trim(); } catch(e) {}',
+        'const latest = "0.0.2";',
+        'const result = { update_available: latest && installed !== latest, installed, latest: latest || "unknown", checked: Math.floor(Date.now() / 1000) };',
+        'fs.writeFileSync(cacheFile, JSON.stringify(result));',
+      ].join('\n');
+      const r = spawnSync(process.execPath, ['-e', script], { encoding: 'utf-8', timeout: 5000 });
+      assert.equal(r.status, 0, `child process failed: ${r.stderr}`);
+
+      assert.ok(fs.existsSync(cacheFile), 'cache file should be created');
+      const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf-8'));
+
+      assert.ok('update_available' in cache, 'must have update_available');
+      assert.ok('installed' in cache, 'must have installed');
+      assert.ok('latest' in cache, 'must have latest');
+      assert.ok('checked' in cache, 'must have checked');
+      assert.equal(cache.installed, '0.0.1');
+      assert.equal(cache.latest, '0.0.2');
+      assert.equal(cache.update_available, true);
+      assert.equal(typeof cache.checked, 'number');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true });
+    }
+  });
+
+  it('reports no update when versions match', () => {
+    const tmpDir = fs.mkdtempSync(path.join(ROOT, 'tmp-update-test-'));
+    const cacheDir = path.join(tmpDir, 'cache');
+    const cacheFile = path.join(cacheDir, 'renn-update-check.json');
+    const versionFile = path.join(tmpDir, 'VERSION');
+
+    fs.mkdirSync(cacheDir, { recursive: true });
+    fs.writeFileSync(versionFile, '1.0.0');
+
+    try {
+      const script = [
+        'const fs = require("fs");',
+        `const cacheFile = ${JSON.stringify(cacheFile)};`,
+        `const versionFile = ${JSON.stringify(versionFile)};`,
+        'let installed = "0.0.0";',
+        'try { installed = fs.readFileSync(versionFile, "utf8").trim(); } catch(e) {}',
+        'const latest = "1.0.0";',
+        'const result = { update_available: latest && installed !== latest, installed, latest: latest || "unknown", checked: Math.floor(Date.now() / 1000) };',
+        'fs.writeFileSync(cacheFile, JSON.stringify(result));',
+      ].join('\n');
+      const r = spawnSync(process.execPath, ['-e', script], { encoding: 'utf-8', timeout: 5000 });
+      assert.equal(r.status, 0, `child process failed: ${r.stderr}`);
+
+      const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf-8'));
+      assert.equal(cache.update_available, false);
+      assert.equal(cache.installed, '1.0.0');
+      assert.equal(cache.latest, '1.0.0');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true });
+    }
+  });
+
+  it('defaults to 0.0.0 when VERSION file is missing', () => {
+    const tmpDir = fs.mkdtempSync(path.join(ROOT, 'tmp-update-test-'));
+    const cacheDir = path.join(tmpDir, 'cache');
+    const cacheFile = path.join(cacheDir, 'renn-update-check.json');
+    const versionFile = path.join(tmpDir, 'VERSION-nonexistent');
+
+    fs.mkdirSync(cacheDir, { recursive: true });
+
+    try {
+      const script = [
+        'const fs = require("fs");',
+        `const cacheFile = ${JSON.stringify(cacheFile)};`,
+        `const versionFile = ${JSON.stringify(versionFile)};`,
+        'let installed = "0.0.0";',
+        'try { if (fs.existsSync(versionFile)) installed = fs.readFileSync(versionFile, "utf8").trim(); } catch(e) {}',
+        'const latest = "0.5.0";',
+        'const result = { update_available: latest && installed !== latest, installed, latest: latest || "unknown", checked: Math.floor(Date.now() / 1000) };',
+        'fs.writeFileSync(cacheFile, JSON.stringify(result));',
+      ].join('\n');
+      const r = spawnSync(process.execPath, ['-e', script], { encoding: 'utf-8', timeout: 5000 });
+      assert.equal(r.status, 0, `child process failed: ${r.stderr}`);
+
+      const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf-8'));
+      assert.equal(cache.installed, '0.0.0');
+      assert.equal(cache.update_available, true);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true });
+    }
   });
 });

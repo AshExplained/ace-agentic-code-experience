@@ -59,6 +59,7 @@ const child = spawn(
 `,
   ],
   {
+    detached: true,
     stdio: 'ignore',
     windowsHide: true,
   }
