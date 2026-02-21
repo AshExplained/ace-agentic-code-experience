@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3](https://github.com/AshExplained/renn/compare/renn-studio-v0.6.2...renn-studio-v0.6.3) (2026-02-21)
+
+
+### Fixed
+
+* add detached flag to check-update spawn for Windows ([0ce4a56](https://github.com/AshExplained/renn/commit/0ce4a563d9a45a6f488a8cd0306c497de13d8739))
+* add detached: true to check-update spawn for Windows compatibility ([1a0865f](https://github.com/AshExplained/renn/commit/1a0865ff09f79d0d2e663002f81c596c2ea7c260))
+
 ## [0.6.2](https://github.com/AshExplained/renn/compare/renn-studio-v0.6.1...renn-studio-v0.6.2) (2026-02-21)
 
 
