@@ -1,6 +1,6 @@
 {
   "name": "renn-studio",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Grow ideas into shipped software",
   "bin": {
     "renn": "bin/install.js"

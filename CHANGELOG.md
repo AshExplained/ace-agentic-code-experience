@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1](https://github.com/AshExplained/renn/compare/renn-studio-v0.6.0...renn-studio-v0.6.1) (2026-02-21)
+
+
+### Fixed
+
+* **47.01:** correct package name in update check hook ([bb88936](https://github.com/AshExplained/renn/commit/bb88936c2b15360c68d6f0b6f424ce26b668f1b4))
+* correct package name in update check hook ([9e9cb3e](https://github.com/AshExplained/renn/commit/9e9cb3e2d8633706ae56bf9f90930bc9d6092b95))
+
 ## [0.6.0](https://github.com/AshExplained/ace-agentic-code-experience/compare/renn-v0.5.1...renn-v0.6.0) (2026-02-20)
 
 
